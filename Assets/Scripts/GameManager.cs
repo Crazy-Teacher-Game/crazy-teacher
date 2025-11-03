@@ -130,6 +130,7 @@ public class GameManager : MonoBehaviour
     }
 
     //TOUT CE QUI EST EN DESSOUS : NE PAS UTILISER - A REFACTORER SUR MON MINI-JEU
+
     public TMP_Text livesText;
 
     void Update()

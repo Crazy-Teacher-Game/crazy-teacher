@@ -10,6 +10,8 @@ public class Slotmachine : MonoBehaviour
     [SerializeField] private WheelFrame wheelFrame1;
     [SerializeField] private WheelFrame wheelFrame2;
     [SerializeField] private WheelFrame wheelFrame3;
+    [SerializeField] float durationSeconds = 5f; //DURÉE DU MINI JEU
+    public GameManager gameManager;
 
     private int level = -1;
     private bool btnDownLastUpdate = false;
@@ -17,7 +19,32 @@ public class Slotmachine : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        gameManager.StartTimer(durationSeconds);
+        gameManager.OnTimerEnded += HandleTimeout;
+        gameManager.OnMinigameWon += AfterWin;
+        gameManager.OnMinigameFailed += AfterFail;
+    }
 
+    public void OnPlayerSucceeded()
+    {
+        gameManager.NotifyWin();
+    }
+
+    // --- LOGIQUE D'ECHEC ---
+    void HandleTimeout()
+    {
+        gameManager.NotifyFail();
+    }
+
+    // --- CE QU'ON VEUT FAIRE À LA FIN D'UN MINI-JEU ---
+    void AfterWin()
+    {
+        gameManager.AddRound();
+    }
+
+    void AfterFail()
+    {
+        gameManager.LoseLife();
     }
 
     // Update is called once per frame
@@ -79,6 +106,7 @@ public class Slotmachine : MonoBehaviour
                 if (pass3)
                 {
                     Debug.Log("You win the jackpot!");
+                    gameManager.NotifyWin();
                     level = 0;
                 }
                 else

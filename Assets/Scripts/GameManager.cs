@@ -30,6 +30,7 @@ public class GameManager : MonoBehaviour
     [Header("Leaderboard")]
     [SerializeField] private int roundsPlayed;
     public int RoundsPlayed { get; private set; }
+    public int currentRound = 0;
 
     [Header("UI")]
     [SerializeField] public TimerUI timerUI;
@@ -62,26 +63,6 @@ public class GameManager : MonoBehaviour
 
     private string currentGame = "";
 
-    // public void getRandomGame()
-    // {
-    //     string[] scenesList = Directory.GetFiles("Assets/Scenes/MiniGames", "*.unity");
-    //     for (int i = 0; i < scenesList.Length; i++)
-    //     {
-    //         scenesList[i] = Path.GetFileNameWithoutExtension(scenesList[i]);
-    //     }
-    //     System.Random rand = new System.Random();
-    //     int index = rand.Next(scenesList.Length);
-    //     if (currentGame == scenesList[index])
-    //     {
-    //         index = (index + 1) % scenesList.Length;
-    //     }
-    //     if (Input.GetButton("P1_B6"))
-    //     {   
-    //         scenesLoader.LoadMiniGame(scenesList[index]);
-    //     }
-    //     currentGame = scenesList[index];
-    // }
-
     void Awake()
     {
         scenesLoader = GetComponent<ScenesLoader>();
@@ -107,6 +88,7 @@ public class GameManager : MonoBehaviour
     public void AddRound()
     {
         RoundsPlayed++;
+        currentRound++;
         //ON POURRA RAJOUTER D'AUTRES ACTIONS AU CHANGEMENT DE ROUND ICI
     }
 
@@ -167,6 +149,7 @@ public class GameManager : MonoBehaviour
         StopTimer();
         OnMinigameWon?.Invoke();
         Debug.Log("[GameManager] Minigame WON");
+        scenesLoader.UnloadMiniGame(currentGame);
     }
 
     public void NotifyFail()
@@ -174,6 +157,7 @@ public class GameManager : MonoBehaviour
         StopTimer();
         OnMinigameFailed?.Invoke();
         Debug.Log("[GameManager] Minigame FAILED");
+        scenesLoader.UnloadMiniGame(currentGame);
     }
 
     void Update()
@@ -182,7 +166,7 @@ public class GameManager : MonoBehaviour
         {
             EnsureSingleAudioListener();
         }
-        
+
         if (Input.GetButtonDown("P1_B6"))
         {
             string nextGame = GetRandomGame(); //ou alors le jeu que vous voulez tester comme ça : nextGame = "SlotMachine";
@@ -196,6 +180,20 @@ public class GameManager : MonoBehaviour
                 scenesLoader.UnloadMiniGame(currentGame);
             }
         }
+
+        // if (currentRound == 0)
+        // {
+        //     string nextGame = GetRandomGame(); //ou alors le jeu que vous voulez tester comme ça : nextGame = "SlotMachine";
+        //     scenesLoader.LoadMiniGame(nextGame);
+        //     currentGame = nextGame;
+        // }
+        // if (currentRound > 0 && lives > 0)
+        // {
+        //     string nextGame = GetRandomGame(); //ou alors le jeu que vous voulez tester comme ça : nextGame = "SlotMachine";
+        //     scenesLoader.LoadMiniGame(nextGame);
+        //     currentGame = nextGame;
+        // }
+        
 
         // Back to menu manager
         if (Input.GetButton("P1_Vertical") ||

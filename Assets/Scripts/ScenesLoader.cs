@@ -13,16 +13,9 @@ public class ScenesLoader : MonoBehaviour
 
     private IEnumerator LoadMiniGameSequence(string sceneName)
     {
-        // Étape 1 : Charger la scène de transition
         yield return StartCoroutine(LoadTransitionSceneCoroutine("LoadingScene"));
-
-        // Étape 2 : Petite pause
         yield return new WaitForSeconds(1f);
-
-        // Étape 3 : Décharger la scène de transition
         yield return StartCoroutine(UnloadTransitionSceneCoroutine("LoadingScene"));
-
-        // Étape 5 : Charger la scène du mini-jeu
         yield return StartCoroutine(LoadMiniGameCoroutine(sceneName));
     }
 

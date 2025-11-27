@@ -59,7 +59,7 @@ public class MiniGame_CalculManager : MonoBehaviour
             if (correctAnswers >= REQUIRED_CORRECT_ANSWERS)
             {
                 Debug.Log("[CalculManager] Win condition reached! Player wins!");
-                GameManager.Instance.NotifySuccess();
+                GameManager.Instance.NotifyWin();
                 return true;
             }
 

@@ -172,6 +172,7 @@ MonoBehaviour:
   wheelFrame1: {fileID: 0}
   wheelFrame2: {fileID: 0}
   wheelFrame3: {fileID: 0}
+  durationSeconds: 5
 --- !u!1 &227408251
 GameObject:
   m_ObjectHideFlags: 0

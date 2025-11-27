@@ -10,6 +10,7 @@ using System.IO;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance { get; private set; }
     [Header("Config Initiale")]
     [SerializeField] public int startingLives = 2;
     [SerializeField] public int difficulty = 1;
@@ -30,6 +31,7 @@ public class GameManager : MonoBehaviour
     [Header("Leaderboard")]
     [SerializeField] private int roundsPlayed;
     public int RoundsPlayed { get; private set; }
+    public int currentRound = 0;
 
     [Header("UI")]
     [SerializeField] public TimerUI timerUI;
@@ -61,29 +63,25 @@ public class GameManager : MonoBehaviour
     //[END] Back to menu manager
 
     private string currentGame = "";
+    public ControlType CurrentControlType { get; private set; }
 
-    // public void getRandomGame()
-    // {
-    //     string[] scenesList = Directory.GetFiles("Assets/Scenes/MiniGames", "*.unity");
-    //     for (int i = 0; i < scenesList.Length; i++)
-    //     {
-    //         scenesList[i] = Path.GetFileNameWithoutExtension(scenesList[i]);
-    //     }
-    //     System.Random rand = new System.Random();
-    //     int index = rand.Next(scenesList.Length);
-    //     if (currentGame == scenesList[index])
-    //     {
-    //         index = (index + 1) % scenesList.Length;
-    //     }
-    //     if (Input.GetButton("P1_B6"))
-    //     {   
-    //         scenesLoader.LoadMiniGame(scenesList[index]);
-    //     }
-    //     currentGame = scenesList[index];
-    // }
+    void Start()
+    {
+        LoadNextMiniGame();
+    }
+
 
     void Awake()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
         scenesLoader = GetComponent<ScenesLoader>();
         Lives = startingLives;
         livesUI?.SetLives(Lives);
@@ -107,6 +105,7 @@ public class GameManager : MonoBehaviour
     public void AddRound()
     {
         RoundsPlayed++;
+        currentRound++;
         //ON POURRA RAJOUTER D'AUTRES ACTIONS AU CHANGEMENT DE ROUND ICI
     }
 
@@ -158,6 +157,16 @@ public class GameManager : MonoBehaviour
         }
         TimerRunning = false;
         OnTimerEnded?.Invoke();
+        if (Lives > 0)
+        {
+            scenesLoader.UnloadMiniGame(currentGame);
+            LoadNextMiniGame();
+        }
+        else
+        {
+            GameOver();
+        }
+
         Debug.Log("[GameManager] Timer ended event fired");
     }
 
@@ -167,6 +176,9 @@ public class GameManager : MonoBehaviour
         StopTimer();
         OnMinigameWon?.Invoke();
         Debug.Log("[GameManager] Minigame WON");
+        scenesLoader.UnloadMiniGame(currentGame);
+        AddRound();
+        LoadNextMiniGame();
     }
 
     public void NotifyFail()
@@ -174,6 +186,31 @@ public class GameManager : MonoBehaviour
         StopTimer();
         OnMinigameFailed?.Invoke();
         Debug.Log("[GameManager] Minigame FAILED");
+        scenesLoader.UnloadMiniGame(currentGame);
+        LoseLife();
+        if (Lives > 0)
+            LoadNextMiniGame();
+        else
+            GameOver();
+    }
+
+    public void SetControlType(ControlType type)
+    {
+        CurrentControlType = type;
+    }
+
+    private void LoadNextMiniGame()
+    {
+        string nextGame = GetRandomGame();
+        scenesLoader.LoadMiniGame(nextGame);
+        currentGame = nextGame;
+        Debug.Log("[GameManager] Loading next mini-game");
+    }
+
+    private void GameOver()
+    {
+        Debug.Log("GAME OVER !");
+        GoBackToMenu();
     }
 
     void Update()
@@ -182,21 +219,6 @@ public class GameManager : MonoBehaviour
         {
             EnsureSingleAudioListener();
         }
-        
-        if (Input.GetButtonDown("P1_B6"))
-        {
-            string nextGame = GetRandomGame(); //ou alors le jeu que vous voulez tester comme ça : nextGame = "SlotMachine";
-            scenesLoader.LoadMiniGame(nextGame);
-            currentGame = nextGame;
-        }
-        if (Input.GetButtonDown("P1_B3"))
-        {
-            if (currentGame != "")
-            {
-                scenesLoader.UnloadMiniGame(currentGame);
-            }
-        }
-
         // Back to menu manager
         if (Input.GetButton("P1_Vertical") ||
             Input.GetButton("P1_Horizontal") ||

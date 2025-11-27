@@ -1343,6 +1343,10 @@ PrefabInstance:
       propertyPath: scoreText
       value: 
       objectReference: {fileID: 758602423}
+    - target: {fileID: 2516263489335548033, guid: 34f379ca9af624b648be302bc52d1702, type: 3}
+      propertyPath: gameManager
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 6081004647945708539, guid: 34f379ca9af624b648be302bc52d1702, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -1421,6 +1425,10 @@ PrefabInstance:
       propertyPath: scoreText
       value: 
       objectReference: {fileID: 758602423}
+    - target: {fileID: 2516263489335548033, guid: 34f379ca9af624b648be302bc52d1702, type: 3}
+      propertyPath: gameManager
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 6081004647945708539, guid: 34f379ca9af624b648be302bc52d1702, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -1619,6 +1627,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f0f06bd061974132815e87d166325e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rotationSpeedDegreesPerSecond: 70
+  localRotationAxis: {x: 0, y: 1, z: 0}
+  durationSeconds: 5
   gameManager: {fileID: 0}
 --- !u!65 &1829854699
 BoxCollider:
@@ -1644,6 +1655,10 @@ PrefabInstance:
       propertyPath: scoreText
       value: 
       objectReference: {fileID: 758602423}
+    - target: {fileID: 2516263489335548033, guid: 34f379ca9af624b648be302bc52d1702, type: 3}
+      propertyPath: gameManager
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 6081004647945708539, guid: 34f379ca9af624b648be302bc52d1702, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -1872,10 +1887,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_SendPointerHoverToParent: 1
-  m_HorizontalAxis: Horizontal
-  m_VerticalAxis: Vertical
-  m_SubmitButton: Submit
-  m_CancelButton: Cancel
+  m_HorizontalAxis: P1_Horizontal
+  m_VerticalAxis: P1_Vertical
+  m_SubmitButton: P1_B1
+  m_CancelButton: P1_B2
   m_InputActionsPerSecond: 10
   m_RepeatDelay: 0.5
   m_ForceModuleActive: 0
@@ -2111,6 +2126,10 @@ PrefabInstance:
       propertyPath: scoreText
       value: 
       objectReference: {fileID: 758602423}
+    - target: {fileID: 2516263489335548033, guid: 34f379ca9af624b648be302bc52d1702, type: 3}
+      propertyPath: gameManager
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 6081004647945708539, guid: 34f379ca9af624b648be302bc52d1702, type: 3}
       propertyPath: m_RootOrder
       value: 3

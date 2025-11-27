@@ -19,8 +19,7 @@ public class TriPommePoire : MonoBehaviour
     private GameObject lastSpawnedFruit;
 
     public float timerDuration = 5f;
-
-    private bool hasFailed = false;
+    
     private bool hasReturnedToCenter = true;
 
     void Start()

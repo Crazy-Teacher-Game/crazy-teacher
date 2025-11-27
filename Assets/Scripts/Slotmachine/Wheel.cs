@@ -23,6 +23,16 @@ public class Wheel : MonoBehaviour
         isSpinning = false;
         //find the object nearest with the Y position nearest to 0 in instantiatedObjects
         //devide spinIndex by two then round to the ciel the value
+        if (numObjects == 0)
+        {
+            Debug.Log("Error: numObjects is 0 in Wheel.Stop()");
+            //Debug element name
+            Debug.Log("Wheel name: " + wheel.name);
+        }
+        if (spaceBetweenObjects == 0f)
+        {
+            Debug.Log("Error: spaceBetweenObjects is 0 in Wheel.Stop()");
+        }
         int nearestIndex = Mathf.RoundToInt(spinIndex / spaceBetweenObjects) % numObjects - offsetMargin - 1;
         if (nearestIndex < 0) nearestIndex += numObjects;
         string nearestObjectName = instantiatedObjects[nearestIndex].name;
@@ -49,6 +59,9 @@ public class Wheel : MonoBehaviour
     void Start()
     {
         instantiatedObjects = new GameObject[slotPrefabs.Length];
+
+        Debug.Log("Initializing wheel with " + slotPrefabs.Length + " slot prefabs.");
+        Debug.Log(instantiatedObjects);
 
         //shuffle the slotPrefabs array
         for (int i = 0; i < slotPrefabs.Length - 1; i++)

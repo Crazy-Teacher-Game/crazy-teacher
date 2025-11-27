@@ -12,7 +12,7 @@ public class Slotmachine : MonoBehaviour
     [SerializeField] private WheelFrame wheelFrame3;
     [SerializeField] float durationSeconds = 5f; //DURÉE DU MINI JEU
 
-    private int level = -1;
+    private int level = 1;
     private bool btnDownLastUpdate = false;
 
     // Start is called before the first frame update

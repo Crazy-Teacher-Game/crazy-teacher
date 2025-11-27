@@ -27,6 +27,12 @@ EditorBuildSettings:
     path: Assets/Scenes/MiniGames/TriPommePoire.unity
     guid: bff8eea4ba85a4a68a1000624b497e10
   - enabled: 1
+    path: Assets/Scenes/MiniGames/PopTheBottle.unity
+    guid: c2772a5b8652f264faf7cf525496479a
+  - enabled: 1
     path: Assets/Scenes/MiniGames/MentalMath.unity
     guid: 6da4c939f7a8f40eab5b8059b51087a2
+  - enabled: 1
+    path: Assets/Scenes/MiniGames/Dice.unity
+    guid: 1c7d3f7d83712497483ff40c33d3b1d0
   m_configObjects: {}

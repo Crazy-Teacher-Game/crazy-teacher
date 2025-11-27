@@ -4,10 +4,6 @@ using UnityEngine;
 
 public class Platform : MonoBehaviour
 {
-    [Header("Rotation")]
-    public float rotationSpeedDegreesPerSecond = 70f;
-    public Vector3 localRotationAxis = Vector3.up;
-    public float durationSeconds = 10f;
     // Start is called before the first frame update
     void Start()
     {
@@ -29,13 +25,4 @@ public class Platform : MonoBehaviour
     // }
 
     // Update is called once per frame
-    void Update()
-    {
-        if (rotationSpeedDegreesPerSecond == 0f)
-        {
-            return;
-        }
-        float deltaDegrees = rotationSpeedDegreesPerSecond * Time.deltaTime;
-        transform.Rotate(localRotationAxis.normalized, deltaDegrees, Space.Self);
-    }
 }

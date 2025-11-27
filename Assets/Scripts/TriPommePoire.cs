@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using TMPro;
+using Random = UnityEngine.Random;
 
 public class TriPommePoire : MonoBehaviour
 {   
@@ -33,12 +35,11 @@ public class TriPommePoire : MonoBehaviour
         Debug.Log(horizontalInput);
 
         fruitsATrouverText.text = "Fruits à trier: " + fruitsATrouver;
-        if (fruitsATrouver > 0)
-        {
             // Si le joystick est revenu au centre, on autorise un nouvel input
             if (Mathf.Abs(horizontalInput) < 0.2f)
             {
                 hasReturnedToCenter = true;
+                Debug.Log("Joystick au centre");
             }
             // Si le joystick est à gauche et qu'on attend un fruit rouge
             else if (horizontalInput < -0.5f && hasReturnedToCenter)
@@ -61,10 +62,11 @@ public class TriPommePoire : MonoBehaviour
                     SpawnRandomFruit(Vector3.right);
                 }
                 hasReturnedToCenter = false;
-            } else if (fruitsATrouver <= 0)
-            {
-                GameManager.Instance.NotifyWin();
             }
+        
+        if (fruitsATrouver <= 0)
+        {
+            GameManager.Instance.NotifyWin();
         }
     }
 

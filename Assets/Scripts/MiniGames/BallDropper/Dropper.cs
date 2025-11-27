@@ -13,10 +13,6 @@ public class Dropper : MonoBehaviour
 
     void Update()
     {
-        if(dropCount >= 5)
-        {
-            return;
-        }
         if(Input.GetKeyDown(KeyCode.DownArrow))
         {
             DropBall();

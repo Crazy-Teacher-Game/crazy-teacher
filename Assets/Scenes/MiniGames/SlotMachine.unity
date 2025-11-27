@@ -173,7 +173,6 @@ MonoBehaviour:
   wheelFrame2: {fileID: 0}
   wheelFrame3: {fileID: 0}
   durationSeconds: 5
-  gameManager: {fileID: 227408255}
 --- !u!1 &227408251
 GameObject:
   m_ObjectHideFlags: 0
@@ -185,7 +184,6 @@ GameObject:
   - component: {fileID: 227408254}
   - component: {fileID: 227408253}
   - component: {fileID: 227408252}
-  - component: {fileID: 227408255}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -259,27 +257,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &227408255
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 227408251}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: af8d1a9c626504e1d998108a204fd418, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  startingLives: 2
-  difficulty: 1
-  lives: 0
-  timerRunning: 0
-  remainingTime: 0
-  duration: 0
-  roundsPlayed: 0
-  timerUI: {fileID: 0}
-  livesUI: {fileID: 0}
 --- !u!1 &406455965
 GameObject:
   m_ObjectHideFlags: 0

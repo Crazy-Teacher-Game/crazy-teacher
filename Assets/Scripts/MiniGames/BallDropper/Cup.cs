@@ -6,13 +6,9 @@ public class Cup : MonoBehaviour
     private static int globalScore = 0;
     public TMP_Text scoreText;
     private bool isWon = false;
-    public GameManager gameManager;
     void Start()
     {
         UpdateScoreUI();
-        gameManager.OnTimerEnded += HandleTimeout;
-        gameManager.OnMinigameWon += AfterWin;
-        gameManager.OnMinigameFailed += AfterFail;
     }
     void OnTriggerEnter(Collider other)
     {
@@ -23,29 +19,31 @@ public class Cup : MonoBehaviour
         }
     }
 
-    public void OnPlayerSucceeded()
-    {
-        gameManager.NotifyWin();
-    }
-    void HandleTimeout()
-    {
-        gameManager.NotifyFail();
-    }
-    void AfterWin()
-    {
-        gameManager.AddRound();
-    }
+    // public void OnPlayerSucceeded()
+    // {
+    //     GameManager.Instance.NotifyWin();
+    // }
+    // void HandleTimeout()
+    // {
+    //     GameManager.Instance.NotifyFail();
+    // }
+    // void AfterWin()
+    // {
+    //     GameManager.Instance.AddRound();
+    // }
 
-    void AfterFail()
-    {
-        gameManager.LoseLife();
-    }
+    // void AfterFail()
+    // {
+    //     GameManager.Instance.LoseLife();
+    // }
 
     void Update()
     {
-        if (globalScore == 4 && !isWon)
+        if (GameManager.Instance == null) return;
+
+        if (globalScore >= 4 && !isWon)
         {
-            gameManager.NotifyWin();
+            GameManager.Instance.NotifyWin();
             isWon = true;
             return;
         }

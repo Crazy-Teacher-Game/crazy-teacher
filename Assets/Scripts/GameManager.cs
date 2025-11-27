@@ -10,6 +10,7 @@ using System.IO;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance { get; private set; }
     [Header("Config Initiale")]
     [SerializeField] public int startingLives = 2;
     [SerializeField] public int difficulty = 1;
@@ -62,9 +63,25 @@ public class GameManager : MonoBehaviour
     //[END] Back to menu manager
 
     private string currentGame = "";
+    public ControlType CurrentControlType { get; private set; }
+
+    void Start()
+    {
+        LoadNextMiniGame();
+    }
+
 
     void Awake()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
         scenesLoader = GetComponent<ScenesLoader>();
         Lives = startingLives;
         livesUI?.SetLives(Lives);
@@ -140,6 +157,16 @@ public class GameManager : MonoBehaviour
         }
         TimerRunning = false;
         OnTimerEnded?.Invoke();
+        if (Lives > 0)
+        {
+            scenesLoader.UnloadMiniGame(currentGame);
+            LoadNextMiniGame();
+        }
+        else
+        {
+            GameOver();
+        }
+
         Debug.Log("[GameManager] Timer ended event fired");
     }
 
@@ -150,6 +177,8 @@ public class GameManager : MonoBehaviour
         OnMinigameWon?.Invoke();
         Debug.Log("[GameManager] Minigame WON");
         scenesLoader.UnloadMiniGame(currentGame);
+        AddRound();
+        LoadNextMiniGame();
     }
 
     public void NotifyFail()
@@ -158,6 +187,30 @@ public class GameManager : MonoBehaviour
         OnMinigameFailed?.Invoke();
         Debug.Log("[GameManager] Minigame FAILED");
         scenesLoader.UnloadMiniGame(currentGame);
+        LoseLife();
+        if (Lives > 0)
+            LoadNextMiniGame();
+        else
+            GameOver();
+    }
+
+    public void SetControlType(ControlType type)
+    {
+        CurrentControlType = type;
+    }
+
+    private void LoadNextMiniGame()
+    {
+        string nextGame = GetRandomGame();
+        scenesLoader.LoadMiniGame(nextGame);
+        currentGame = nextGame;
+        Debug.Log("[GameManager] Loading next mini-game");
+    }
+
+    private void GameOver()
+    {
+        Debug.Log("GAME OVER !");
+        GoBackToMenu();
     }
 
     void Update()
@@ -166,35 +219,6 @@ public class GameManager : MonoBehaviour
         {
             EnsureSingleAudioListener();
         }
-
-        if (Input.GetButtonDown("P1_B6"))
-        {
-            string nextGame = GetRandomGame(); //ou alors le jeu que vous voulez tester comme ça : nextGame = "SlotMachine";
-            scenesLoader.LoadMiniGame(nextGame);
-            currentGame = nextGame;
-        }
-        if (Input.GetButtonDown("P1_B3"))
-        {
-            if (currentGame != "")
-            {
-                scenesLoader.UnloadMiniGame(currentGame);
-            }
-        }
-
-        // if (currentRound == 0)
-        // {
-        //     string nextGame = GetRandomGame(); //ou alors le jeu que vous voulez tester comme ça : nextGame = "SlotMachine";
-        //     scenesLoader.LoadMiniGame(nextGame);
-        //     currentGame = nextGame;
-        // }
-        // if (currentRound > 0 && lives > 0)
-        // {
-        //     string nextGame = GetRandomGame(); //ou alors le jeu que vous voulez tester comme ça : nextGame = "SlotMachine";
-        //     scenesLoader.LoadMiniGame(nextGame);
-        //     currentGame = nextGame;
-        // }
-        
-
         // Back to menu manager
         if (Input.GetButton("P1_Vertical") ||
             Input.GetButton("P1_Horizontal") ||

@@ -7,38 +7,26 @@ public class Platform : MonoBehaviour
     [Header("Rotation")]
     public float rotationSpeedDegreesPerSecond = 70f;
     public Vector3 localRotationAxis = Vector3.up;
-    public GameManager gameManager;
-    public float durationSeconds = 5f;
+    public float durationSeconds = 10f;
     // Start is called before the first frame update
     void Start()
     {
-        gameManager.StartTimer(durationSeconds);
-        gameManager.OnTimerEnded += HandleTimeout;
-        gameManager.OnMinigameWon += AfterWin;
-        gameManager.OnMinigameFailed+= AfterFail;
+        GameManager.Instance.StartTimer(durationSeconds);
     }
 
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.CompareTag("ball"))
-        {
-            gameManager.LoseLife();
-        }
-    }
+    // void HandleTimeout()
+    // {
+    //     GameManager.Instance.NotifyFail();
+    // }
+    // void AfterWin()
+    // {
+    //     GameManager.Instance.AddRound();
+    // }
 
-    void HandleTimeout()
-    {
-        gameManager.NotifyFail();
-    }
-    void AfterWin()
-    {
-        gameManager.AddRound();
-    }
-
-    void AfterFail()
-    {
-        gameManager.LoseLife();
-    }
+    // void AfterFail()
+    // {
+    //     GameManager.Instance.LoseLife();
+    // }
 
     // Update is called once per frame
     void Update()

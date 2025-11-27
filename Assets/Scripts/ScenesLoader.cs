@@ -8,22 +8,26 @@ public class ScenesLoader : MonoBehaviour
 
     public void LoadMiniGame(string sceneName)
     {
-        StartCoroutine(LoadMiniGameSequence(sceneName));
+        ControlType controlType = GameControlsDatabase.GetControlType(sceneName);
+        GameManager.Instance.SetControlType(controlType);
+        StartCoroutine(LoadMiniGameSequence(sceneName, controlType));
     }
 
-    private IEnumerator LoadMiniGameSequence(string sceneName)
+    private IEnumerator LoadMiniGameSequence(string sceneName, ControlType controlType)
     {
-        yield return StartCoroutine(LoadTransitionSceneCoroutine("LoadingScene"));
-        yield return new WaitForSeconds(1f);
+        yield return StartCoroutine(LoadTransitionSceneCoroutine("LoadingScene", controlType));
+        yield return new WaitForSeconds(2f);
         yield return StartCoroutine(UnloadTransitionSceneCoroutine("LoadingScene"));
         yield return StartCoroutine(LoadMiniGameCoroutine(sceneName));
     }
 
-    private IEnumerator LoadTransitionSceneCoroutine(string sceneName)
+
+    private IEnumerator LoadTransitionSceneCoroutine(string sceneName, ControlType type)
     {
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
         while (!asyncLoad.isDone)
             yield return null;
+        // UIManager.Instance.SwitchControls(type);
 
         Scene transitionScene = SceneManager.GetSceneByName(sceneName);
         foreach (GameObject go in transitionScene.GetRootGameObjects())

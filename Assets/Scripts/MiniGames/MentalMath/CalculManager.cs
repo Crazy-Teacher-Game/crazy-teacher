@@ -3,9 +3,11 @@ using UnityEngine;
 public class MiniGame_CalculManager : MonoBehaviour
 {
     [SerializeField] private CalculLogic calculLogic;
-    [SerializeField] private CalculUIManager calculUIManager;  
+    [SerializeField] private CalculUIManager calculUIManager;
 
     private int wrongAttempts;
+    private int correctAnswers;
+    private const int REQUIRED_CORRECT_ANSWERS = 3;
 
     void Start()
     {
@@ -16,6 +18,7 @@ public class MiniGame_CalculManager : MonoBehaviour
         GameManager.Instance.StartTimer(15f);
         Debug.Log("[CalculManager] Timer started for 5s");
         wrongAttempts = 0;
+        correctAnswers = 0;
         GenerateNewCalculation();
     }
 
@@ -46,11 +49,21 @@ public class MiniGame_CalculManager : MonoBehaviour
         }
         
         bool correct = calculLogic.CheckAnswer(index);
-        
+
         if (correct)
         {
-            Debug.Log("[CalculManager] Correct answer selected");
-            // Do not end the minigame on each correct answer; UI will advance to next question
+            correctAnswers++;
+            Debug.Log($"[CalculManager] Correct answer selected. Progress: {correctAnswers}/{REQUIRED_CORRECT_ANSWERS}");
+
+            // Check win condition
+            if (correctAnswers >= REQUIRED_CORRECT_ANSWERS)
+            {
+                Debug.Log("[CalculManager] Win condition reached! Player wins!");
+                GameManager.Instance.NotifyWin();
+                return true;
+            }
+
+            // Generate next calculation if not yet won
             return true;
         }
         

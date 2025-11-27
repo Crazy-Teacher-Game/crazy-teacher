@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class MiniGame_CalculManager : MonoBehaviour
 {
-    [SerializeField] private GameManager gameManager;
     [SerializeField] private CalculLogic calculLogic;
     [SerializeField] private CalculUIManager calculUIManager;  
 
@@ -13,16 +12,16 @@ public class MiniGame_CalculManager : MonoBehaviour
         if (calculLogic == null) calculLogic = FindObjectOfType<CalculLogic>();
         if (calculUIManager == null) calculUIManager = FindObjectOfType<CalculUIManager>();
         
-        gameManager.OnTimerEnded += HandleTimerEnded;
-        gameManager.StartTimer(25f);
-        Debug.Log("[CalculManager] Timer started for 25s");
+        GameManager.Instance.OnTimerEnded += HandleTimerEnded;
+        GameManager.Instance.StartTimer(15f);
+        Debug.Log("[CalculManager] Timer started for 5s");
         wrongAttempts = 0;
         GenerateNewCalculation();
     }
 
     void OnDestroy()
     {
-        gameManager.OnTimerEnded -= HandleTimerEnded;
+        GameManager.Instance.OnTimerEnded -= HandleTimerEnded;
     }
 
     public void GenerateNewCalculation()
@@ -40,7 +39,7 @@ public class MiniGame_CalculManager : MonoBehaviour
     public bool OnAnswerSelected(int index)
     {
         // Check if game is over (no lives left)
-        if (gameManager.Lives <= 0)
+        if (GameManager.Instance.Lives <= 0)
         {
             Debug.Log("[CalculManager] Game over - no lives left, ignoring input");
             return false;
@@ -56,25 +55,22 @@ public class MiniGame_CalculManager : MonoBehaviour
         }
         
         wrongAttempts++;
-        
-            gameManager.LoseLife(); // visually update lives on each wrong answer
-            
-            // Check if game is over after losing a life
-            if (gameManager.Lives <= 0)
-            {
-                Debug.Log("[CalculManager] Game over - no lives left!");
-                gameManager.NotifyFail();
-                return false;
-        }
-        else
+
+        GameManager.Instance.LoseLife(); // visually update lives on each wrong answer
+
+        // Check if game is over after losing a life
+        if (GameManager.Instance.Lives <= 0)
         {
-            Debug.LogError("[CalculManager] gameManager is null - cannot lose life!");
+            Debug.Log("[CalculManager] Game over - no lives left!");
+            GameManager.Instance.NotifyFail();
+            return false;
         }
+
         Debug.Log($"[CalculManager] Wrong answer. Attempts={wrongAttempts}/3");
         if (wrongAttempts >= 3)
         {
             Debug.Log("[CalculManager] Max wrong attempts reached. Ending.");
-            gameManager.NotifyFail();
+            GameManager.Instance.NotifyFail();
             return false;
         }
         return false; 
@@ -83,6 +79,6 @@ public class MiniGame_CalculManager : MonoBehaviour
     private void HandleTimerEnded()
     {
         Debug.Log("[CalculManager] Timer ended → failing minigame");
-        gameManager?.NotifyFail();
+        GameManager.Instance?.NotifyFail();
     }
 }

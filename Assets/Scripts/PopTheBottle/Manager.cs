@@ -49,7 +49,7 @@ public class Manager : MonoBehaviour
             Debug.LogError("[Manager] No GameManager found in the scene!");
         }
 
-        gameManager.StartTimer(120);
+        gameManager.StartTimer(10);
     }
 
     // Update is called once per frame

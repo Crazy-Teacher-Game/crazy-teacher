@@ -2,9 +2,15 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public static class MentalMathBootstrapper
+public class MentalMathBootstrapper : MonoBehaviour
 {
-	private static void EnsureMentalMathHUD()
+	void Awake()
+	{
+		Debug.Log("[MentalMathBootstrapper] Awake called - initializing MentalMath");
+		EnsureMentalMathHUD();
+	}
+
+	private void EnsureMentalMathHUD()
 	{
 		var canvas = Object.FindObjectOfType<Canvas>();
 		if (canvas == null)
@@ -19,8 +25,17 @@ public static class MentalMathBootstrapper
 		var gm = Object.FindObjectOfType<GameManager>();
 		var timerUI = Object.FindObjectOfType<TimerUI>();
 		var livesUI = Object.FindObjectOfType<LivesUI>();
-		
+
 		Debug.Log($"[MentalMathBootstrapper] Scene objects found - GameManager={(gm!=null)}, TimerUI={(timerUI!=null)}, LivesUI={(livesUI!=null)}");
+
+		if (timerUI != null)
+		{
+			Debug.Log($"[MentalMathBootstrapper] TimerUI found on GameObject: {timerUI.gameObject.name}, active: {timerUI.gameObject.activeSelf}");
+		}
+		if (livesUI != null)
+		{
+			Debug.Log($"[MentalMathBootstrapper] LivesUI found on GameObject: {livesUI.gameObject.name}, active: {livesUI.gameObject.activeSelf}");
+		}
 		
 		// If no GameManager exists, create one
 		if (gm == null)
@@ -35,11 +50,39 @@ public static class MentalMathBootstrapper
 		if (gm != null)
 		{
 			Debug.Log($"[MentalMathBootstrapper] GameManager found: {gm.name}, active: {gm.gameObject.activeInHierarchy}");
-			typeof(GameManager).GetField("timerUI", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-				?.SetValue(gm, timerUI);
-			typeof(GameManager).GetField("livesUI", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-				?.SetValue(gm, livesUI);
+
+			// Wire timerUI (public field)
+			var timerUIField = typeof(GameManager).GetField("timerUI", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+			if (timerUIField != null)
+			{
+				timerUIField.SetValue(gm, timerUI);
+				Debug.Log($"[MentalMathBootstrapper] Set timerUI field to {timerUI}");
+			}
+			else
+			{
+				Debug.LogError("[MentalMathBootstrapper] Could not find timerUI field!");
+			}
+
+			// Wire livesUI (private field)
+			var livesUIField = typeof(GameManager).GetField("livesUI", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+			if (livesUIField != null)
+			{
+				livesUIField.SetValue(gm, livesUI);
+				Debug.Log($"[MentalMathBootstrapper] Set livesUI field to {livesUI}");
+			}
+			else
+			{
+				Debug.LogError("[MentalMathBootstrapper] Could not find livesUI field!");
+			}
+
 			Debug.Log($"[MentalMathBootstrapper] Wired GameManager -> TimerUI={(timerUI!=null)}, LivesUI={(livesUI!=null)}");
+
+			// Reinitialize lives display after wiring
+			if (livesUI != null)
+			{
+				livesUI.SetLives(gm.Lives);
+				Debug.Log($"[MentalMathBootstrapper] Initialized LivesUI with {gm.Lives} lives");
+			}
 		}
 
 		// If COMMON_Canvas has specific children for time bar, wire them into TimerUI
@@ -49,18 +92,29 @@ public static class MentalMathBootstrapper
 			var barGO = GameObject.Find("FillBar");
 			var label = labelGO ? labelGO.GetComponent<TextMeshProUGUI>() : null;
 			var bar = barGO ? barGO.GetComponent<Image>() : null;
+
+			Debug.Log($"[MentalMathBootstrapper] Looking for Timer UI elements - TimeLabel found: {(labelGO != null)}, FillBar found: {(barGO != null)}");
+
 			if (label != null && bar != null)
 			{
 				timerUI.SetRefs(label, bar);
 				Debug.Log("[MentalMathBootstrapper] TimerUI refs set from COMMON_Canvas");
 			}
+			else
+			{
+				Debug.LogWarning($"[MentalMathBootstrapper] Could not find Timer UI elements! TimeLabel={(label!=null)}, FillBar={(bar!=null)}");
+			}
+		}
+		else
+		{
+			Debug.LogWarning("[MentalMathBootstrapper] TimerUI component not found in scene!");
 		}
 
 		// Ensure MentalMath components exist and are wired
 		EnsureMentalMath(canvas);
 	}
 
-	private static void EnsureMentalMath(Canvas canvas)
+	private void EnsureMentalMath(Canvas canvas)
 	{
 		var logic = Object.FindObjectOfType<CalculLogic>();
 		var ui = Object.FindObjectOfType<CalculUIManager>();

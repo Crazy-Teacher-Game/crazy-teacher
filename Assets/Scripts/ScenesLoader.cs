@@ -8,29 +8,26 @@ public class ScenesLoader : MonoBehaviour
 
     public void LoadMiniGame(string sceneName)
     {
-        StartCoroutine(LoadMiniGameSequence(sceneName));
+        ControlType controlType = GameControlsDatabase.GetControlType(sceneName);
+        GameManager.Instance.SetControlType(controlType);
+        StartCoroutine(LoadMiniGameSequence(sceneName, controlType));
     }
 
-    private IEnumerator LoadMiniGameSequence(string sceneName)
+    private IEnumerator LoadMiniGameSequence(string sceneName, ControlType controlType)
     {
-        // Étape 1 : Charger la scène de transition
-        yield return StartCoroutine(LoadTransitionSceneCoroutine("LoadingScene"));
-
-        // Étape 2 : Petite pause
-        yield return new WaitForSeconds(1f);
-
-        // Étape 3 : Décharger la scène de transition
+        yield return StartCoroutine(LoadTransitionSceneCoroutine("LoadingScene", controlType));
+        yield return new WaitForSeconds(2f);
         yield return StartCoroutine(UnloadTransitionSceneCoroutine("LoadingScene"));
-
-        // Étape 5 : Charger la scène du mini-jeu
         yield return StartCoroutine(LoadMiniGameCoroutine(sceneName));
     }
 
-    private IEnumerator LoadTransitionSceneCoroutine(string sceneName)
+
+    private IEnumerator LoadTransitionSceneCoroutine(string sceneName, ControlType type)
     {
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
         while (!asyncLoad.isDone)
             yield return null;
+        // UIManager.Instance.SwitchControls(type);
 
         Scene transitionScene = SceneManager.GetSceneByName(sceneName);
         foreach (GameObject go in transitionScene.GetRootGameObjects())
@@ -66,6 +63,23 @@ public class ScenesLoader : MonoBehaviour
                 continue;
             }
             go.transform.SetParent(sceneContainer.transform, false);
+        }
+
+        // Ensure only one EventSystem exists after scene load
+        EnsureSingleEventSystem();
+    }
+
+    private void EnsureSingleEventSystem()
+    {
+        var eventSystems = FindObjectsOfType<UnityEngine.EventSystems.EventSystem>();
+        if (eventSystems.Length > 1)
+        {
+            Debug.LogWarning($"[ScenesLoader] Found {eventSystems.Length} EventSystems! Destroying duplicates...");
+            for (int i = 1; i < eventSystems.Length; i++)
+            {
+                Destroy(eventSystems[i].gameObject);
+                Debug.Log($"[ScenesLoader] Destroyed duplicate EventSystem: {eventSystems[i].name}");
+            }
         }
     }
 

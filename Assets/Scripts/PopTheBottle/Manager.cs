@@ -6,11 +6,13 @@ using UnityEngine.UI;
 public class Manager : MonoBehaviour
 {
     [SerializeField] private GameObject bottleObject;
-    [SerializeField] private Sprite alternateSprite;
+    [SerializeField] private Sprite baseBottle;
+    [SerializeField] private Sprite botteShaken;
+    [SerializeField] private Sprite botteShaken2;
     private RectTransform bottleRectTransform;
 
     private GameManager gameManager;
-    private SpriteRenderer bottleImage;
+    private SpriteRenderer bottleSpriteRenderer;
 
     private float bottleOffsetY = 0f;
     private float initializedBottleY = 0f;
@@ -34,7 +36,11 @@ public class Manager : MonoBehaviour
             initializedBottleY = bottleObject.transform.localPosition.y;
         }
 
-        bottleImage = bottleObject.GetComponent<SpriteRenderer>();
+        bottleSpriteRenderer = bottleObject.GetComponent<SpriteRenderer>();
+        if (bottleSpriteRenderer == null)
+        {
+            Debug.LogError("[Manager] Bottle does not have a SpriteRenderer! Add one to the Bottle GameObject.");
+        }
 
         // Find the GameManager in the scene
         gameManager = FindObjectOfType<GameManager>();
@@ -83,16 +89,21 @@ public class Manager : MonoBehaviour
             if (Input.GetAxis("P1_Vertical") > 0)
             {
                 bottleState = 1;
+                if (bottleSpriteRenderer != null && botteShaken2 != null)
+                    bottleSpriteRenderer.sprite = botteShaken2;
             }
             else
             {
                 bottleState = -1;
-                bottleImage.sprite = alternateSprite;
+                if (bottleSpriteRenderer != null && botteShaken != null)
+                    bottleSpriteRenderer.sprite = botteShaken;
             }
         }
         else
         {
             bottleState = 0;
+            if (bottleSpriteRenderer != null && baseBottle != null)
+                bottleSpriteRenderer.sprite = baseBottle;
         }
 
         bottleOffsetY = bottleState;

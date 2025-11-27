@@ -5,7 +5,7 @@ MonoImporter:
   serializedVersion: 2
   defaultReferences:
   - bottleObject: {instanceID: 0}
-  - alternateSprite: {fileID: 21300000, guid: af55b7f5c4ffa98419ab0342bfe1cc36, type: 3}
+  - alternateSprite: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

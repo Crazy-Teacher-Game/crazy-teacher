@@ -1,8 +1,8 @@
+using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class TriPommePoire : MonoBehaviour
 {   
@@ -32,24 +32,14 @@ public class TriPommePoire : MonoBehaviour
     void Update()
     {
         float horizontalInput = Input.GetAxisRaw("P1_Horizontal");
-        // Gestion du timer et de l'échec
-        if (GameManager.Instance.RemainingTime <= 0f && fruitsATrouver > 0)
-        {
-            Debug.Log("Temps écoulé, fruit manqué");
-            if (hasFailed == false)
-            {
-                GameManager.Instance.LoseLife();
-                hasFailed = true;
-            }
-        }
+        Debug.Log(horizontalInput);
 
         fruitsATrouverText.text = "Fruits à trier: " + fruitsATrouver;
-        if (fruitsATrouver > 0 && GameManager.Instance.RemainingTime > 0f)
-        {
             // Si le joystick est revenu au centre, on autorise un nouvel input
             if (Mathf.Abs(horizontalInput) < 0.2f)
             {
                 hasReturnedToCenter = true;
+                Debug.Log("Joystick au centre");
             }
             // Si le joystick est à gauche et qu'on attend un fruit rouge
             else if (horizontalInput < -0.5f && hasReturnedToCenter)
@@ -73,6 +63,10 @@ public class TriPommePoire : MonoBehaviour
                 }
                 hasReturnedToCenter = false;
             }
+        
+        if (fruitsATrouver <= 0)
+        {
+            GameManager.Instance.NotifyWin();
         }
     }
 

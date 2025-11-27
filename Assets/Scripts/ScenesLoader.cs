@@ -64,6 +64,23 @@ public class ScenesLoader : MonoBehaviour
             }
             go.transform.SetParent(sceneContainer.transform, false);
         }
+
+        // Ensure only one EventSystem exists after scene load
+        EnsureSingleEventSystem();
+    }
+
+    private void EnsureSingleEventSystem()
+    {
+        var eventSystems = FindObjectsOfType<UnityEngine.EventSystems.EventSystem>();
+        if (eventSystems.Length > 1)
+        {
+            Debug.LogWarning($"[ScenesLoader] Found {eventSystems.Length} EventSystems! Destroying duplicates...");
+            for (int i = 1; i < eventSystems.Length; i++)
+            {
+                Destroy(eventSystems[i].gameObject);
+                Debug.Log($"[ScenesLoader] Destroyed duplicate EventSystem: {eventSystems[i].name}");
+            }
+        }
     }
 
     public void UnloadMiniGame(string sceneName)

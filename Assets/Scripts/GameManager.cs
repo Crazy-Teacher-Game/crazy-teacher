@@ -201,7 +201,7 @@ public class GameManager : MonoBehaviour
 
     private void LoadNextMiniGame()
     {
-        string nextGame = "MentalMath";
+        string nextGame = GetRandomGame();
         scenesLoader.LoadMiniGame(nextGame);
         currentGame = nextGame;
         Debug.Log("[GameManager] Loading next mini-game");

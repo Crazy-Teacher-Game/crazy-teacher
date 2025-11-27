@@ -13,8 +13,8 @@ public class MiniGame_CalculManager : MonoBehaviour
         if (calculUIManager == null) calculUIManager = FindObjectOfType<CalculUIManager>();
         
         GameManager.Instance.OnTimerEnded += HandleTimerEnded;
-        GameManager.Instance.StartTimer(25f);
-        Debug.Log("[CalculManager] Timer started for 25s");
+        GameManager.Instance.StartTimer(5f);
+        Debug.Log("[CalculManager] Timer started for 5s");
         wrongAttempts = 0;
         GenerateNewCalculation();
     }
@@ -55,20 +55,17 @@ public class MiniGame_CalculManager : MonoBehaviour
         }
         
         wrongAttempts++;
-        
-            GameManager.Instance.LoseLife(); // visually update lives on each wrong answer
-            
-            // Check if game is over after losing a life
-            if (GameManager.Instance.Lives <= 0)
-            {
-                Debug.Log("[CalculManager] Game over - no lives left!");
-                GameManager.Instance.NotifyFail();
-                return false;
-        }
-        else
+
+        GameManager.Instance.LoseLife(); // visually update lives on each wrong answer
+
+        // Check if game is over after losing a life
+        if (GameManager.Instance.Lives <= 0)
         {
-            Debug.LogError("[CalculManager] gameManager is null - cannot lose life!");
+            Debug.Log("[CalculManager] Game over - no lives left!");
+            GameManager.Instance.NotifyFail();
+            return false;
         }
+
         Debug.Log($"[CalculManager] Wrong answer. Attempts={wrongAttempts}/3");
         if (wrongAttempts >= 3)
         {

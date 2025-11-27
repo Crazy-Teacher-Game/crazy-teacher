@@ -187,7 +187,7 @@ public class GameManager : MonoBehaviour
         {
             string nextGame = GetRandomGame();
             //ou alors le jeu que vous voulez tester comme ça :
-            nextGame = "PopTheBottle";
+            // nextGame = "PopTheBottle";
             scenesLoader.LoadMiniGame(nextGame);
             currentGame = nextGame;
         }

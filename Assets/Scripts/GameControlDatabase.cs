@@ -8,7 +8,8 @@ public static class GameControlsDatabase
             { "BallDropper", ControlType.Joystick },
             { "TriPommePoire", ControlType.Joystick },
             { "SlotMachine", ControlType.Buttons },
-            {"Dice", ControlType.Joystick }
+            {"Dice", ControlType.Joystick },
+            {"MentalMath", ControlType.Buttons }
         };
 
     public static ControlType GetControlType(string sceneName)

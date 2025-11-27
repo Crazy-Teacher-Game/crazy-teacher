@@ -10,6 +10,7 @@ public static class GameControlsDatabase
             { "SlotMachine", ControlType.Buttons },
             {"Dice", ControlType.Joystick },
             {"MentalMath", ControlType.Buttons }
+            {"PopTheBottle", ControlType.Joystick}
         };
 
     public static ControlType GetControlType(string sceneName)

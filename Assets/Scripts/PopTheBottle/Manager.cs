@@ -1,13 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Manager : MonoBehaviour
 {
     [SerializeField] private GameObject bottleObject;
+    [SerializeField] private Sprite alternateSprite;
     private RectTransform bottleRectTransform;
 
     private GameManager gameManager;
+    private SpriteRenderer bottleImage;
 
     private float bottleOffsetY = 0f;
     private float initializedBottleY = 0f;
@@ -30,6 +33,8 @@ public class Manager : MonoBehaviour
         {
             initializedBottleY = bottleObject.transform.localPosition.y;
         }
+
+        bottleImage = bottleObject.GetComponent<SpriteRenderer>();
 
         // Find the GameManager in the scene
         gameManager = FindObjectOfType<GameManager>();
@@ -82,6 +87,7 @@ public class Manager : MonoBehaviour
             else
             {
                 bottleState = -1;
+                bottleImage.sprite = alternateSprite;
             }
         }
         else
@@ -105,7 +111,7 @@ public class Manager : MonoBehaviour
             bottleObject.transform.localPosition = localPosition;
         }
 
-        Debug.Log("Bottle Position: " + bottleObject.transform.position);
+        //Debug.Log("Bottle Position: " + bottleObject.transform.position);
 
         // Update bottle saturation
         //make the difference between last and current state

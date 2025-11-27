@@ -182,10 +182,12 @@ public class GameManager : MonoBehaviour
         {
             EnsureSingleAudioListener();
         }
-        
+
         if (Input.GetButtonDown("P1_B6"))
         {
-            string nextGame = GetRandomGame(); //ou alors le jeu que vous voulez tester comme ça : nextGame = "SlotMachine";
+            string nextGame = GetRandomGame();
+            //ou alors le jeu que vous voulez tester comme ça :
+            nextGame = "PopTheBottle";
             scenesLoader.LoadMiniGame(nextGame);
             currentGame = nextGame;
         }

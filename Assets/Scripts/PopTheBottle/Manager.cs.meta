@@ -3,7 +3,9 @@ guid: 8e09109f3bdc68e429f2491c8fe6e40a
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - bottleObject: {instanceID: 0}
+  - alternateSprite: {fileID: 21300000, guid: af55b7f5c4ffa98419ab0342bfe1cc36, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

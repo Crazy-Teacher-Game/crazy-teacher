@@ -38,6 +38,7 @@ public class Cup : MonoBehaviour
         if (other.gameObject.CompareTag("ball"))
         {
             globalScore++;
+            Destroy(other.gameObject);
             UpdateScoreUI();
         }
     }

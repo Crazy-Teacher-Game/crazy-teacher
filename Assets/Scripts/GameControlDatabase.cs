@@ -9,7 +9,7 @@ public static class GameControlsDatabase
             { "TriPommePoire", ControlType.Joystick },
             { "SlotMachine", ControlType.Buttons },
             {"Dice", ControlType.Joystick },
-            {"MentalMath", ControlType.Buttons }
+            {"MentalMath", ControlType.Buttons },
             {"PopTheBottle", ControlType.Joystick}
         };
 

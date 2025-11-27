@@ -11,6 +11,14 @@ public class Platform : MonoBehaviour
         GameManager.Instance.StartTimer(durationSeconds);
     }
 
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("ball"))
+        {
+            Destroy(other.gameObject);
+        }
+    }
+
     // void HandleTimeout()
     // {
     //     GameManager.Instance.NotifyFail();

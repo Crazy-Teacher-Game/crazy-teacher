@@ -13,7 +13,7 @@ public class MiniGame_CalculManager : MonoBehaviour
         if (calculUIManager == null) calculUIManager = FindObjectOfType<CalculUIManager>();
         
         GameManager.Instance.OnTimerEnded += HandleTimerEnded;
-        GameManager.Instance.StartTimer(5f);
+        GameManager.Instance.StartTimer(15f);
         Debug.Log("[CalculManager] Timer started for 5s");
         wrongAttempts = 0;
         GenerateNewCalculation();

@@ -10,16 +10,24 @@ public class Dropper : MonoBehaviour
     [SerializeField] float x = 0f;
     [SerializeField] float y = -0.5f;
     [SerializeField] float z = 0f;
+    private bool canDrop = true;
 
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.DownArrow))
+        float vertical = Input.GetAxis("P1_Vertical");
+        if (vertical < 0 && canDrop)
         {
             DropBall();
             dropCount++;
             ballCount++;
+            canDrop = false;
+        }
+        if (vertical == 0 )
+        {
+            canDrop = true;
         }
     }
+
     void DropBall()
     {
         Vector3 spawnPos = transform.position + new Vector3(x, y, z);

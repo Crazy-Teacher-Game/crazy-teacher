@@ -24,6 +24,14 @@ public class Cup : MonoBehaviour
             rotationAxis.normalized,
             deltaDegrees
         );
+        if (GameManager.Instance == null) return;
+
+        if (globalScore >= 4 && !isWon)
+        {
+            GameManager.Instance.NotifyWin();
+            isWon = true;
+            return;
+        }
     }
     void OnTriggerEnter(Collider other)
     {
@@ -51,18 +59,6 @@ public class Cup : MonoBehaviour
     // {
     //     GameManager.Instance.LoseLife();
     // }
-
-    void Update()
-    {
-        if (GameManager.Instance == null) return;
-
-        if (globalScore >= 4 && !isWon)
-        {
-            GameManager.Instance.NotifyWin();
-            isWon = true;
-            return;
-        }
-    }
 
     void UpdateScoreUI()
     {

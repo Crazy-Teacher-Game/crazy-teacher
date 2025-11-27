@@ -5,6 +5,7 @@ using UnityEngine;
 public class Platform : MonoBehaviour
 {
     // Start is called before the first frame update
+    public float durationSeconds = 10f;
     void Start()
     {
         GameManager.Instance.StartTimer(durationSeconds);

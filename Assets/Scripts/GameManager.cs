@@ -262,7 +262,16 @@ public class GameManager : MonoBehaviour
 
     private string GetRandomGame()
     {
-        string[] scenesList = Directory.GetFiles("Assets/Scenes/MiniGames", "*.unity");
+        // string[] scenesList = Directory.GetFiles("Assets/Scenes/MiniGames", "*.unity");
+        string[] scenesList =
+        {
+            "BallDropper",
+            "SlotMachine",
+            "PopTheBottle",
+            "MentalMath",
+            "Dice",
+            "TriPommePoire"
+        };
         for (int i = 0; i < scenesList.Length; i++)
         {
             scenesList[i] = Path.GetFileNameWithoutExtension(scenesList[i]);

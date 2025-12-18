@@ -229,6 +229,7 @@ GameObject:
   - component: {fileID: 162265975}
   - component: {fileID: 162265974}
   - component: {fileID: 162265978}
+  - component: {fileID: 162265979}
   m_Layer: 0
   m_Name: cercle_1
   m_TagString: Untagged
@@ -331,6 +332,19 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -1041346445784232805, guid: f596f634448634df6ba33de87c6132ef, type: 3}
+--- !u!65 &162265979
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 162265973}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.0071698185, y: 0.008193021, z: 0.0006162647}
+  m_Center: {x: 0, y: -0.000000007450581, z: -0.005}
 --- !u!1 &278209606
 GameObject:
   m_ObjectHideFlags: 0
@@ -344,6 +358,7 @@ GameObject:
   - component: {fileID: 278209608}
   - component: {fileID: 278209607}
   - component: {fileID: 278209611}
+  - component: {fileID: 278209612}
   m_Layer: 0
   m_Name: cercle_3
   m_TagString: Untagged
@@ -446,6 +461,19 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -4709489829576056030, guid: f596f634448634df6ba33de87c6132ef, type: 3}
+--- !u!65 &278209612
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 278209606}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.0071698185, y: 0.008193021, z: 0.0006162647}
+  m_Center: {x: -0.0011834805, y: -0.00033973454, z: -0.005}
 --- !u!1 &675595423
 GameObject:
   m_ObjectHideFlags: 0
@@ -459,6 +487,7 @@ GameObject:
   - component: {fileID: 675595425}
   - component: {fileID: 675595424}
   - component: {fileID: 675595428}
+  - component: {fileID: 675595429}
   m_Layer: 0
   m_Name: cercle_2
   m_TagString: Untagged
@@ -561,6 +590,19 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 585783646870851896, guid: f596f634448634df6ba33de87c6132ef, type: 3}
+--- !u!65 &675595429
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 675595423}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.0071698185, y: 0.008193021, z: 0.0006162647}
+  m_Center: {x: 0, y: -9.221889e-19, z: -0.005}
 --- !u!1 &758602421
 GameObject:
   m_ObjectHideFlags: 0
@@ -904,6 +946,7 @@ GameObject:
   - component: {fileID: 1668523365}
   - component: {fileID: 1668523364}
   - component: {fileID: 1668523368}
+  - component: {fileID: 1668523369}
   m_Layer: 0
   m_Name: cercle_4
   m_TagString: Untagged
@@ -1006,6 +1049,19 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 287847471289708748, guid: f596f634448634df6ba33de87c6132ef, type: 3}
+--- !u!65 &1668523369
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1668523363}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.0071698185, y: 0.008193021, z: 0.0006162647}
+  m_Center: {x: 0, y: -9.221889e-19, z: -0.005}
 --- !u!1 &1963167294
 GameObject:
   m_ObjectHideFlags: 0

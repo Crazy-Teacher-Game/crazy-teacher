@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7296943114014764128}
   - component: {fileID: 885021401866506852}
   - component: {fileID: 178588122414692608}
+  - component: {fileID: 1832503801748011445}
   m_Layer: 0
   m_Name: DroppingFish
   m_TagString: ball
@@ -109,9 +110,22 @@ MeshCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6911840315201378994}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
-  m_Convex: 1
+  m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4610526760612563749, guid: f596f634448634df6ba33de87c6132ef, type: 3}
+--- !u!135 &1832503801748011445
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6911840315201378994}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.012
+  m_Center: {x: -0.004560278, y: -0.004215069, z: -0.00000035730795}

@@ -82,8 +82,6 @@ public class CalculLogic : MonoBehaviour
             Question = $"{a} {operation} {b} = ?",
             Answers = answers
         };
-
-        Debug.Log($"[CalculLogic] Generated: {data.Question} | Answers: {answers[0]}, {answers[1]}, {answers[2]} | CorrectIndex: {correctAnswerIndex}");
         
         return data;
     }
@@ -91,7 +89,6 @@ public class CalculLogic : MonoBehaviour
     public bool CheckAnswer(int index)
     {
         bool ok = index == correctAnswerIndex;
-        Debug.Log($"[CalculLogic] Validate index {index} => {(ok ? "CORRECT" : "WRONG")} (correctIndex={correctAnswerIndex})");
         return ok;
     }
 }

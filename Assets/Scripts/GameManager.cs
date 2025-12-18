@@ -150,24 +150,13 @@ public class GameManager : MonoBehaviour
         while (RemainingTime > 0f)
         {
             RemainingTime -= Time.deltaTime;
-            if (RemainingTime < 0f) RemainingTime = 0f;
-            timerUI?.UpdateTime(RemainingTime, Duration);
-            OnTimerTick?.Invoke(RemainingTime);
             yield return null;
         }
+
         TimerRunning = false;
         OnTimerEnded?.Invoke();
-        if (Lives > 0)
-        {
-            scenesLoader.UnloadMiniGame(currentGame);
-            LoadNextMiniGame();
-        }
-        else
-        {
-            GameOver();
-        }
 
-        Debug.Log("[GameManager] Timer ended event fired");
+        NotifyFail();
     }
 
     //ACTIONS QUI SE LANCENT QUAND ON GAGNE OU PERD UN MINI-JEU
@@ -189,9 +178,13 @@ public class GameManager : MonoBehaviour
         scenesLoader.UnloadMiniGame(currentGame);
         LoseLife();
         if (Lives > 0)
+        {
             LoadNextMiniGame();
+        }
         else
+        {
             GameOver();
+        }
     }
 
     public void SetControlType(ControlType type)
@@ -209,8 +202,9 @@ public class GameManager : MonoBehaviour
 
     private void GameOver()
     {
+        // scenesLoader.UnloadMiniGame(currentGame);
+        // scenesLoader.LoadGameOverScene();
         Debug.Log("GAME OVER !");
-        GoBackToMenu();
     }
 
     void Update()

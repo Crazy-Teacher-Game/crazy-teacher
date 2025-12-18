@@ -16,7 +16,6 @@ public class MiniGame_CalculManager : MonoBehaviour
         
         GameManager.Instance.OnTimerEnded += HandleTimerEnded;
         GameManager.Instance.StartTimer(15f);
-        Debug.Log("[CalculManager] Timer started for 5s");
         wrongAttempts = 0;
         correctAnswers = 0;
         GenerateNewCalculation();
@@ -31,11 +30,9 @@ public class MiniGame_CalculManager : MonoBehaviour
     {
         if (calculUIManager == null)
         {
-            Debug.LogWarning("[CalculManager] Cannot generate calculation: missing refs");
             return;
         }
         var calcul = calculLogic.GenerateCalculation();
-        Debug.Log($"[CalculManager] New calculation generated -> {calcul.Question} | {string.Join(", ", calcul.Answers)}");
         calculUIManager.DisplayCalculation(calcul);
     }
 
@@ -44,7 +41,6 @@ public class MiniGame_CalculManager : MonoBehaviour
         // Check if game is over (no lives left)
         if (GameManager.Instance.Lives <= 0)
         {
-            Debug.Log("[CalculManager] Game over - no lives left, ignoring input");
             return false;
         }
         
@@ -53,12 +49,10 @@ public class MiniGame_CalculManager : MonoBehaviour
         if (correct)
         {
             correctAnswers++;
-            Debug.Log($"[CalculManager] Correct answer selected. Progress: {correctAnswers}/{REQUIRED_CORRECT_ANSWERS}");
 
             // Check win condition
             if (correctAnswers >= REQUIRED_CORRECT_ANSWERS)
             {
-                Debug.Log("[CalculManager] Win condition reached! Player wins!");
                 GameManager.Instance.NotifyWin();
                 return true;
             }
@@ -74,15 +68,12 @@ public class MiniGame_CalculManager : MonoBehaviour
         // Check if game is over after losing a life
         if (GameManager.Instance.Lives <= 0)
         {
-            Debug.Log("[CalculManager] Game over - no lives left!");
             GameManager.Instance.NotifyFail();
             return false;
         }
 
-        Debug.Log($"[CalculManager] Wrong answer. Attempts={wrongAttempts}/3");
         if (wrongAttempts >= 3)
         {
-            Debug.Log("[CalculManager] Max wrong attempts reached. Ending.");
             GameManager.Instance.NotifyFail();
             return false;
         }
@@ -91,7 +82,6 @@ public class MiniGame_CalculManager : MonoBehaviour
 
     private void HandleTimerEnded()
     {
-        Debug.Log("[CalculManager] Timer ended → failing minigame");
         GameManager.Instance?.NotifyFail();
     }
 }

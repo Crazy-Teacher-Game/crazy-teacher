@@ -50,12 +50,10 @@ public class DiceNumberPrompt : MonoBehaviour
 
         if (gameManager == null)
         {
-            Debug.LogWarning("[DiceNumberPrompt] GameManager not found - running in STANDALONE MODE for testing");
             standaloneMode = true;
         }
         else
         {
-            Debug.Log("[DiceNumberPrompt] GameManager found!");
             // Subscribe to timer end event
             gameManager.OnTimerEnded += OnTimerEnded;
         }
@@ -91,11 +89,6 @@ public class DiceNumberPrompt : MonoBehaviour
         if (!standaloneMode && gameManager != null)
         {
             gameManager.StartTimer(gameDuration);
-            Debug.Log($"[DiceNumberPrompt] Game started with GameManager - Need {targetSuccesses} correct faces in {gameDuration}s");
-        }
-        else
-        {
-            Debug.Log($"[DiceNumberPrompt] Game started in STANDALONE mode - Need {targetSuccesses} correct faces in {gameDuration}s");
         }
     }
 
@@ -104,15 +97,10 @@ public class DiceNumberPrompt : MonoBehaviour
         if (!gameActive) return;
 
         gameActive = false;
-        Debug.Log($"[DiceNumberPrompt] Timer ended - Score: {successCount}/{targetSuccesses}");
 
         if (!standaloneMode && gameManager != null)
         {
             gameManager.NotifyFail();
-        }
-        else
-        {
-            Debug.Log("[DiceNumberPrompt] GAME OVER - Time's up! (Standalone mode)");
         }
     }
 
@@ -138,7 +126,6 @@ public class DiceNumberPrompt : MonoBehaviour
         // Log only when the detected face changes (to avoid spam)
         if (top != lastDetectedFace)
         {
-            Debug.Log($"[DiceNumberPrompt] Detected face changed: {top} (target: {targetFace})");
             lastDetectedFace = top;
         }
 
@@ -146,7 +133,6 @@ public class DiceNumberPrompt : MonoBehaviour
         {
             if (autoNextOnMatch && _pendingNext == null && !hasMatchedCurrentTarget)
             {
-                Debug.Log($"[DiceNumberPrompt] MATCH! Top face {top} == target {targetFace}");
                 hasMatchedCurrentTarget = true;
                 _pendingNext = StartCoroutine(CoNextAfterDelay());
             }
@@ -165,18 +151,12 @@ public class DiceNumberPrompt : MonoBehaviour
     {
         targetFace = Random.Range(1, 7); // 1..6 inclusive
         hasMatchedCurrentTarget = false; // Reset match flag for new target
-        Debug.Log($"[DiceNumberPrompt] Generated new target: {targetFace}");
 
         if (targetText != null)
         {
             targetText.text = targetFace.ToString();
             targetText.enabled = true;
             Canvas.ForceUpdateCanvases();
-            Debug.Log($"[DiceNumberPrompt] Updated UI text to: {targetFace}");
-        }
-        else
-        {
-            Debug.LogWarning("[DiceNumberPrompt] targetText is NULL! Please assign TMP_Text in Inspector.");
         }
     }
 
@@ -187,7 +167,6 @@ public class DiceNumberPrompt : MonoBehaviour
 
         // Increment success count
         successCount++;
-        Debug.Log($"[DiceNumberPrompt] Success! Score: {successCount}/{targetSuccesses}");
 
         // Check if player has won
         if (successCount >= targetSuccesses)
@@ -197,11 +176,6 @@ public class DiceNumberPrompt : MonoBehaviour
             if (!standaloneMode && gameManager != null)
             {
                 gameManager.NotifyWin();
-                Debug.Log("[DiceNumberPrompt] Player won! Notifying GameManager.");
-            }
-            else
-            {
-                Debug.Log("[DiceNumberPrompt] YOU WIN! (Standalone mode)");
             }
         }
         else

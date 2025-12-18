@@ -63,10 +63,7 @@ public class Manager : MonoBehaviour
         // Check for game end
         if (bottleSaturation >= bottleSaturationMax)
         {
-            Debug.Log("Game Over! Bottle is full! You won !!");
-
             gameManager.NotifyWin();
-
             gameEnded = true;
             //logique de victoire
             return;
@@ -74,10 +71,7 @@ public class Manager : MonoBehaviour
 
         if (gameManager.RemainingTime <= 0f)
         {
-            Debug.Log("Game Over! You loose gros nullos...");
-
             gameManager.NotifyFail();
-
             gameEnded = true;
             //logique de victoire
             return;
@@ -131,7 +125,6 @@ public class Manager : MonoBehaviour
         {
             bottleSaturation += Mathf.Abs(bottleState - lastBottleState);
             lastBottleState = bottleState;
-            Debug.Log("Win Percentage: " + winPercentage + "%");
         }
 
         // Calculate win percentage

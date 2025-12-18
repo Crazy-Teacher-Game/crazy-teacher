@@ -9,6 +9,9 @@ public class Platform : MonoBehaviour
     void Start()
     {
         GameManager.Instance.StartTimer(durationSeconds);
+        GameManager.Instance.OnTimerEnded += HandleTimeout;
+        GameManager.Instance.OnMinigameWon   += AfterWin;
+        GameManager.Instance.OnMinigameFailed+= AfterFail;
     }
 
     void OnTriggerEnter(Collider other)
@@ -19,19 +22,19 @@ public class Platform : MonoBehaviour
         }
     }
 
-    // void HandleTimeout()
-    // {
-    //     GameManager.Instance.NotifyFail();
-    // }
-    // void AfterWin()
-    // {
-    //     GameManager.Instance.AddRound();
-    // }
+    void HandleTimeout()
+    {
+        GameManager.Instance.NotifyFail();
+    }
+    void AfterWin()
+    {
+        GameManager.Instance.AddRound();
+    }
 
-    // void AfterFail()
-    // {
-    //     GameManager.Instance.LoseLife();
-    // }
+    void AfterFail()
+    {
+        GameManager.Instance.LoseLife();
+    }
 
     // Update is called once per frame
 }

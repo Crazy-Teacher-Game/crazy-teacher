@@ -43,24 +43,6 @@ public class Cup : MonoBehaviour
         }
     }
 
-    // public void OnPlayerSucceeded()
-    // {
-    //     GameManager.Instance.NotifyWin();
-    // }
-    // void HandleTimeout()
-    // {
-    //     GameManager.Instance.NotifyFail();
-    // }
-    // void AfterWin()
-    // {
-    //     GameManager.Instance.AddRound();
-    // }
-
-    // void AfterFail()
-    // {
-    //     GameManager.Instance.LoseLife();
-    // }
-
     void UpdateScoreUI()
     {
         if (scoreText != null)

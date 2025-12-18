@@ -39,16 +39,12 @@ public class CalculUIManager : MonoBehaviour
             var f = GameObject.Find("FailImage");
             if (f != null) failImage = f.GetComponent<Image>();
         }
-        Debug.Log("[CalculUI] Awake - wired refs: " +
-                  $"Q={(questionText!=null)}, P={(propositionsText!=null)}, S={(successImage!=null)}, F={(failImage!=null)}");
         if (successImage != null) successImage.enabled = false;
         if (failImage != null) failImage.enabled = false;
     }
 
     void Start()
     {
-        Debug.Log("[CalculUI] Start - refs: " +
-                  $"Mgr={(calculManager!=null)}, Q={(questionText!=null)}, P={(propositionsText!=null)}, S={(successImage!=null)}, F={(failImage!=null)}");
     }
 
     public void DisplayCalculation(CalculLogic.CalculationData data)
@@ -63,7 +59,6 @@ public class CalculUIManager : MonoBehaviour
             var a2 = data.Answers.Count > 2 ? data.Answers[2].ToString() : "";
             propositionsText.text = $"1) {a0}     2) {a1}     3) {a2}";
         }
-        Debug.Log($"[CalculUI] Display - Q='{data.Question}' | A='{string.Join(", ", data.Answers)}'");
         if (successImage != null) successImage.enabled = false;
         if (failImage != null) failImage.enabled = false;
         awaitingAnswer = true;
@@ -74,17 +69,14 @@ public class CalculUIManager : MonoBehaviour
         // Gestion des boutons P1_B1 / P1_B2 / P1_B3
         if (Input.GetButtonDown("P1_B1") || Input.GetKeyDown(KeyCode.F))
         {
-            Debug.Log("[CalculUI] Input -> P1_B1 / F");
             CheckAnswer(0);
         }
         if (Input.GetButtonDown("P1_B2") || Input.GetKeyDown(KeyCode.G))
         {
-            Debug.Log("[CalculUI] Input -> P1_B2 / G");
             CheckAnswer(1);
         }
         if (Input.GetButtonDown("P1_B3") || Input.GetKeyDown(KeyCode.H))
         {
-            Debug.Log("[CalculUI] Input -> P1_B3 / H");
             CheckAnswer(2);
         }
     }
@@ -93,7 +85,6 @@ public class CalculUIManager : MonoBehaviour
     {
         if (!awaitingAnswer)
         {
-            Debug.Log("[CalculUI] Input ignored (awaiting next question)");
             return;
         }
         
@@ -103,7 +94,6 @@ public class CalculUIManager : MonoBehaviour
             var gm = FindObjectOfType<GameManager>();
             if (gm != null && gm.Lives <= 0)
             {
-                Debug.Log("[CalculUI] Game over - no lives left, ignoring input");
                 return;
             }
         }
@@ -114,14 +104,12 @@ public class CalculUIManager : MonoBehaviour
             calculManager = FindObjectOfType<MiniGame_CalculManager>();
             if (calculManager == null)
             {
-                Debug.LogError("[CalculUI] Cannot validate: MiniGame_CalculManager not found");
                 return;
             }
         }
         var chosenValue = (currentCalculation.Answers != null && currentCalculation.Answers.Count > index)
             ? currentCalculation.Answers[index]
             : int.MinValue;
-        Debug.Log($"[CalculUI] Validate - pressed index {index} (value={chosenValue}) for '{currentCalculation.Question}'");
         bool correct = calculManager.OnAnswerSelected(index);
         if (successImage != null) successImage.enabled = correct;
         if (failImage != null) failImage.enabled = !correct;

@@ -21,6 +21,27 @@ public class ScenesLoader : MonoBehaviour
         yield return StartCoroutine(LoadMiniGameCoroutine(sceneName));
     }
 
+    public void LoadGameOverScene()
+    {
+        StartCoroutine(LoadGameOverSequence());
+    }
+
+    private IEnumerator LoadGameOverSequence()
+    {
+        foreach (Transform child in sceneContainer.transform)
+        {
+            Destroy(child.gameObject);
+        }
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("GameOverScene", LoadSceneMode.Additive);
+        while (!asyncLoad.isDone)
+            yield return null;
+
+        Scene gameOverScene = SceneManager.GetSceneByName("GameOverScene");
+        foreach (GameObject go in gameOverScene.GetRootGameObjects())
+        {
+            go.transform.SetParent(sceneContainer.transform, false);
+        }
+    }
 
     private IEnumerator LoadTransitionSceneCoroutine(string sceneName, ControlType type)
     {

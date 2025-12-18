@@ -31,14 +31,12 @@ public class TriPommePoire : MonoBehaviour
     void Update()
     {
         float horizontalInput = Input.GetAxisRaw("P1_Horizontal");
-        Debug.Log(horizontalInput);
 
         fruitsATrouverText.text = "Fruits à trier: " + fruitsATrouver;
             // Si le joystick est revenu au centre, on autorise un nouvel input
             if (Mathf.Abs(horizontalInput) < 0.2f)
             {
                 hasReturnedToCenter = true;
-                Debug.Log("Joystick au centre");
             }
             // Si le joystick est à gauche et qu'on attend un fruit rouge
             else if (horizontalInput < -0.5f && hasReturnedToCenter)
@@ -46,7 +44,6 @@ public class TriPommePoire : MonoBehaviour
                 if (currentFruitName == "red")
                 {
                     fruitsATrouver--;
-                    Debug.Log("Fruit correct (gauche)");
                     SpawnRandomFruit(Vector3.left);
                 }
                 hasReturnedToCenter = false;
@@ -57,7 +54,6 @@ public class TriPommePoire : MonoBehaviour
                 if (currentFruitName == "blue")
                 {
                     fruitsATrouver--;
-                    Debug.Log("Fruit correct (droite)");
                     SpawnRandomFruit(Vector3.right);
                 }
                 hasReturnedToCenter = false;

@@ -55,7 +55,6 @@ public class Slotmachine : MonoBehaviour
             wheel2.Stop();
             wheel3.Stop();
 
-            Debug.Log("Press space to start the slot machine!");
             level = 0;
         }
 
@@ -77,11 +76,9 @@ public class Slotmachine : MonoBehaviour
                 if (pass)
                 {
                     level++;
-                    Debug.Log("Level up! Now at level " + level);
                 }
                 else
                 {
-                    Debug.Log("Try again!");
                     level = 0;
                 }
             }
@@ -91,11 +88,9 @@ public class Slotmachine : MonoBehaviour
                 if (pass2)
                 {
                     level++;
-                    Debug.Log("Level up! Now at level " + level);
                 }
                 else
                 {
-                    Debug.Log("Try again!");
                     level = 0;
                 }
             }
@@ -104,13 +99,11 @@ public class Slotmachine : MonoBehaviour
                 bool pass3 = wheel3.Stop();
                 if (pass3)
                 {
-                    Debug.Log("You win the jackpot!");
                     GameManager.Instance.NotifyWin();
                     level = 0;
                 }
                 else
                 {
-                    Debug.Log("Try again!");
                     level = 0;
                 }
             }

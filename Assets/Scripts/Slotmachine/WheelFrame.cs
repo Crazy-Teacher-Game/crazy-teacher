@@ -14,7 +14,6 @@ public class WheelFrame : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log(wheelFrame.name);
         //set color to black with alpha 0.5
         Color color = new Color(0f, 0f, 0f, 0.5f);
         Renderer renderer = wheelFrame.GetComponent<Renderer>();

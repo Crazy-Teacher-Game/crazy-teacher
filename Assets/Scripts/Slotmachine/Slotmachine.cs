@@ -10,7 +10,7 @@ public class Slotmachine : MonoBehaviour
     [SerializeField] private WheelFrame wheelFrame1;
     [SerializeField] private WheelFrame wheelFrame2;
     [SerializeField] private WheelFrame wheelFrame3;
-    [SerializeField] float durationSeconds = 5f; //DURÉE DU MINI JEU
+    [SerializeField] float durationSeconds = 8f;
 
     private int level = 1;
     private bool btnDownLastUpdate = false;
@@ -19,31 +19,6 @@ public class Slotmachine : MonoBehaviour
     void Start()
     {
         GameManager.Instance.StartTimer(durationSeconds);
-        GameManager.Instance.OnTimerEnded += HandleTimeout;
-        GameManager.Instance.OnMinigameWon += AfterWin;
-        GameManager.Instance.OnMinigameFailed += AfterFail;
-    }
-
-    public void OnPlayerSucceeded()
-    {
-        GameManager.Instance.NotifyWin();
-    }
-
-    // --- LOGIQUE D'ECHEC ---
-    void HandleTimeout()
-    {
-        GameManager.Instance.NotifyFail();
-    }
-
-    // --- CE QU'ON VEUT FAIRE À LA FIN D'UN MINI-JEU ---
-    void AfterWin()
-    {
-        GameManager.Instance.AddRound();
-    }
-
-    void AfterFail()
-    {
-        GameManager.Instance.LoseLife();
     }
 
     // Update is called once per frame

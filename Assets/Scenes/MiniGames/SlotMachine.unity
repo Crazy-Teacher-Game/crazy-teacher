@@ -169,10 +169,10 @@ MonoBehaviour:
   wheel1: {fileID: 1597861402}
   wheel2: {fileID: 2114939260}
   wheel3: {fileID: 2015744377}
-  wheelFrame1: {fileID: 0}
-  wheelFrame2: {fileID: 0}
-  wheelFrame3: {fileID: 0}
-  durationSeconds: 5
+  wheelFrame1: {fileID: 1248391192}
+  wheelFrame2: {fileID: 544421603}
+  wheelFrame3: {fileID: 1302114042}
+  durationSeconds: 8
 --- !u!1 &227408251
 GameObject:
   m_ObjectHideFlags: 0

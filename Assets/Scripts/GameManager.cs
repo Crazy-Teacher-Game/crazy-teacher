@@ -174,7 +174,7 @@ public class GameManager : MonoBehaviour
     {
         StopTimer();
         OnMinigameFailed?.Invoke();
-        Debug.Log("[GameManager] Minigame FAILED");
+        Debug.Log("[GameManager] Minigame FAILED, rest of lives: " + Lives);
         scenesLoader.UnloadMiniGame(currentGame);
         LoseLife();
         if (Lives > 0)

@@ -439,4 +439,19 @@ public class GameManager : MonoBehaviour
 
         return activeCount == 1;
     }
+
+    public void RegisterTimerUI(TimerUI ui)
+    {
+        Debug.Log($"[GameManager] RegisterTimerUI called - old timerUI={(timerUI != null)}, new ui={(ui != null)}, ui.InstanceID={ui?.GetInstanceID()}");
+        timerUI = ui;
+        Debug.Log("[GameManager] TimerUI registered successfully");
+    }
+
+    public void RegisterLivesUI(LivesUI ui)
+    {
+        Debug.Log($"[GameManager] RegisterLivesUI called - old livesUI={(livesUI != null)}, new ui={(ui != null)}, ui.InstanceID={ui?.GetInstanceID()}, current Lives={Lives}");
+        livesUI = ui;
+        livesUI.SetLives(Lives);
+        Debug.Log("[GameManager] LivesUI registered successfully");
+    }
 }

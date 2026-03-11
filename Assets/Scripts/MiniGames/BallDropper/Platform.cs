@@ -4,14 +4,12 @@ using UnityEngine;
 
 public class Platform : MonoBehaviour
 {
-    // Start is called before the first frame update
-    public float durationSeconds = 10f;
+    public float durationSeconds = 15f;
     void Start()
     {
         GameManager.Instance.StartTimer(durationSeconds);
         GameManager.Instance.OnTimerEnded += HandleTimeout;
-        GameManager.Instance.OnMinigameWon   += AfterWin;
-        GameManager.Instance.OnMinigameFailed+= AfterFail;
+        GameManager.Instance.OnMinigameWon += AfterWin;
     }
 
     void OnTriggerEnter(Collider other)
@@ -25,16 +23,19 @@ public class Platform : MonoBehaviour
     void HandleTimeout()
     {
         GameManager.Instance.NotifyFail();
+        GameObject[] balls = GameObject.FindGameObjectsWithTag("ball");
+        foreach (GameObject ball in balls)
+        {
+            Destroy(ball);
+        }
     }
     void AfterWin()
     {
         GameManager.Instance.AddRound();
+        GameObject[] balls = GameObject.FindGameObjectsWithTag("ball");
+        foreach (GameObject ball in balls)
+        {
+            Destroy(ball);
+        }
     }
-
-    void AfterFail()
-    {
-        GameManager.Instance.LoseLife();
-    }
-
-    // Update is called once per frame
 }

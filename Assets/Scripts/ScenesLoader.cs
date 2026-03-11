@@ -42,17 +42,28 @@ public class ScenesLoader : MonoBehaviour
         Scene gameOverScene = SceneManager.GetSceneByName("GameOverScene");
         foreach (GameObject go in gameOverScene.GetRootGameObjects())
         {
-            if (go.name == "Main Camera")
+            if (go.name == "EventSystem")
             {
                 Destroy(go);
                 continue;
             }
-            if (go.name == "EventSystem")
+            if (go.name == "Main Camera")
             {
-                DestroyImmediate(go);
+                var cam = go.GetComponent<Camera>();
+                if (cam != null)
+                {
+                    cam.clearFlags = CameraClearFlags.Skybox;
+                    cam.cullingMask = ~(1 << LayerMask.NameToLayer("UI_Global"));
+                    cam.depth = 0;
+                    Debug.Log($"[ScenesLoader] Mini-game camera configured (depth=0, cullingMask excludes UI_Global)");
+                }
+                var al = go.GetComponent<AudioListener>();
+                if (al != null) al.enabled = false;
+
+                go.transform.SetParent(sceneContainer.transform, true);
                 continue;
             }
-            go.transform.SetParent(sceneContainer.transform, false);
+            go.transform.SetParent(sceneContainer.transform, true);
         }
     }
 
@@ -66,17 +77,28 @@ public class ScenesLoader : MonoBehaviour
         Scene transitionScene = SceneManager.GetSceneByName(sceneName);
         foreach (GameObject go in transitionScene.GetRootGameObjects())
         {
-            if (go.name == "Main Camera")
+            if (go.name == "EventSystem")
             {
                 Destroy(go);
                 continue;
             }
-            if (go.name == "EventSystem")
+            if (go.name == "Main Camera")
             {
-                DestroyImmediate(go);
+                var cam = go.GetComponent<Camera>();
+                if (cam != null)
+                {
+                    cam.clearFlags = CameraClearFlags.Skybox;
+                    cam.cullingMask = ~(1 << LayerMask.NameToLayer("UI_Global"));
+                    cam.depth = 0;
+                    Debug.Log($"[ScenesLoader] Mini-game camera configured (depth=0, cullingMask excludes UI_Global)");
+                }
+                var al = go.GetComponent<AudioListener>();
+                if (al != null) al.enabled = false;
+
+                go.transform.SetParent(sceneContainer.transform, true);
                 continue;
             }
-            go.transform.SetParent(sceneContainer.transform, false);
+            go.transform.SetParent(sceneContainer.transform, true);
         }
     }
 
@@ -103,18 +125,28 @@ public class ScenesLoader : MonoBehaviour
         Scene miniScene = SceneManager.GetSceneByName(sceneName);
         foreach (GameObject go in miniScene.GetRootGameObjects())
         {
-            Debug.Log($"[ScenesLoader] Processing root object: {go.name}");
-            if (go.name == "Main Camera")
+            if (go.name == "EventSystem")
             {
                 Destroy(go);
                 continue;
             }
-            if (go.name == "EventSystem")
+            if (go.name == "Main Camera")
             {
-                DestroyImmediate(go);
+                var cam = go.GetComponent<Camera>();
+                if (cam != null)
+                {
+                    cam.clearFlags = CameraClearFlags.Skybox;
+                    cam.cullingMask = ~(1 << LayerMask.NameToLayer("UI_Global"));
+                    cam.depth = 0;
+                    Debug.Log($"[ScenesLoader] Mini-game camera configured (depth=0, cullingMask excludes UI_Global)");
+                }
+                var al = go.GetComponent<AudioListener>();
+                if (al != null) al.enabled = false;
+
+                go.transform.SetParent(sceneContainer.transform, true);
                 continue;
             }
-            go.transform.SetParent(sceneContainer.transform, false);
+            go.transform.SetParent(sceneContainer.transform, true);
         }
         Debug.Log($"[ScenesLoader] LoadMiniGameCoroutine END: {sceneName}");
     }

@@ -72,6 +72,7 @@ public class GameManager : MonoBehaviour
         "PopTheBottle",
         "MentalMath",
         "Dice",
+        "FlashTheCar",
         "TriPommePoire"
     };
     private List<string> _minigamePlaylist;

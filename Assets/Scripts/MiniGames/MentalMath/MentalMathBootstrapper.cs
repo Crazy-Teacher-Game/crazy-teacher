@@ -2,9 +2,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+[DefaultExecutionOrder(-100)]
 public class MentalMathBootstrapper : MonoBehaviour
 {
-	void Awake()
+	void Start()
 	{
 		EnsureMentalMathHUD();
 	}
@@ -18,10 +19,13 @@ public class MentalMathBootstrapper : MonoBehaviour
 		}
 
 		// Wire existing GameManager to existing TimerUI and LivesUI (from COMMON_Canvas)
+		// IMPORTANT: utiliser true pour inclure les objets inactifs (TimerUI peut être caché par Hide())
 		var gm = Object.FindObjectOfType<GameManager>();
-		var timerUI = Object.FindObjectOfType<TimerUI>();
-		var livesUI = Object.FindObjectOfType<LivesUI>();
-		
+		var timerUI = Object.FindObjectOfType<TimerUI>(true);
+		var livesUI = Object.FindObjectOfType<LivesUI>(true);
+
+		Debug.Log($"[MentalMathBootstrapper] Found timerUI={(timerUI != null)}, livesUI={(livesUI != null)}");
+
 		// If no GameManager exists, create one
 		if (gm == null)
 		{
@@ -30,7 +34,7 @@ public class MentalMathBootstrapper : MonoBehaviour
 			Object.DontDestroyOnLoad(gmGO);
 			Debug.Log("[MentalMathBootstrapper] Created GameManager");
 		}
-		
+
 		if (gm != null)
 		{
 			// Wire timerUI (public field)
@@ -51,6 +55,13 @@ public class MentalMathBootstrapper : MonoBehaviour
 			if (livesUI != null)
 			{
 				livesUI.SetLives(gm.Lives);
+			}
+
+			// Réactiver le TimerUI s'il était caché
+			if (timerUI != null && !timerUI.gameObject.activeSelf)
+			{
+				Debug.Log("[MentalMathBootstrapper] TimerUI was inactive, reactivating");
+				timerUI.gameObject.SetActive(true);
 			}
 		}
 
@@ -74,29 +85,42 @@ public class MentalMathBootstrapper : MonoBehaviour
 
 	private void EnsureMentalMath(Canvas canvas)
 	{
-		var logic = Object.FindObjectOfType<CalculLogic>();
-		var ui = Object.FindObjectOfType<CalculUIManager>();
-		var mgr = Object.FindObjectOfType<MiniGame_CalculManager>();
+		// Détruire les anciens composants s'ils existent (ils peuvent avoir des références cassées après un rechargement)
+		var oldLogic = Object.FindObjectOfType<CalculLogic>();
+		var oldUI = Object.FindObjectOfType<CalculUIManager>();
+		var oldMgr = Object.FindObjectOfType<MiniGame_CalculManager>();
 
-		// Ensure gameplay components exist (safe to create these; we only avoid creating HUD)
-		if (logic == null)
+		if (oldLogic != null)
 		{
-			var go = new GameObject("CalculLogic");
-			go.transform.SetParent(canvas.transform, false);
-			logic = go.AddComponent<CalculLogic>();
+			Debug.Log("[MentalMathBootstrapper] Destroying old CalculLogic");
+			Object.Destroy(oldLogic.gameObject);
 		}
-		if (ui == null)
+		if (oldUI != null)
 		{
-			var go = new GameObject("CalculUIManager");
-			go.transform.SetParent(canvas.transform, false);
-			ui = go.AddComponent<CalculUIManager>();
+			Debug.Log("[MentalMathBootstrapper] Destroying old CalculUIManager");
+			Object.Destroy(oldUI.gameObject);
 		}
-		if (mgr == null)
+		if (oldMgr != null)
 		{
-			var go = new GameObject("MiniGame_CalculManager");
-			go.transform.SetParent(canvas.transform, false);
-			mgr = go.AddComponent<MiniGame_CalculManager>();
+			Debug.Log("[MentalMathBootstrapper] Destroying old MiniGame_CalculManager");
+			Object.Destroy(oldMgr.gameObject);
 		}
+
+		// Créer les nouveaux composants sous ce Bootstrapper (qui sera détruit avec la scène)
+		var logicGO = new GameObject("CalculLogic");
+		logicGO.transform.SetParent(transform, false);
+		var logic = logicGO.AddComponent<CalculLogic>();
+		Debug.Log("[MentalMathBootstrapper] Created new CalculLogic");
+
+		var uiGO = new GameObject("CalculUIManager");
+		uiGO.transform.SetParent(transform, false);
+		var ui = uiGO.AddComponent<CalculUIManager>();
+		Debug.Log("[MentalMathBootstrapper] Created new CalculUIManager");
+
+		var mgrGO = new GameObject("MiniGame_CalculManager");
+		mgrGO.transform.SetParent(transform, false);
+		var mgr = mgrGO.AddComponent<MiniGame_CalculManager>();
+		Debug.Log("[MentalMathBootstrapper] Created new MiniGame_CalculManager");
 
 		// Wire UI references by scene object names
 		var calcTextObj = GameObject.Find("calculation-value");

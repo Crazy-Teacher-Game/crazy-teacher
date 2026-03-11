@@ -8,8 +8,16 @@ using System;
 public class TimerUI : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI timeLabel;
-    [SerializeField] private Image fillBar; //Faudra mettre une image en “Filled” radial/horizontal
-    
+    [SerializeField] private Image fillBar; //Faudra mettre une image en "Filled" radial/horizontal
+
+    void Start()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.RegisterTimerUI(this);
+        }
+    }
+
     public void Show(float duration)
     {
         gameObject.SetActive(true);

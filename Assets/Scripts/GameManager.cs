@@ -147,16 +147,19 @@ public class GameManager : MonoBehaviour
 
     IEnumerator CoTimer()
     {
+        Debug.Log($"[GameManager] CoTimer started - Duration={Duration}, timerUI={timerUI != null}");
         while (RemainingTime > 0f)
         {
             RemainingTime -= Time.deltaTime;
+            timerUI?.UpdateTime(RemainingTime, Duration);
+            OnTimerTick?.Invoke(RemainingTime);
             yield return null;
         }
 
+        Debug.Log($"[GameManager] CoTimer ended - invoking OnTimerEnded, subscribers count={(OnTimerEnded != null ? OnTimerEnded.GetInvocationList().Length : 0)}");
         TimerRunning = false;
         OnTimerEnded?.Invoke();
-
-        NotifyFail();
+        Debug.Log($"[GameManager] OnTimerEnded invoked");
     }
 
     //ACTIONS QUI SE LANCENT QUAND ON GAGNE OU PERD UN MINI-JEU
@@ -165,24 +168,27 @@ public class GameManager : MonoBehaviour
         StopTimer();
         OnMinigameWon?.Invoke();
         Debug.Log("[GameManager] Minigame WON");
-        scenesLoader.UnloadMiniGame(currentGame);
         AddRound();
         LoadNextMiniGame();
     }
 
     public void NotifyFail()
     {
+        Debug.Log($"[GameManager] NotifyFail() called - Lives BEFORE LoseLife: {Lives}, currentGame: {currentGame}");
         StopTimer();
         OnMinigameFailed?.Invoke();
         Debug.Log("[GameManager] Minigame FAILED, rest of lives: " + Lives);
-        scenesLoader.UnloadMiniGame(currentGame);
         LoseLife();
+        Debug.Log($"[GameManager] NotifyFail() - Lives AFTER LoseLife: {Lives}");
         if (Lives > 0)
         {
+            Debug.Log($"[GameManager] NotifyFail() - Lives > 0, calling LoadNextMiniGame");
             LoadNextMiniGame();
         }
         else
         {
+            Debug.Log($"[GameManager] NotifyFail() - No lives left, calling GameOver");
+            scenesLoader.UnloadMiniGame(currentGame);
             GameOver();
         }
     }
@@ -195,9 +201,33 @@ public class GameManager : MonoBehaviour
     private void LoadNextMiniGame()
     {
         string nextGame = GetRandomGame();
-        scenesLoader.LoadMiniGame(nextGame);
+        Debug.Log($"[GameManager] Loading next mini-game: {nextGame} (current: {currentGame})");
+
+        if (string.IsNullOrEmpty(currentGame))
+        {
+            scenesLoader.LoadMiniGame(nextGame);
+        }
+        else
+        {
+            scenesLoader.UnloadAndLoadMiniGame(currentGame, nextGame);
+        }
         currentGame = nextGame;
-        Debug.Log("[GameManager] Loading next mini-game");
+    }
+
+    // Méthodes d'enregistrement pour les UI
+    public void RegisterTimerUI(TimerUI ui)
+    {
+        Debug.Log($"[GameManager] RegisterTimerUI called - old timerUI={(timerUI != null)}, new ui={(ui != null)}, ui.InstanceID={ui?.GetInstanceID()}");
+        timerUI = ui;
+        Debug.Log("[GameManager] TimerUI registered successfully");
+    }
+
+    public void RegisterLivesUI(LivesUI ui)
+    {
+        Debug.Log($"[GameManager] RegisterLivesUI called - old livesUI={(livesUI != null)}, new ui={(ui != null)}, ui.InstanceID={ui?.GetInstanceID()}, current Lives={Lives}");
+        livesUI = ui;
+        livesUI.SetLives(Lives);
+        Debug.Log("[GameManager] LivesUI registered successfully");
     }
 
     private void GameOver()
@@ -259,12 +289,12 @@ public class GameManager : MonoBehaviour
         // string[] scenesList = Directory.GetFiles("Assets/Scenes/MiniGames", "*.unity");
         string[] scenesList =
         {
-            "BallDropper",
-            "SlotMachine",
-            "PopTheBottle",
+            // "BallDropper",
+            // "SlotMachine",
+            // "PopTheBottle",
             "MentalMath",
             "Dice",
-            "TriPommePoire"
+            // "TriPommePoire"
         };
         for (int i = 0; i < scenesList.Length; i++)
         {

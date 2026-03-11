@@ -8,6 +8,7 @@ public class CalculUIManager : MonoBehaviour
     [Header("UI")]
     [SerializeField] private TMP_Text questionText; // calculation-value
     [SerializeField] private TMP_Text propositionsText; // proposition-value (single TMP to list 3 choices)
+    [SerializeField] private TMP_Text progressText; // progress-value (ex: "1/3")
     [SerializeField] private Image successImage; // SucessImage
     [SerializeField] private Image failImage;    // FailImage
 
@@ -17,6 +18,7 @@ public class CalculUIManager : MonoBehaviour
 
     void Awake()
     {
+        Debug.Log($"[CalculUIManager] Awake() called - Instance ID: {GetInstanceID()}");
         calculManager = FindObjectOfType<MiniGame_CalculManager>();
         if (questionText == null)
         {
@@ -39,6 +41,11 @@ public class CalculUIManager : MonoBehaviour
             var f = GameObject.Find("FailImage");
             if (f != null) failImage = f.GetComponent<Image>();
         }
+        if (progressText == null)
+        {
+            var pr = GameObject.Find("progress-value");
+            if (pr != null) progressText = pr.GetComponent<TMP_Text>();
+        }
         if (successImage != null) successImage.enabled = false;
         if (failImage != null) failImage.enabled = false;
     }
@@ -59,9 +66,22 @@ public class CalculUIManager : MonoBehaviour
             var a2 = data.Answers.Count > 2 ? data.Answers[2].ToString() : "";
             propositionsText.text = $"1) {a0}     2) {a1}     3) {a2}";
         }
+        UpdateProgressDisplay();
         if (successImage != null) successImage.enabled = false;
         if (failImage != null) failImage.enabled = false;
         awaitingAnswer = true;
+    }
+
+    private void UpdateProgressDisplay()
+    {
+        if (calculManager == null)
+        {
+            calculManager = FindObjectOfType<MiniGame_CalculManager>();
+        }
+        if (progressText != null && calculManager != null)
+        {
+            progressText.text = $"{calculManager.CorrectAnswers}/{calculManager.RequiredCorrectAnswers}";
+        }
     }
 
     void Update()
@@ -127,10 +147,26 @@ public class CalculUIManager : MonoBehaviour
 
     private void Advance()
     {
+        Debug.Log($"[CalculUIManager] Advance() called - this={(this != null)}, calculManager={(calculManager != null)}");
+
+        // Vérifier que le jeu n'est pas en cours de destruction
+        if (this == null || calculManager == null)
+        {
+            Debug.LogWarning("[CalculUIManager] Advance() aborted - object or calculManager is null/destroyed");
+            return;
+        }
+
         if (successImage != null) successImage.enabled = false;
         if (failImage != null) failImage.enabled = false;
         calculManager.GenerateNewCalculation();
         awaitingAnswer = true;
+        Debug.Log("[CalculUIManager] Advance() complete");
+    }
+
+    void OnDestroy()
+    {
+        Debug.Log($"[CalculUIManager] OnDestroy() called - Instance ID: {GetInstanceID()}");
+        CancelInvoke(); // Annuler tous les Invoke en attente pour éviter les appels sur objet détruit
     }
 
 }

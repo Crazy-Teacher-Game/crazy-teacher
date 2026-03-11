@@ -9,21 +9,36 @@ public class MiniGame_CalculManager : MonoBehaviour
     private int correctAnswers;
     private const int REQUIRED_CORRECT_ANSWERS = 3;
 
+    public int CorrectAnswers => correctAnswers;
+    public int RequiredCorrectAnswers => REQUIRED_CORRECT_ANSWERS;
+
     void Start()
     {
+        Debug.Log($"[MiniGame_CalculManager] Start() called - Instance ID: {GetInstanceID()}");
         if (calculLogic == null) calculLogic = FindObjectOfType<CalculLogic>();
         if (calculUIManager == null) calculUIManager = FindObjectOfType<CalculUIManager>();
-        
+
+        Debug.Log($"[MiniGame_CalculManager] Subscribing to OnTimerEnded - GameManager.Instance={(GameManager.Instance != null)}");
         GameManager.Instance.OnTimerEnded += HandleTimerEnded;
         GameManager.Instance.StartTimer(15f);
         wrongAttempts = 0;
         correctAnswers = 0;
         GenerateNewCalculation();
+        Debug.Log($"[MiniGame_CalculManager] Start() complete - calculLogic={(calculLogic != null)}, calculUIManager={(calculUIManager != null)}");
     }
 
     void OnDestroy()
     {
-        GameManager.Instance.OnTimerEnded -= HandleTimerEnded;
+        Debug.Log($"[MiniGame_CalculManager] OnDestroy() called - Instance ID: {GetInstanceID()}");
+        if (GameManager.Instance != null)
+        {
+            Debug.Log($"[MiniGame_CalculManager] Unsubscribing from OnTimerEnded");
+            GameManager.Instance.OnTimerEnded -= HandleTimerEnded;
+        }
+        else
+        {
+            Debug.LogWarning($"[MiniGame_CalculManager] OnDestroy - GameManager.Instance is NULL, cannot unsubscribe!");
+        }
     }
 
     public void GenerateNewCalculation()
@@ -63,15 +78,6 @@ public class MiniGame_CalculManager : MonoBehaviour
         
         wrongAttempts++;
 
-        GameManager.Instance.LoseLife(); // visually update lives on each wrong answer
-
-        // Check if game is over after losing a life
-        if (GameManager.Instance.Lives <= 0)
-        {
-            GameManager.Instance.NotifyFail();
-            return false;
-        }
-
         if (wrongAttempts >= 3)
         {
             GameManager.Instance.NotifyFail();
@@ -82,6 +88,15 @@ public class MiniGame_CalculManager : MonoBehaviour
 
     private void HandleTimerEnded()
     {
-        GameManager.Instance?.NotifyFail();
+        Debug.Log($"[MiniGame_CalculManager] HandleTimerEnded() called - Instance ID: {GetInstanceID()}, this={(this != null)}, gameObject={(gameObject != null)}");
+        if (GameManager.Instance != null)
+        {
+            Debug.Log($"[MiniGame_CalculManager] Calling NotifyFail from HandleTimerEnded");
+            GameManager.Instance.NotifyFail();
+        }
+        else
+        {
+            Debug.LogWarning($"[MiniGame_CalculManager] HandleTimerEnded - GameManager.Instance is NULL!");
+        }
     }
 }

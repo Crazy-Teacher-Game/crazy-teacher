@@ -10,6 +10,14 @@ public class LivesUI : MonoBehaviour
     [SerializeField] private Image[] hearts; //2 ou + images de coeurs ou autre à assigner dans l'inspecteur
     private int lastShown = -1;
 
+    void Start()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.RegisterLivesUI(this);
+        }
+    }
+
     public void SetLives(int lives)
     {
         if (hearts == null) return;

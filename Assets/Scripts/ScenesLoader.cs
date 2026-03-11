@@ -8,6 +8,7 @@ public class ScenesLoader : MonoBehaviour
 
     public void LoadMiniGame(string sceneName)
     {
+        Debug.Log($"[ScenesLoader] LoadMiniGame called: {sceneName}");
         ControlType controlType = GameControlsDatabase.GetControlType(sceneName);
         GameManager.Instance.SetControlType(controlType);
         StartCoroutine(LoadMiniGameSequence(sceneName, controlType));
@@ -15,10 +16,12 @@ public class ScenesLoader : MonoBehaviour
 
     private IEnumerator LoadMiniGameSequence(string sceneName, ControlType controlType)
     {
+        Debug.Log($"[ScenesLoader] LoadMiniGameSequence START: {sceneName}");
         yield return StartCoroutine(LoadTransitionSceneCoroutine("LoadingScene", controlType));
         yield return new WaitForSeconds(2f);
         yield return StartCoroutine(UnloadTransitionSceneCoroutine("LoadingScene"));
         yield return StartCoroutine(LoadMiniGameCoroutine(sceneName));
+        Debug.Log($"[ScenesLoader] LoadMiniGameSequence END: {sceneName}");
     }
 
     public void LoadGameOverScene()
@@ -39,6 +42,16 @@ public class ScenesLoader : MonoBehaviour
         Scene gameOverScene = SceneManager.GetSceneByName("GameOverScene");
         foreach (GameObject go in gameOverScene.GetRootGameObjects())
         {
+            if (go.name == "Main Camera")
+            {
+                Destroy(go);
+                continue;
+            }
+            if (go.name == "EventSystem")
+            {
+                DestroyImmediate(go);
+                continue;
+            }
             go.transform.SetParent(sceneContainer.transform, false);
         }
     }
@@ -53,6 +66,16 @@ public class ScenesLoader : MonoBehaviour
         Scene transitionScene = SceneManager.GetSceneByName(sceneName);
         foreach (GameObject go in transitionScene.GetRootGameObjects())
         {
+            if (go.name == "Main Camera")
+            {
+                Destroy(go);
+                continue;
+            }
+            if (go.name == "EventSystem")
+            {
+                DestroyImmediate(go);
+                continue;
+            }
             go.transform.SetParent(sceneContainer.transform, false);
         }
     }
@@ -71,23 +94,29 @@ public class ScenesLoader : MonoBehaviour
 
     private IEnumerator LoadMiniGameCoroutine(string sceneName)
     {
+        Debug.Log($"[ScenesLoader] LoadMiniGameCoroutine START: {sceneName}");
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
         while (!asyncLoad.isDone)
             yield return null;
 
+        Debug.Log($"[ScenesLoader] Scene {sceneName} loaded, reparenting objects...");
         Scene miniScene = SceneManager.GetSceneByName(sceneName);
         foreach (GameObject go in miniScene.GetRootGameObjects())
         {
-            if (go.name == "Main Camera" || go.name == "EventSystem")
+            Debug.Log($"[ScenesLoader] Processing root object: {go.name}");
+            if (go.name == "Main Camera")
             {
                 Destroy(go);
                 continue;
             }
+            if (go.name == "EventSystem")
+            {
+                DestroyImmediate(go);
+                continue;
+            }
             go.transform.SetParent(sceneContainer.transform, false);
         }
-
-        // Ensure only one EventSystem exists after scene load
-        EnsureSingleEventSystem();
+        Debug.Log($"[ScenesLoader] LoadMiniGameCoroutine END: {sceneName}");
     }
 
     private void EnsureSingleEventSystem()
@@ -106,10 +135,69 @@ public class ScenesLoader : MonoBehaviour
 
     public void UnloadMiniGame(string sceneName)
     {
-        SceneManager.UnloadSceneAsync(sceneName);
+        StartCoroutine(UnloadMiniGameCoroutine(sceneName));
+    }
+
+    private IEnumerator UnloadMiniGameCoroutine(string sceneName)
+    {
+        // Destroy children first
         foreach (Transform child in sceneContainer.transform)
         {
             Destroy(child.gameObject);
         }
+
+        // Wait for destruction to complete
+        yield return null;
+
+        // Then unload scene
+        var asyncUnload = SceneManager.UnloadSceneAsync(sceneName);
+        if (asyncUnload != null)
+        {
+            while (!asyncUnload.isDone)
+                yield return null;
+        }
+    }
+
+    public void UnloadAndLoadMiniGame(string unloadScene, string loadScene)
+    {
+        Debug.Log($"[ScenesLoader] UnloadAndLoadMiniGame called: unload={unloadScene}, load={loadScene}");
+        StartCoroutine(UnloadAndLoadSequence(unloadScene, loadScene));
+    }
+
+    private IEnumerator UnloadAndLoadSequence(string unloadScene, string loadScene)
+    {
+        Debug.Log($"[ScenesLoader] UnloadAndLoadSequence START: unload={unloadScene}, load={loadScene}");
+
+        // First, fully unload the current scene
+        int childCount = sceneContainer.transform.childCount;
+        Debug.Log($"[ScenesLoader] Destroying {childCount} children in sceneContainer");
+        foreach (Transform child in sceneContainer.transform)
+        {
+            Debug.Log($"[ScenesLoader] Destroying child: {child.name}");
+            Destroy(child.gameObject);
+        }
+
+        // Wait for destruction to complete
+        yield return null;
+        Debug.Log($"[ScenesLoader] Children destroyed, now unloading scene: {unloadScene}");
+
+        var asyncUnload = SceneManager.UnloadSceneAsync(unloadScene);
+        if (asyncUnload != null)
+        {
+            while (!asyncUnload.isDone)
+                yield return null;
+            Debug.Log($"[ScenesLoader] Scene {unloadScene} unloaded successfully");
+        }
+        else
+        {
+            Debug.LogWarning($"[ScenesLoader] Could not unload scene: {unloadScene} (asyncUnload is null)");
+        }
+
+        // Now load the new scene
+        Debug.Log($"[ScenesLoader] Now loading new scene: {loadScene}");
+        ControlType controlType = GameControlsDatabase.GetControlType(loadScene);
+        GameManager.Instance.SetControlType(controlType);
+        yield return StartCoroutine(LoadMiniGameSequence(loadScene, controlType));
+        Debug.Log($"[ScenesLoader] UnloadAndLoadSequence END");
     }
 }

@@ -7,6 +7,7 @@ public class DiceNumberPrompt : MonoBehaviour
     [Header("Refs")]
     [SerializeField] private MainDice mainDice; // Assign the MainDice in the scene
     [SerializeField] private TMP_Text targetText; // Assign your TMP Text
+    [SerializeField] private TMP_Text progressText; // Affiche "X/5" pour la progression
     private GameManager gameManager;
 
     [Header("Behavior")]
@@ -30,6 +31,13 @@ public class DiceNumberPrompt : MonoBehaviour
         if (mainDice == null)
         {
             mainDice = FindObjectOfType<MainDice>();
+        }
+
+        // Chercher le progressText par nom si non assigné
+        if (progressText == null)
+        {
+            var progressGO = GameObject.Find("progress-value");
+            if (progressGO != null) progressText = progressGO.GetComponent<TMP_Text>();
         }
 
         // Find GameManager - it might take a frame to load if in a different scene
@@ -85,10 +93,19 @@ public class DiceNumberPrompt : MonoBehaviour
 
         // Generate first target immediately
         GenerateNewTarget();
+        UpdateProgressDisplay();
 
         if (!standaloneMode && gameManager != null)
         {
             gameManager.StartTimer(gameDuration);
+        }
+    }
+
+    private void UpdateProgressDisplay()
+    {
+        if (progressText != null)
+        {
+            progressText.text = $"{successCount}/{targetSuccesses}";
         }
     }
 
@@ -167,6 +184,7 @@ public class DiceNumberPrompt : MonoBehaviour
 
         // Increment success count
         successCount++;
+        UpdateProgressDisplay();
 
         // Check if player has won
         if (successCount >= targetSuccesses)

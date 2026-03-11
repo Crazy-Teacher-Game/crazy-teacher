@@ -6,7 +6,6 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 using System;
-using System.IO;
 
 public class GameManager : MonoBehaviour
 {
@@ -65,6 +64,19 @@ public class GameManager : MonoBehaviour
     private string currentGame = "";
     public ControlType CurrentControlType { get; private set; }
 
+    // Playlist : ordre aléatoire une fois, puis chargement un par un ; à la fin du tableau on reprend au début
+    private static readonly string[] MinigameSceneNames =
+    {
+        "BallDropper",
+        "SlotMachine",
+        "PopTheBottle",
+        "MentalMath",
+        "Dice",
+        "TriPommePoire"
+    };
+    private List<string> _minigamePlaylist;
+    private int _minigamePlaylistIndex;
+
     void Start()
     {
         LoadNextMiniGame();
@@ -86,6 +98,7 @@ public class GameManager : MonoBehaviour
         Lives = startingLives;
         livesUI?.SetLives(Lives);
         RoundsPlayed = 0;
+        BuildAndShufflePlaylist();
         Debug.Log($"[GameManager] Awake - Lives={Lives}, Difficulty={difficulty}");
 
         EnsureSingleAudioListener();
@@ -200,34 +213,39 @@ public class GameManager : MonoBehaviour
 
     private void LoadNextMiniGame()
     {
-        string nextGame = GetRandomGame();
-        Debug.Log($"[GameManager] Loading next mini-game: {nextGame} (current: {currentGame})");
-
-        if (string.IsNullOrEmpty(currentGame))
-        {
-            scenesLoader.LoadMiniGame(nextGame);
-        }
-        else
-        {
-            scenesLoader.UnloadAndLoadMiniGame(currentGame, nextGame);
-        }
+        string nextGame = GetNextGameInPlaylist();
         currentGame = nextGame;
+        scenesLoader.LoadMiniGame(nextGame);
+        Debug.Log("[GameManager] Loading next mini-game: " + nextGame);
     }
 
-    // Méthodes d'enregistrement pour les UI
-    public void RegisterTimerUI(TimerUI ui)
+    private void BuildAndShufflePlaylist()
     {
-        Debug.Log($"[GameManager] RegisterTimerUI called - old timerUI={(timerUI != null)}, new ui={(ui != null)}, ui.InstanceID={ui?.GetInstanceID()}");
-        timerUI = ui;
-        Debug.Log("[GameManager] TimerUI registered successfully");
+        _minigamePlaylist = new List<string>(MinigameSceneNames);
+        ShufflePlaylist(_minigamePlaylist);
+        _minigamePlaylistIndex = 0;
     }
 
-    public void RegisterLivesUI(LivesUI ui)
+    private static void ShufflePlaylist(List<string> list)
     {
-        Debug.Log($"[GameManager] RegisterLivesUI called - old livesUI={(livesUI != null)}, new ui={(ui != null)}, ui.InstanceID={ui?.GetInstanceID()}, current Lives={Lives}");
-        livesUI = ui;
-        livesUI.SetLives(Lives);
-        Debug.Log("[GameManager] LivesUI registered successfully");
+        var rng = new System.Random();
+        int n = list.Count;
+        while (n > 1)
+        {
+            n--;
+            int k = rng.Next(n + 1);
+            (list[k], list[n]) = (list[n], list[k]);
+        }
+    }
+
+    private string GetNextGameInPlaylist()
+    {
+        if (_minigamePlaylist == null || _minigamePlaylist.Count == 0)
+            BuildAndShufflePlaylist();
+
+        string next = _minigamePlaylist[_minigamePlaylistIndex];
+        _minigamePlaylistIndex = (_minigamePlaylistIndex + 1) % _minigamePlaylist.Count;
+        return next;
     }
 
     private void GameOver()
@@ -282,35 +300,6 @@ public class GameManager : MonoBehaviour
             quitTimer = 0f;
         }
         //[END] Back to menu manager
-    }
-
-    private string GetRandomGame()
-    {
-        // string[] scenesList = Directory.GetFiles("Assets/Scenes/MiniGames", "*.unity");
-        string[] scenesList =
-        {
-            "BallDropper",
-            "SlotMachine",
-            "PopTheBottle",
-            "MentalMath",
-            "Dice",
-            "TriPommePoire"
-        };
-        for (int i = 0; i < scenesList.Length; i++)
-        {
-            scenesList[i] = Path.GetFileNameWithoutExtension(scenesList[i]);
-        }
-
-        System.Random rand = new System.Random();
-        int index = rand.Next(scenesList.Length);
-
-        if (currentGame == scenesList[index])
-        {
-            index = (index + 1) % scenesList.Length;
-        }
-
-        return scenesList[index];
-
     }
 
     void FixedUpdate()

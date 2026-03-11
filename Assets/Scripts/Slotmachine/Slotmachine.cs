@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Slotmachine : MonoBehaviour
@@ -13,79 +12,125 @@ public class Slotmachine : MonoBehaviour
     [SerializeField] float durationSeconds = 8f;
 
     private int level = 1;
+    private bool gameEnded = false;
+    private bool isResetting = false;
     private bool btnDownLastUpdate = false;
 
-    // Start is called before the first frame update
     void Start()
     {
-        GameManager.Instance.StartTimer(durationSeconds);
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnTimerEnded += HandleTimerEnded;
+            GameManager.Instance.StartTimer(durationSeconds);
+        }
+
+        // Wheels start spinning immediately
+        wheel1.StartSpin();
+        wheel2.StartSpin();
+        wheel3.StartSpin();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (level == -1)
+        if (gameEnded || isResetting)
         {
-            wheel1.Stop();
-            wheel2.Stop();
-            wheel3.Stop();
-
-            level = 0;
+            btnDownLastUpdate = Input.GetButton("P1_B1");
+            return;
         }
 
         if (Input.GetButton("P1_B1"))
         {
             if (btnDownLastUpdate) return;
             btnDownLastUpdate = true;
-            if (level == 0)
-            {
-                //start all the wheels spinning again
-                wheel1.StartSpin();
-                wheel2.StartSpin();
-                wheel3.StartSpin();
-                level = 1;
-            }
-            else if (level == 1)
+            if (level == 1)
             {
                 bool pass = wheel1.Stop();
                 if (pass)
                 {
-                    level++;
+                    level = 2;
                 }
                 else
                 {
-                    level = 0;
+                    TriggerMiss();
                 }
             }
             else if (level == 2)
             {
-                bool pass2 = wheel2.Stop();
-                if (pass2)
+                bool pass = wheel2.Stop();
+                if (pass)
                 {
-                    level++;
+                    level = 3;
                 }
                 else
                 {
-                    level = 0;
+                    TriggerMiss();
                 }
             }
             else if (level == 3)
             {
-                bool pass3 = wheel3.Stop();
-                if (pass3)
+                bool pass = wheel3.Stop();
+                if (pass)
                 {
+                    gameEnded = true;
                     GameManager.Instance.NotifyWin();
-                    level = 0;
                 }
                 else
                 {
-                    level = 0;
+                    TriggerMiss();
                 }
             }
         }
         else
         {
             btnDownLastUpdate = false;
+        }
+    }
+
+    private void TriggerMiss()
+    {
+        isResetting = true;
+        SetAllFrames(Color.red);
+        wheel1.Stop();
+        wheel2.Stop();
+        wheel3.Stop();
+        StartCoroutine(ResetAfterDelay());
+    }
+
+    private IEnumerator ResetAfterDelay()
+    {
+        yield return new WaitForSeconds(0.5f);
+        if (!gameEnded)
+        {
+            SetAllFrames(Color.yellow);
+            wheel1.StartSpin();
+            wheel2.StartSpin();
+            wheel3.StartSpin();
+            level = 1;
+        }
+        isResetting = false;
+    }
+
+    private void SetAllFrames(Color color)
+    {
+        wheelFrame1.SetColor(color);
+        wheelFrame2.SetColor(color);
+        wheelFrame3.SetColor(color);
+    }
+
+    private void HandleTimerEnded()
+    {
+        if (!gameEnded)
+        {
+            gameEnded = true;
+            GameManager.Instance.NotifyFail();
+        }
+    }
+
+    void OnDestroy()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnTimerEnded -= HandleTimerEnded;
         }
     }
 }

@@ -63,6 +63,11 @@ public class TriPommePoire : MonoBehaviour
         {
             GameManager.Instance.NotifyWin();
         }
+
+        if (fruitsATrouver > 0 && GameManager.Instance.RemainingTime <= 0f)
+        {
+            GameManager.Instance.NotifyFail();
+        }
     }
 
     void SpawnRandomFruit(Vector3 moveDirection)

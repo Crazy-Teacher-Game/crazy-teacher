@@ -181,6 +181,7 @@ public class GameManager : MonoBehaviour
         StopTimer();
         OnMinigameWon?.Invoke();
         Debug.Log("[GameManager] Minigame WON");
+        scenesLoader.UnloadMiniGame(currentGame);
         AddRound();
         LoadNextMiniGame();
     }
@@ -196,6 +197,7 @@ public class GameManager : MonoBehaviour
         if (Lives > 0)
         {
             Debug.Log($"[GameManager] NotifyFail() - Lives > 0, calling LoadNextMiniGame");
+            scenesLoader.UnloadMiniGame(currentGame);
             LoadNextMiniGame();
         }
         else

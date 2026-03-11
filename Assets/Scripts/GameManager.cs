@@ -243,9 +243,20 @@ public class GameManager : MonoBehaviour
         if (_minigamePlaylist == null || _minigamePlaylist.Count == 0)
             BuildAndShufflePlaylist();
 
-        string next = _minigamePlaylist[_minigamePlaylistIndex];
-        _minigamePlaylistIndex = (_minigamePlaylistIndex + 1) % _minigamePlaylist.Count;
-        return next;
+        if (_minigamePlaylistIndex >= _minigamePlaylist.Count)
+        {
+            string lastPlayed = _minigamePlaylist[_minigamePlaylist.Count - 1];
+            ShufflePlaylist(_minigamePlaylist);
+            if (_minigamePlaylist.Count > 1 && _minigamePlaylist[0] == lastPlayed)
+            {
+                int swapIndex = new System.Random().Next(1, _minigamePlaylist.Count);
+                (_minigamePlaylist[0], _minigamePlaylist[swapIndex]) =
+                    (_minigamePlaylist[swapIndex], _minigamePlaylist[0]);
+            }
+            _minigamePlaylistIndex = 0;
+        }
+
+        return _minigamePlaylist[_minigamePlaylistIndex++];
     }
 
     private void GameOver()

@@ -33,7 +33,6 @@ public class DiceNumberPrompt : MonoBehaviour
             mainDice = FindObjectOfType<MainDice>();
         }
 
-        // Chercher le progressText par nom si non assigné
         if (progressText == null)
         {
             var progressGO = GameObject.Find("progress-value");
@@ -150,6 +149,7 @@ public class DiceNumberPrompt : MonoBehaviour
         {
             if (autoNextOnMatch && _pendingNext == null && !hasMatchedCurrentTarget)
             {
+                Debug.Log($"[DiceNumberPrompt] MATCH! Target {targetFace} achieved. Success count: {successCount + 1}/{targetSuccesses}");
                 hasMatchedCurrentTarget = true;
                 _pendingNext = StartCoroutine(CoNextAfterDelay());
             }
@@ -166,7 +166,16 @@ public class DiceNumberPrompt : MonoBehaviour
 
     public void GenerateNewTarget()
     {
-        targetFace = Random.Range(1, 7); // 1..6 inclusive
+        int currentFace = mainDice.GetTopFace();
+        
+        // Generate a target different from the current face
+        do
+        {
+            targetFace = Random.Range(1, 7); // 1..6 inclusive
+        } while (targetFace == currentFace);
+        
+        Debug.Log($"[DiceNumberPrompt] New target generated: {targetFace} (current face was: {currentFace})");
+        
         hasMatchedCurrentTarget = false; // Reset match flag for new target
 
         if (targetText != null)

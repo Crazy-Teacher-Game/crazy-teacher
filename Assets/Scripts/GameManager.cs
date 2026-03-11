@@ -264,8 +264,7 @@ public class GameManager : MonoBehaviour
 
     private void GameOver()
     {
-        // scenesLoader.UnloadMiniGame(currentGame);
-        // scenesLoader.LoadGameOverScene();
+        scenesLoader.LoadGameOverScene();
         Debug.Log("GAME OVER !");
     }
 

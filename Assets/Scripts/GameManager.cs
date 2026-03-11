@@ -289,12 +289,12 @@ public class GameManager : MonoBehaviour
         // string[] scenesList = Directory.GetFiles("Assets/Scenes/MiniGames", "*.unity");
         string[] scenesList =
         {
-            // "BallDropper",
-            // "SlotMachine",
-            // "PopTheBottle",
+            "BallDropper",
+            "SlotMachine",
+            "PopTheBottle",
             "MentalMath",
             "Dice",
-            // "TriPommePoire"
+            "TriPommePoire"
         };
         for (int i = 0; i < scenesList.Length; i++)
         {

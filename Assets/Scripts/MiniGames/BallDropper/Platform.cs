@@ -5,9 +5,10 @@ using UnityEngine;
 public class Platform : MonoBehaviour
 {
     public float durationSeconds = 15f;
+    public float minDurationSeconds = 8f;
     void Start()
     {
-        GameManager.Instance.StartTimer(durationSeconds);
+        GameManager.Instance.StartTimer(durationSeconds, minDurationSeconds);
         GameManager.Instance.OnTimerEnded += HandleTimeout;
         GameManager.Instance.OnMinigameWon += AfterWin;
     }

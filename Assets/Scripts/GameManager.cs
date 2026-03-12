@@ -16,6 +16,11 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int lives;
     public int Lives { get; private set; }
 
+    [Header("Difficulté progressive")]
+    [SerializeField] private float difficultyFactor = 0f;
+    public float DifficultyFactor => difficultyFactor;
+    [SerializeField] private int gamesBeforeDifficultyIncrease = 3;
+
     [Header("Timer Partagé")]
     [SerializeField] private bool timerRunning;
     public bool TimerRunning { get; private set; }
@@ -120,7 +125,13 @@ public class GameManager : MonoBehaviour
     {
         RoundsPlayed++;
         currentRound++;
-        //ON POURRA RAJOUTER D'AUTRES ACTIONS AU CHANGEMENT DE ROUND ICI
+
+        // Augmente la difficulté de 0.1 après chaque jeu, sauf les 3 premiers
+        if (currentRound > gamesBeforeDifficultyIncrease)
+        {
+            difficultyFactor = Mathf.Min(1f, difficultyFactor + 0.1f);
+            Debug.Log($"[GameManager] DifficultyFactor increased to {difficultyFactor}");
+        }
     }
 
     //GESTION DES VIES
@@ -139,15 +150,16 @@ public class GameManager : MonoBehaviour
     }
 
     //GESTION DU TIMER
-    public void StartTimer(float seconds)
+    public void StartTimer(float maxSeconds, float minSeconds)
     {
         StopTimer(); //pour être sur qu'on en a pas deux qui tournent
-        Duration = Mathf.Max(0f, seconds);
+        float computed = (maxSeconds - minSeconds) * (1f - difficultyFactor) + minSeconds;
+        Duration = Mathf.Max(0f, computed);
         RemainingTime = Duration;
         TimerRunning = true;
         timerUI?.Show(Duration);
         _timerCo = StartCoroutine(CoTimer());
-        Debug.Log($"[GameManager] StartTimer {Duration}s");
+        Debug.Log($"[GameManager] StartTimer {Duration}s (max={maxSeconds}, min={minSeconds}, difficulty={difficultyFactor})");
     }
 
     public void StopTimer()

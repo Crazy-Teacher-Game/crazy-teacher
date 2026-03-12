@@ -19,13 +19,14 @@ public class TriPommePoire : MonoBehaviour
     private GameObject lastSpawnedFruit;
 
     public float timerDuration = 5f;
+    public float timerMinDuration = 3f;
     
     private bool hasReturnedToCenter = true;
 
     void Start()
     {
         SpawnRandomFruit(Vector3.zero);
-        GameManager.Instance.StartTimer(timerDuration);
+        GameManager.Instance.StartTimer(timerDuration, timerMinDuration);
     }
 
     void Update()

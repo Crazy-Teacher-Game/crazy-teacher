@@ -19,6 +19,7 @@ public class FlashTheCar : MonoBehaviour
     private float zoneMin = 230f;
     private float zoneMax = 263f;
     private float timerDuration = 30f;
+    private float timerMinDuration = 15f;
     private int requiredFlashes = 3;
 
     private GameObject[] cars;
@@ -51,7 +52,7 @@ public class FlashTheCar : MonoBehaviour
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnTimerEnded += HandleTimerEnded;
-            GameManager.Instance.StartTimer(timerDuration);
+            GameManager.Instance.StartTimer(timerDuration, timerMinDuration);
         }
         LaunchNewCar();
     }

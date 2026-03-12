@@ -20,7 +20,7 @@ public class MiniGame_CalculManager : MonoBehaviour
 
         Debug.Log($"[MiniGame_CalculManager] Subscribing to OnTimerEnded - GameManager.Instance={(GameManager.Instance != null)}");
         GameManager.Instance.OnTimerEnded += HandleTimerEnded;
-        GameManager.Instance.StartTimer(15f);
+        GameManager.Instance.StartTimer(15f, 8f);
         wrongAttempts = 0;
         correctAnswers = 0;
         GenerateNewCalculation();

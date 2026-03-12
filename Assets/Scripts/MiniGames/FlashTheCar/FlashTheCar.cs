@@ -4,6 +4,16 @@ using UnityEngine;
 public class FlashTheCar : MonoBehaviour
 {
     [SerializeField] private Light flashLight;
+    [SerializeField] private Camera gameCamera;
+    [SerializeField] private AudioClip ambientSound;
+    [SerializeField] private AudioClip carSound;
+    [SerializeField] private AudioClip flashSound;
+    [SerializeField] private float carSoundDelay = 0f; // Délai avant de jouer le son de la voiture (normale)
+    [SerializeField] private float carSoundDelayFast = 0f; // Délai avant de jouer le son de la voiture (rapide)
+    [SerializeField] private float carVisualDelay = 0f; // Délai entre le son et l'apparition de la voiture normale
+    [SerializeField] private float carVisualDelayFast = 0f; // Délai entre le son et l'apparition de la voiture rapide
+    private AudioSource audioSource;
+    private AudioSource ambientAudioSource;
     [SerializeField] private GameObject car1;
     [SerializeField] private GameObject car2;
     [SerializeField] private GameObject car3;
@@ -32,6 +42,8 @@ public class FlashTheCar : MonoBehaviour
     private float[] carWorldX;
     private bool[] carIsFast;
 
+    private FlashPhotoStrip photoStrip;
+
     private int lastCarIndex = -1;
     private bool isFirstCar = true;
     private bool inputWindowOpen;
@@ -59,6 +71,21 @@ public class FlashTheCar : MonoBehaviour
             cars[i].SetActive(false);
         }
 
+        if (gameCamera == null) gameCamera = Camera.main;
+        photoStrip = gameObject.AddComponent<FlashPhotoStrip>();
+
+        // Son d'ambiance (bouclé)
+        if (ambientSound != null)
+        {
+            ambientAudioSource = gameObject.AddComponent<AudioSource>();
+            ambientAudioSource.clip = ambientSound;
+            ambientAudioSource.loop = true;
+            ambientAudioSource.Play();
+        }
+
+        // Source pour les sons ponctuels (voiture, flash)
+        audioSource = gameObject.AddComponent<AudioSource>();
+
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnTimerEnded += HandleTimerEnded;
@@ -69,6 +96,11 @@ public class FlashTheCar : MonoBehaviour
 
     private void LaunchNewCar()
     {
+        StartCoroutine(LaunchCarRoutine());
+    }
+
+    private IEnumerator LaunchCarRoutine()
+    {
         int carIndex;
         do
         {
@@ -76,13 +108,29 @@ public class FlashTheCar : MonoBehaviour
         } while (carIndex == lastCarIndex || cars[carIndex].activeSelf);
 
         lastCarIndex = carIndex;
-        cars[carIndex].SetActive(true);
-        spawnChance = 0.33f + 0.33f * GameManager.Instance.DifficultyFactor; // 33% base, up to 66% at max difficulty
+        spawnChance = 0.5f + 0.4f * GameManager.Instance.DifficultyFactor;
         carIsFast[carIndex] = !isFirstCar && (Random.value < spawnChance);
         isFirstCar = false;
         carSpeeds[carIndex] = carIsFast[carIndex] ? fastSpeed * (1f + GameManager.Instance.DifficultyFactor) : normalSpeed;
         carWorldX[carIndex] = carIsFast[carIndex] ? fixedWorldXFast : fixedWorldX;
+
+        bool isFast = carIsFast[carIndex];
+        float soundDelay = isFast ? carSoundDelayFast : carSoundDelay;
+        float visualDelay = isFast ? carVisualDelayFast : carVisualDelay;
+
+        // Jouer le son en avance sur le visuel
+        if (carSound != null)
+        {
+            if (soundDelay > 0f) yield return new WaitForSeconds(soundDelay);
+            if (!gameEnded) audioSource.PlayOneShot(carSound);
+        }
+
+        // Attendre avant d'activer la voiture visuellement
+        if (visualDelay > 0f) yield return new WaitForSeconds(visualDelay);
+        if (gameEnded) yield break;
+
         carTransforms[carIndex].position = new Vector3(carWorldX[carIndex], originalY[carIndex], startZ);
+        cars[carIndex].SetActive(true);
 
         inputWindowOpen = false;
         hasPressedThisTurn = false;
@@ -132,6 +180,7 @@ public class FlashTheCar : MonoBehaviour
                     {
                         // Voiture rapide ratée → fail
                         gameEnded = true;
+                        photoStrip.Cleanup();
                         GameManager.Instance.NotifyFail();
                     }
                 }
@@ -181,6 +230,7 @@ public class FlashTheCar : MonoBehaviour
                 {
                     // Voiture normale dans la zone → fail
                     gameEnded = true;
+                    photoStrip.Cleanup();
                     GameManager.Instance.NotifyFail();
                 }
                 else
@@ -190,6 +240,7 @@ public class FlashTheCar : MonoBehaviour
                     if (flashCount >= requiredFlashes)
                     {
                         gameEnded = true;
+                        photoStrip.Cleanup();
                         GameManager.Instance.NotifyWin();
                     }
                 }
@@ -208,6 +259,13 @@ public class FlashTheCar : MonoBehaviour
             yield return null;
         }
         flashLight.intensity = 3f;
+
+        // Son du flash
+        if (flashSound != null) audioSource.PlayOneShot(flashSound);
+
+        // Capture la scène au pic du flash (lumière à pleine intensité)
+        photoStrip.AddPhoto(CaptureFrame());
+
         elapsed = 0f;
         while (elapsed < 0.5f)
         {
@@ -218,12 +276,28 @@ public class FlashTheCar : MonoBehaviour
         flashLight.intensity = 0f;
     }
 
+    private Texture2D CaptureFrame()
+    {
+        RenderTexture rt = RenderTexture.GetTemporary(Screen.width, Screen.height, 24);
+        gameCamera.targetTexture = rt;
+        gameCamera.Render();
+        gameCamera.targetTexture = null;
+
+        RenderTexture.active = rt;
+        Texture2D snap = new Texture2D(rt.width, rt.height, TextureFormat.RGB24, false);
+        snap.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
+        snap.Apply();
+        RenderTexture.active = null;
+        RenderTexture.ReleaseTemporary(rt);
+        return snap;
+    }
+
     private IEnumerator NextCarWithDelay()
     {
         yield return new WaitForSeconds(Random.Range(0f, 2f));
         if (!gameEnded)
         {
-            LaunchNewCar();
+            StartCoroutine(LaunchCarRoutine());
         }
     }
 
@@ -232,6 +306,7 @@ public class FlashTheCar : MonoBehaviour
         if (!gameEnded)
         {
             gameEnded = true;
+            photoStrip.Cleanup();
             if (anyFastCarPassedZone)
                 GameManager.Instance.NotifyFail();
             else
@@ -245,5 +320,6 @@ public class FlashTheCar : MonoBehaviour
         {
             GameManager.Instance.OnTimerEnded -= HandleTimerEnded;
         }
+        if (photoStrip != null) photoStrip.Cleanup();
     }
 }

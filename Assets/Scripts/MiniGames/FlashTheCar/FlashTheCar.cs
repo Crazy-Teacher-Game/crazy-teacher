@@ -112,17 +112,37 @@ public class FlashTheCar : MonoBehaviour
 
     private IEnumerator LaunchCarRoutine()
     {
-        int carIndex;
-        do
+        int carIndex = -1;
+        while (carIndex < 0)
         {
-            carIndex = Random.Range(0, 5);
-        } while (carIndex == lastCarIndex || cars[carIndex].activeSelf);
+            if (gameEnded) yield break;
+
+            int[] available = new int[5];
+            int availableCount = 0;
+            for (int i = 0; i < 5; i++)
+            {
+                if (!cars[i].activeSelf && i != lastCarIndex)
+                {
+                    available[availableCount] = i;
+                    availableCount++;
+                }
+            }
+
+            if (availableCount == 0)
+            {
+                yield return null;
+                continue;
+            }
+
+            carIndex = available[Random.Range(0, availableCount)];
+        }
 
         lastCarIndex = carIndex;
-        spawnChance = 0.5f + 0.4f * GameManager.Instance.DifficultyFactor;
+        float difficulty = GameManager.Instance != null ? GameManager.Instance.DifficultyFactor : 0f;
+        spawnChance = 0.5f + 0.4f * difficulty;
         carIsFast[carIndex] = !isFirstCar && (Random.value < spawnChance);
         isFirstCar = false;
-        carSpeeds[carIndex] = carIsFast[carIndex] ? fastSpeed * (1f + GameManager.Instance.DifficultyFactor) : normalSpeed;
+        carSpeeds[carIndex] = carIsFast[carIndex] ? fastSpeed * (1f + difficulty) : normalSpeed;
         carWorldX[carIndex] = carIsFast[carIndex] ? fixedWorldXFast : fixedWorldX;
 
         bool isFast = carIsFast[carIndex];
@@ -198,18 +218,7 @@ public class FlashTheCar : MonoBehaviour
                     if (!hasPressedThisTurn)
                     {
                         // Voiture rapide ratée → fail
-                        gameEnded = true;
-                        if (screenIndicator != null)
-                            screenIndicator.ShowScreen(FlashScreenIndicator.ScreenType.Rate, () =>
-                            {
-                                photoStrip.Cleanup();
-                                GameManager.Instance.NotifyFail();
-                            });
-                        else
-                        {
-                            photoStrip.Cleanup();
-                            GameManager.Instance.NotifyFail();
-                        }
+                        EndGame(false, FlashScreenIndicator.ScreenType.Rate);
                     }
                 }
             }
@@ -257,18 +266,7 @@ public class FlashTheCar : MonoBehaviour
                 if (!carIsFast[lastCarIndex])
                 {
                     // Voiture normale dans la zone → fail
-                    gameEnded = true;
-                    if (screenIndicator != null)
-                        screenIndicator.ShowScreen(FlashScreenIndicator.ScreenType.Innocent, () =>
-                        {
-                            photoStrip.Cleanup();
-                            GameManager.Instance.NotifyFail();
-                        });
-                    else
-                    {
-                        photoStrip.Cleanup();
-                        GameManager.Instance.NotifyFail();
-                    }
+                    EndGame(false, FlashScreenIndicator.ScreenType.Innocent);
                 }
                 else
                 {
@@ -278,18 +276,7 @@ public class FlashTheCar : MonoBehaviour
 
                     if (isFinalFlash)
                     {
-                        gameEnded = true;
-                        if (screenIndicator != null)
-                            screenIndicator.ShowScreen(FlashScreenIndicator.ScreenType.Fini, () =>
-                            {
-                                photoStrip.Cleanup();
-                                GameManager.Instance.NotifyWin();
-                            });
-                        else
-                        {
-                            photoStrip.Cleanup();
-                            GameManager.Instance.NotifyWin();
-                        }
+                        EndGame(true, FlashScreenIndicator.ScreenType.Fini);
                     }
                     else
                     {
@@ -371,37 +358,35 @@ public class FlashTheCar : MonoBehaviour
 
     private void HandleTimerEnded()
     {
-        if (!gameEnded)
+        EndGame(!anyFastCarPassedZone, FlashScreenIndicator.ScreenType.Fini);
+    }
+
+    private void EndGame(bool isWin, FlashScreenIndicator.ScreenType? screenType = null)
+    {
+        if (gameEnded) return;
+        gameEnded = true;
+
+        if (ambientAudioSource != null)
+            StartCoroutine(FadeAudio(ambientAudioSource, ambientAudioSource.volume, 0f, ambientFadeOutDuration));
+
+        System.Action notify = () =>
         {
-            gameEnded = true;
-            if (screenIndicator != null)
+            photoStrip.Cleanup();
+            if (GameManager.Instance != null)
             {
-                if (ambientAudioSource != null)
-                    StartCoroutine(FadeAudio(ambientAudioSource, ambientAudioSource.volume, 0f, ambientFadeOutDuration));
-                if (anyFastCarPassedZone)
-                    screenIndicator.ShowScreen(FlashScreenIndicator.ScreenType.Fini, () =>
-                    {
-                        photoStrip.Cleanup();
-                        GameManager.Instance.NotifyFail();
-                    });
-                else
-                    screenIndicator.ShowScreen(FlashScreenIndicator.ScreenType.Fini, () =>
-                    {
-                        photoStrip.Cleanup();
-                        GameManager.Instance.NotifyWin();
-                    });
+                if (isWin) GameManager.Instance.NotifyWin();
+                else GameManager.Instance.NotifyFail();
             }
             else
             {
-                if (ambientAudioSource != null)
-                    StartCoroutine(FadeAudio(ambientAudioSource, ambientAudioSource.volume, 0f, ambientFadeOutDuration));
-                photoStrip.Cleanup();
-                if (anyFastCarPassedZone)
-                    GameManager.Instance.NotifyFail();
-                else
-                    GameManager.Instance.NotifyWin();
+                Debug.LogWarning("FlashTheCar: GameManager.Instance is null at end game.");
             }
-        }
+        };
+
+        if (screenIndicator != null && screenType.HasValue)
+            screenIndicator.ShowScreen(screenType.Value, notify);
+        else
+            notify();
     }
 
     private IEnumerator FadeAudio(AudioSource source, float from, float to, float duration)

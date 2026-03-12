@@ -21,7 +21,8 @@ public class FlashPhotoStrip : MonoBehaviour
         canvasGO = new GameObject("FlashPhotoCanvas");
         Canvas canvas = canvasGO.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 10;
+        canvas.overrideSorting = true;
+        canvas.sortingOrder = -100;
         canvasGO.AddComponent<CanvasScaler>();
 
         // Container ancré en bas à droite, décalé de 10 % de la hauteur d'écran

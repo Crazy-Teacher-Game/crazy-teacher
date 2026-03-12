@@ -22,6 +22,7 @@ public class FlashScreenIndicator : MonoBehaviour
     [Header("UI References")]
     [SerializeField] private Canvas canvas;
     [SerializeField] private Image screenImage;
+    [SerializeField] private int canvasSortingOrder = -5; // Derriere le global UI, devant les photos
 
     [Header("Animation Settings")]
     [SerializeField] private float fadeInDuration = 0.5f;
@@ -35,6 +36,12 @@ public class FlashScreenIndicator : MonoBehaviour
 
     void Awake()
     {
+        if (canvas != null)
+        {
+            canvas.overrideSorting = true;
+            canvas.sortingOrder = canvasSortingOrder;
+        }
+
         if (screenImage != null)
         {
             centerPosition = screenImage.rectTransform.anchoredPosition;

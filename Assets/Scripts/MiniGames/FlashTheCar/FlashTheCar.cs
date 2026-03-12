@@ -16,6 +16,8 @@ public class FlashTheCar : MonoBehaviour
     [SerializeField] private float shakeDelayFast = 0f; // Délai avant la secousse (voiture rapide)
     [SerializeField] private float shakeIntensity = 0.2f; // Amplitude de la secousse de caméra
     [SerializeField] private float shakeDuration = 0.3f; // Durée de la secousse
+    [SerializeField] private float ambientFadeInDuration = 1f; // Fondu d'entrée du son d'ambiance
+    [SerializeField] private float ambientFadeOutDuration = 1f; // Fondu de sortie du son d'ambiance
     private AudioSource audioSource;
     private AudioSource ambientAudioSource;
     private Vector3 cameraOriginalPosition;
@@ -87,7 +89,9 @@ public class FlashTheCar : MonoBehaviour
             ambientAudioSource = gameObject.AddComponent<AudioSource>();
             ambientAudioSource.clip = ambientSound;
             ambientAudioSource.loop = true;
+            ambientAudioSource.volume = 0f;
             ambientAudioSource.Play();
+            StartCoroutine(FadeAudio(ambientAudioSource, 0f, 1f, ambientFadeInDuration));
         }
 
         // Source pour les sons ponctuels (voiture, flash)
@@ -372,6 +376,8 @@ public class FlashTheCar : MonoBehaviour
             gameEnded = true;
             if (screenIndicator != null)
             {
+                if (ambientAudioSource != null)
+                    StartCoroutine(FadeAudio(ambientAudioSource, ambientAudioSource.volume, 0f, ambientFadeOutDuration));
                 if (anyFastCarPassedZone)
                     screenIndicator.ShowScreen(FlashScreenIndicator.ScreenType.Fini, () =>
                     {
@@ -387,6 +393,8 @@ public class FlashTheCar : MonoBehaviour
             }
             else
             {
+                if (ambientAudioSource != null)
+                    StartCoroutine(FadeAudio(ambientAudioSource, ambientAudioSource.volume, 0f, ambientFadeOutDuration));
                 photoStrip.Cleanup();
                 if (anyFastCarPassedZone)
                     GameManager.Instance.NotifyFail();
@@ -394,6 +402,28 @@ public class FlashTheCar : MonoBehaviour
                     GameManager.Instance.NotifyWin();
             }
         }
+    }
+
+    private IEnumerator FadeAudio(AudioSource source, float from, float to, float duration)
+    {
+        if (source == null)
+            yield break;
+
+        if (duration <= 0f)
+        {
+            source.volume = to;
+            yield break;
+        }
+
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+            source.volume = Mathf.Lerp(from, to, t);
+            yield return null;
+        }
+        source.volume = to;
     }
 
     void OnDestroy()

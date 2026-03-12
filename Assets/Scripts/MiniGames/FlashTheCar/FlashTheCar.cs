@@ -10,6 +10,7 @@ public class FlashTheCar : MonoBehaviour
     [SerializeField] private GameObject car5_taxi;
     [SerializeField] private GameObject car6_police;
     private float fixedWorldX = 206.19f;
+    private float fixedWorldXFast = 211.4f;
     private float normalSpeed = 0.5f;
     private float fastSpeed = 1.4f;
     private float startZ = 310f;
@@ -25,6 +26,7 @@ public class FlashTheCar : MonoBehaviour
     private GameObject[] cars;
     private float[] originalY;
     private float[] carSpeeds;
+    private float[] carWorldX;
     private bool[] carIsFast;
 
     private int lastCarIndex = -1;
@@ -41,6 +43,7 @@ public class FlashTheCar : MonoBehaviour
 
         originalY = new float[6];
         carSpeeds = new float[6];
+        carWorldX = new float[6];
         carIsFast = new bool[6];
 
         for (int i = 0; i < 6; i++)
@@ -66,10 +69,11 @@ public class FlashTheCar : MonoBehaviour
         } while (carIndex == lastCarIndex);
 
         lastCarIndex = carIndex;
-        cars[carIndex].transform.position = new Vector3(fixedWorldX, originalY[carIndex], startZ);
         cars[carIndex].SetActive(true);
         carIsFast[carIndex] = (Random.value < 0.25f);
         carSpeeds[carIndex] = carIsFast[carIndex] ? fastSpeed : normalSpeed;
+        carWorldX[carIndex] = carIsFast[carIndex] ? fixedWorldXFast : fixedWorldX;
+        cars[carIndex].transform.position = new Vector3(carWorldX[carIndex], originalY[carIndex], startZ);
 
         inputWindowOpen = false;
         hasPressedThisTurn = false;
@@ -87,12 +91,12 @@ public class FlashTheCar : MonoBehaviour
             if (cars[i].activeSelf)
             {
                 float newZ = cars[i].transform.position.z - carSpeeds[i];
-                cars[i].transform.position = new Vector3(fixedWorldX, cars[i].transform.position.y, newZ);
+                cars[i].transform.position = new Vector3(carWorldX[i], cars[i].transform.position.y, newZ);
 
                 if (newZ < destroyZ)
                 {
                     cars[i].SetActive(false);
-                    cars[i].transform.position = new Vector3(fixedWorldX, originalY[i], startZ);
+                    cars[i].transform.position = new Vector3(carWorldX[i], originalY[i], startZ);
                 }
             }
         }
@@ -103,7 +107,7 @@ public class FlashTheCar : MonoBehaviour
             float curZ = cars[lastCarIndex].transform.position.z;
 
             // Enter window
-            if (carIsFast[lastCarIndex] && curZ >= zoneMin && curZ <= zoneMax && !hasPressedThisTurn)
+            if (curZ >= zoneMin && curZ <= zoneMax && !hasPressedThisTurn)
             {
                 inputWindowOpen = true;
             }
@@ -112,9 +116,11 @@ public class FlashTheCar : MonoBehaviour
             if (curZ < zoneMin && inputWindowOpen)
             {
                 inputWindowOpen = false;
-                if (!hasPressedThisTurn)
+                if (!hasPressedThisTurn && carIsFast[lastCarIndex] && lastCarIndex != 5)
                 {
-                    LoseLifeAndCheck();
+                    // Fast non-police car missed → fail
+                    gameEnded = true;
+                    GameManager.Instance.NotifyFail();
                 }
             }
 
@@ -153,22 +159,33 @@ public class FlashTheCar : MonoBehaviour
         {
             if (inputWindowOpen && !hasPressedThisTurn)
             {
-                // Good press
                 hasPressedThisTurn = true;
                 inputWindowOpen = false;
-                flashCount++;
-                if (flashCount >= requiredFlashes)
+
+                if (lastCarIndex == 5)
                 {
+                    // Police in zone → fail
                     gameEnded = true;
-                    GameManager.Instance.NotifyWin();
+                    GameManager.Instance.NotifyFail();
+                }
+                else if (!carIsFast[lastCarIndex])
+                {
+                    // Normal car in zone → fail
+                    gameEnded = true;
+                    GameManager.Instance.NotifyFail();
+                }
+                else
+                {
+                    // Fast non-police → success
+                    flashCount++;
+                    if (flashCount >= requiredFlashes)
+                    {
+                        gameEnded = true;
+                        GameManager.Instance.NotifyWin();
+                    }
                 }
             }
-            else if (!hasPressedThisTurn)
-            {
-                // Bad press
-                hasPressedThisTurn = true;
-                LoseLifeAndCheck();
-            }
+            // Press outside window → no consequence
         }
     }
 
@@ -178,16 +195,6 @@ public class FlashTheCar : MonoBehaviour
         if (!gameEnded)
         {
             LaunchNewCar();
-        }
-    }
-
-    private void LoseLifeAndCheck()
-    {
-        GameManager.Instance.LoseLife();
-        if (GameManager.Instance.Lives <= 0)
-        {
-            gameEnded = true;
-            GameManager.Instance.NotifyFail();
         }
     }
 

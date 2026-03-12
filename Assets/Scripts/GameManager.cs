@@ -291,7 +291,7 @@ public class GameManager : MonoBehaviour
     private void RestartGame()
     {
         isGameOver = false;
-        scenesLoader.UnloadMiniGame("GameOverScene");
+        scenesLoader.UnloadGameOverScene();
         Lives = startingLives;
         livesUI?.SetLives(Lives);
         currentRound = 0;

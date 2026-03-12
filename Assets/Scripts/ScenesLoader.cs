@@ -165,6 +165,28 @@ public class ScenesLoader : MonoBehaviour
         }
     }
 
+    public void UnloadGameOverScene()
+    {
+        StartCoroutine(UnloadGameOverSequence());
+    }
+
+    private IEnumerator UnloadGameOverSequence()
+    {
+        foreach (Transform child in sceneContainer.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        yield return null;
+
+        var asyncUnload = SceneManager.UnloadSceneAsync("GameOverScene");
+        if (asyncUnload != null)
+        {
+            while (!asyncUnload.isDone)
+                yield return null;
+        }
+    }
+
     public void UnloadMiniGame(string sceneName)
     {
         StartCoroutine(UnloadMiniGameCoroutine(sceneName));

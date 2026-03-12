@@ -72,6 +72,7 @@ public class GameManager : MonoBehaviour
 
     private string currentGame = "";
     public ControlType CurrentControlType { get; private set; }
+    private bool isGameOver = false;
 
     // Playlist : ordre aléatoire une fois, puis chargement un par un ; à la fin du tableau on reprend au début
     private static readonly string[] MinigameSceneNames =
@@ -282,12 +283,35 @@ public class GameManager : MonoBehaviour
 
     private void GameOver()
     {
+        isGameOver = true;
         scenesLoader.LoadGameOverScene();
         Debug.Log("GAME OVER !");
     }
 
+    private void RestartGame()
+    {
+        isGameOver = false;
+        scenesLoader.UnloadMiniGame("GameOverScene");
+        Lives = startingLives;
+        livesUI?.SetLives(Lives);
+        currentRound = 0;
+        difficultyFactor = 0f;
+        RoundsPlayed = 0;
+        BuildAndShufflePlaylist();
+        LoadNextMiniGame();
+    }
+
     void Update()
     {
+        if (isGameOver)
+        {
+            if (Input.GetButtonDown("P1_B3") || Input.GetButtonDown("P2_B3"))
+            {
+                RestartGame();
+            }
+            return;
+        }
+
         if (!HasExactlyOneActiveAudioListener())
         {
             EnsureSingleAudioListener();

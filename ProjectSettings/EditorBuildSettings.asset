@@ -5,15 +5,18 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/MainScene.unity
+    guid: 820e609e7afbb4f72be9e0fe239ef7da
+  - enabled: 1
+    path: Assets/Scenes/HomePage.unity
+    guid: 209dc08bdface4177b1d97cdab3b4455
   - enabled: 0
     path: Assets/Anatidae/Anatidae Welcome.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   - enabled: 0
     path: Assets/Scenes/InputTester.unity
     guid: d006b734cd6e72b4cb3ee94f4598919c
-  - enabled: 1
-    path: Assets/Scenes/MainScene.unity
-    guid: 820e609e7afbb4f72be9e0fe239ef7da
   - enabled: 1
     path: Assets/Scenes/LoadingScene.unity
     guid: 93259285c3ef84b49a6deda8928c6fb2

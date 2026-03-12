@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Manager : MonoBehaviour
+public class PopTheBottle : MonoBehaviour
 {
     [SerializeField] private GameObject bottleObject;
     [SerializeField] private Sprite baseBottle;
@@ -11,7 +11,6 @@ public class Manager : MonoBehaviour
     [SerializeField] private Sprite botteShaken2;
     private RectTransform bottleRectTransform;
 
-    private GameManager gameManager;
     private SpriteRenderer bottleSpriteRenderer;
 
     private float bottleOffsetY = 0f;
@@ -23,7 +22,6 @@ public class Manager : MonoBehaviour
     private float winPercentage = 0f;
     private bool gameEnded = false;
 
-    // Start is called before the first frame update
     void Start()
     {
         bottleRectTransform = bottleObject.GetComponent<RectTransform>();
@@ -39,41 +37,27 @@ public class Manager : MonoBehaviour
         bottleSpriteRenderer = bottleObject.GetComponent<SpriteRenderer>();
         if (bottleSpriteRenderer == null)
         {
-            Debug.LogError("[Manager] Bottle does not have a SpriteRenderer! Add one to the Bottle GameObject.");
+            Debug.LogError("[PopTheBottle] Bottle does not have a SpriteRenderer! Add one to the Bottle GameObject.");
         }
 
-        // Find the GameManager in the scene
-        gameManager = FindObjectOfType<GameManager>();
-        if (gameManager == null)
+        if (GameManager.Instance != null)
         {
-            Debug.LogError("[Manager] No GameManager found in the scene!");
+            GameManager.Instance.OnTimerEnded += HandleTimerEnded;
+            GameManager.Instance.StartTimer(10);
         }
 
         gameManager.StartTimer(10f, 5f);
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (gameEnded) return;
 
-        // Guard against null gameManager
-        if (gameManager == null) return;
-
-        // Check for game end
+        // Check for win
         if (bottleSaturation >= bottleSaturationMax)
         {
-            gameManager.NotifyWin();
             gameEnded = true;
-            //logique de victoire
-            return;
-        }
-
-        if (gameManager.RemainingTime <= 0f)
-        {
-            gameManager.NotifyFail();
-            gameEnded = true;
-            //logique de victoire
+            GameManager.Instance.NotifyWin();
             return;
         }
 
@@ -106,21 +90,17 @@ public class Manager : MonoBehaviour
         if (bottleRectTransform != null)
         {
             Vector2 anchoredPosition = bottleRectTransform.anchoredPosition;
-            anchoredPosition.y = initializedBottleY + bottleOffsetY;
+            anchoredPosition.y = initializedBottleY + bottleOffsetY * 2;
             bottleRectTransform.anchoredPosition = anchoredPosition;
         }
         else
         {
             Vector3 localPosition = bottleObject.transform.localPosition;
-            localPosition.y = initializedBottleY + bottleOffsetY;
+            localPosition.y = initializedBottleY + bottleOffsetY * 2;
             bottleObject.transform.localPosition = localPosition;
         }
 
-        //Debug.Log("Bottle Position: " + bottleObject.transform.position);
-
         // Update bottle saturation
-        //make the difference between last and current state
-        //the difference is added to the saturation
         if (bottleState != lastBottleState)
         {
             bottleSaturation += Mathf.Abs(bottleState - lastBottleState);
@@ -131,11 +111,20 @@ public class Manager : MonoBehaviour
         winPercentage = (float)bottleSaturation / bottleSaturationMax * 100f;
     }
 
-    // void FixedUpdate()
-    // {
-    //     if (Input.GetButton("P1_B1"))
-    //     {
-    //         bottleOffsetY += 0.1f;
-    //     }
-    // }
+    private void HandleTimerEnded()
+    {
+        if (!gameEnded)
+        {
+            gameEnded = true;
+            GameManager.Instance.NotifyFail();
+        }
+    }
+
+    void OnDestroy()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnTimerEnded -= HandleTimerEnded;
+        }
+    }
 }

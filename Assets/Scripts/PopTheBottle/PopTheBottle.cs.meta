@@ -1,11 +1,9 @@
 fileFormatVersion: 2
-guid: 8e09109f3bdc68e429f2491c8fe6e40a
+guid: 4069da2bbe6ccfe4da3754bea8811a93
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences:
-  - bottleObject: {instanceID: 0}
-  - alternateSprite: {instanceID: 0}
+  defaultReferences: []
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

@@ -680,6 +680,10 @@ MonoBehaviour:
   carSoundDelayFast: 0
   carVisualDelay: 0
   carVisualDelayFast: 1
+  shakeDelay: 0
+  shakeDelayFast: 1
+  shakeIntensity: 0.05
+  shakeDuration: 0.25
   car1: {fileID: 6830414098843300259}
   car2: {fileID: 5610891235388516728}
   car3: {fileID: 6195416536454363327}

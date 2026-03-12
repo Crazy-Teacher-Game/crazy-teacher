@@ -12,8 +12,13 @@ public class FlashTheCar : MonoBehaviour
     [SerializeField] private float carSoundDelayFast = 0f; // Délai avant de jouer le son de la voiture (rapide)
     [SerializeField] private float carVisualDelay = 0f; // Délai entre le son et l'apparition de la voiture normale
     [SerializeField] private float carVisualDelayFast = 0f; // Délai entre le son et l'apparition de la voiture rapide
+    [SerializeField] private float shakeDelay = 0f; // Délai avant la secousse (voiture normale)
+    [SerializeField] private float shakeDelayFast = 0f; // Délai avant la secousse (voiture rapide)
+    [SerializeField] private float shakeIntensity = 0.2f; // Amplitude de la secousse de caméra
+    [SerializeField] private float shakeDuration = 0.3f; // Durée de la secousse
     private AudioSource audioSource;
     private AudioSource ambientAudioSource;
+    private Vector3 cameraOriginalPosition;
     [SerializeField] private GameObject car1;
     [SerializeField] private GameObject car2;
     [SerializeField] private GameObject car3;
@@ -72,6 +77,7 @@ public class FlashTheCar : MonoBehaviour
         }
 
         if (gameCamera == null) gameCamera = Camera.main;
+        cameraOriginalPosition = gameCamera.transform.position;
         photoStrip = gameObject.AddComponent<FlashPhotoStrip>();
 
         // Son d'ambiance (bouclé)
@@ -131,6 +137,14 @@ public class FlashTheCar : MonoBehaviour
 
         carTransforms[carIndex].position = new Vector3(carWorldX[carIndex], originalY[carIndex], startZ);
         cars[carIndex].SetActive(true);
+
+        // Déclencher la secousse de caméra pour les voitures rapides
+        if (isFast)
+        {
+            float shakeDelayToUse = shakeDelayFast;
+            if (shakeDelayToUse > 0f) yield return new WaitForSeconds(shakeDelayToUse);
+            if (!gameEnded) StartCoroutine(CameraShake());
+        }
 
         inputWindowOpen = false;
         hasPressedThisTurn = false;
@@ -290,6 +304,21 @@ public class FlashTheCar : MonoBehaviour
         RenderTexture.active = null;
         RenderTexture.ReleaseTemporary(rt);
         return snap;
+    }
+
+    private IEnumerator CameraShake()
+    {
+        float elapsed = 0f;
+        while (elapsed < shakeDuration)
+        {
+            float x = Random.Range(-1f, 1f) * shakeIntensity;
+            float y = Random.Range(-1f, 1f) * shakeIntensity;
+            gameCamera.transform.position = cameraOriginalPosition + new Vector3(x, y, 0);
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        gameCamera.transform.position = cameraOriginalPosition;
     }
 
     private IEnumerator NextCarWithDelay()

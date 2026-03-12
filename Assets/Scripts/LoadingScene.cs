@@ -1,9 +1,15 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.Video;
 
 public class LoadingScene : MonoBehaviour
 {
     public TMP_Text instructionsText;
+
+    public GameObject JoystickYPrefab;
+    public GameObject JoystickXPrefab;
+    public GameObject ButtonFPrefab;
+    public GameObject ButtonsFGHPrefab;
 
     private void OnEnable()
     {
@@ -11,12 +17,20 @@ public class LoadingScene : MonoBehaviour
 
         switch (type)
         {
-            case ControlType.Joystick:
-                instructionsText.text = "Utilise le joystick pour jouer !";
+            case ControlType.JoystickY:
+                JoystickYPrefab.SetActive(true);
                 break;
 
-            case ControlType.Buttons:
-                instructionsText.text = "Utilise les boutons pour jouer !";
+            case ControlType.JoystickX:
+                JoystickXPrefab.SetActive(true);
+                break;
+
+            case ControlType.ButtonF:
+                ButtonFPrefab.SetActive(true);
+                break;
+
+            case ControlType.ButtonsFGH:
+                ButtonsFGHPrefab.SetActive(true);
                 break;
 
             default:

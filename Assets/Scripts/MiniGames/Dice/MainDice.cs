@@ -47,7 +47,6 @@ public class MainDice : MonoBehaviour
         logicalRotation = randomRotation;
         
         int initialFace = GetTopFace();
-        Debug.Log($"[MainDice] Dice initialized with random rotation (Y:{yRotation}°, X:{xRotation}°) - Initial face: {initialFace}");
     }
 
     void Update()
@@ -62,7 +61,6 @@ public class MainDice : MonoBehaviour
         {
             if (!gateCenterReturn)
             {
-                Debug.Log("[MainDice] Gate reset - joystick returned to center");
             }
             gateCenterReturn = true;
         }
@@ -79,7 +77,6 @@ public class MainDice : MonoBehaviour
         // Right (D key): Rotate +90° around world Y
         if (h > inputThreshold)
         {
-            Debug.Log("[MainDice] Input detected: RIGHT (h=" + h + ")");
             StartCoroutine(RotateStep(target, Vector3.up, 90f));
             gateCenterReturn = false;
             return;
@@ -88,7 +85,6 @@ public class MainDice : MonoBehaviour
         // Left (Q key): Rotate -90° around world Y
         if (h < -inputThreshold)
         {
-            Debug.Log("[MainDice] Input detected: LEFT (h=" + h + ")");
             StartCoroutine(RotateStep(target, Vector3.up, -90f));
             gateCenterReturn = false;
             return;
@@ -97,7 +93,6 @@ public class MainDice : MonoBehaviour
         // Up (Z key): Rotate +90° around world X
         if (v > inputThreshold)
         {
-            Debug.Log("[MainDice] Input detected: UP (v=" + v + ")");
             StartCoroutine(RotateStep(target, Vector3.right, 90f));
             gateCenterReturn = false;
             return;
@@ -106,7 +101,6 @@ public class MainDice : MonoBehaviour
         // Down (S key): Rotate -90° around world X
         if (v < -inputThreshold)
         {
-            Debug.Log("[MainDice] Input detected: DOWN (v=" + v + ")");
             StartCoroutine(RotateStep(target, Vector3.right, -90f));
             gateCenterReturn = false;
             return;
@@ -116,7 +110,6 @@ public class MainDice : MonoBehaviour
     private IEnumerator RotateStep(Transform target, Vector3 axis, float degrees)
     {
         isRotating = true;
-        Debug.Log($"[MainDice] Rotation started: {degrees}° around {axis}");
 
         Quaternion start = logicalRotation;
         // Apply rotation around world axis
@@ -138,7 +131,6 @@ public class MainDice : MonoBehaviour
         target.rotation = logicalRotation;
 
         int newFace = GetTopFace();
-        Debug.Log($"[MainDice] Rotation completed - New top face: {newFace}");
         isRotating = false;
     }
 

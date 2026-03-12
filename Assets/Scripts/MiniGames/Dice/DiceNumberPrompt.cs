@@ -40,19 +40,16 @@ public class DiceNumberPrompt : MonoBehaviour
             if (progressGO != null) progressText = progressGO.GetComponent<TMP_Text>();
         }
 
-        // Find GameManager - it might take a frame to load if in a different scene
         StartCoroutine(InitializeGameManager());
     }
 
     private IEnumerator InitializeGameManager()
     {
-        // Try to find GameManager immediately
         gameManager = FindObjectOfType<GameManager>(true);
 
-        // If not found, wait a few frames (scene might be loading)
         if (gameManager == null)
         {
-            yield return null; // Wait one frame
+            yield return null;
             gameManager = FindObjectOfType<GameManager>(true);
         }
 
@@ -62,17 +59,14 @@ public class DiceNumberPrompt : MonoBehaviour
         }
         else
         {
-            // Subscribe to timer end event
             gameManager.OnTimerEnded += OnTimerEnded;
         }
 
-        // Start the game immediately
         StartGame();
     }
 
     void OnDestroy()
     {
-        // Unsubscribe from events to prevent memory leaks
         if (gameManager != null)
         {
             gameManager.OnTimerEnded -= OnTimerEnded;
@@ -85,13 +79,11 @@ public class DiceNumberPrompt : MonoBehaviour
         gameActive = true;
         standaloneTimer = gameDuration;
 
-        // Ensure text is enabled before setting content
         if (targetText != null)
         {
             targetText.enabled = true;
         }
 
-        // Generate first target immediately
         GenerateNewTarget();
         UpdateProgressDisplay();
 
@@ -127,7 +119,6 @@ public class DiceNumberPrompt : MonoBehaviour
     {
         if (mainDice == null || !gameActive) return;
 
-        // Handle standalone timer
         if (standaloneMode)
         {
             standaloneTimer -= Time.deltaTime;
@@ -140,7 +131,6 @@ public class DiceNumberPrompt : MonoBehaviour
 
         int top = mainDice.GetTopFace();
 
-        // Log only when the detected face changes (to avoid spam)
         if (top != lastDetectedFace)
         {
             lastDetectedFace = top;
@@ -150,7 +140,6 @@ public class DiceNumberPrompt : MonoBehaviour
         {
             if (autoNextOnMatch && _pendingNext == null && !hasMatchedCurrentTarget)
             {
-                Debug.Log($"[DiceNumberPrompt] MATCH! Target {targetFace} achieved. Success count: {successCount + 1}/{targetSuccesses}");
                 hasMatchedCurrentTarget = true;
                 _pendingNext = StartCoroutine(CoNextAfterDelay());
             }
@@ -174,8 +163,6 @@ public class DiceNumberPrompt : MonoBehaviour
         {
             targetFace = Random.Range(1, 7); // 1..6 inclusive
         } while (targetFace == currentFace);
-        
-        Debug.Log($"[DiceNumberPrompt] New target generated: {targetFace} (current face was: {currentFace})");
         
         hasMatchedCurrentTarget = false; // Reset match flag for new target
 

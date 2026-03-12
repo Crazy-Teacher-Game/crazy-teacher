@@ -105,7 +105,6 @@ public class GameManager : MonoBehaviour
         livesUI?.SetLives(Lives);
         RoundsPlayed = 0;
         BuildAndShufflePlaylist();
-        Debug.Log($"[GameManager] Awake - Lives={Lives}, Difficulty={difficulty}");
 
         EnsureSingleAudioListener();
     }

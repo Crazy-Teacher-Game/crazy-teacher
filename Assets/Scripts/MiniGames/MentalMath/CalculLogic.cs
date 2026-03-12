@@ -79,7 +79,7 @@ public class CalculLogic : MonoBehaviour
 
         var data = new CalculationData
         {
-            Question = $"{a} {operation} {b} = ?",
+            Question = $"{a} {operation} {b}",
             Answers = answers
         };
         

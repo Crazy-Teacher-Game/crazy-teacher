@@ -677,14 +677,17 @@ MonoBehaviour:
   ambientSound: {fileID: 8300000, guid: c716215ae1f958249a21edac1825a04f, type: 3}
   carSound: {fileID: 8300000, guid: d83ca474ec438f442ac574cec677019a, type: 3}
   flashSound: {fileID: 8300000, guid: 0bb7427a930c5b247bbe5f90364c0ad6, type: 3}
+  endMiniGameSound: {fileID: 8300000, guid: 198307cec7ed65143a6401b5f1f853ac, type: 3}
+  victorySound: {fileID: 8300000, guid: 2e7718402476e604789b0b4b94ca8d1e, type: 3}
   carSoundDelay: 0
   carSoundDelayFast: 0
   carVisualDelay: 0
   carVisualDelayFast: 1
-  shakeDelay: 0
   shakeDelayFast: 1
   shakeIntensity: 0.05
   shakeDuration: 0.25
+  ambientFadeInDuration: 1
+  ambientFadeOutDuration: 1
   car1: {fileID: 6830414098843300259}
   car2: {fileID: 5610891235388516728}
   car3: {fileID: 6195416536454363327}
@@ -709,6 +712,7 @@ MonoBehaviour:
   finiSprite: {fileID: 21300000, guid: f362b7b08ab29054194f5101e626fe9b, type: 3}
   canvas: {fileID: 1265323749}
   screenImage: {fileID: 1592669281}
+  canvasSortingOrder: -5
   fadeInDuration: 0.5
   displayDuration: 2
   fadeOutDuration: 0.5

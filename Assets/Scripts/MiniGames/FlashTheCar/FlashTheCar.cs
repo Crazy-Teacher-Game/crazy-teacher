@@ -8,11 +8,12 @@ public class FlashTheCar : MonoBehaviour
     [SerializeField] private AudioClip ambientSound;
     [SerializeField] private AudioClip carSound;
     [SerializeField] private AudioClip flashSound;
+    [SerializeField] private AudioClip endMiniGameSound;
+    [SerializeField] private AudioClip victorySound;
     [SerializeField] private float carSoundDelay = 0f; // Délai avant de jouer le son de la voiture (normale)
     [SerializeField] private float carSoundDelayFast = 0f; // Délai avant de jouer le son de la voiture (rapide)
     [SerializeField] private float carVisualDelay = 0f; // Délai entre le son et l'apparition de la voiture normale
     [SerializeField] private float carVisualDelayFast = 0f; // Délai entre le son et l'apparition de la voiture rapide
-    [SerializeField] private float shakeDelay = 0f; // Délai avant la secousse (voiture normale)
     [SerializeField] private float shakeDelayFast = 0f; // Délai avant la secousse (voiture rapide)
     [SerializeField] private float shakeIntensity = 0.2f; // Amplitude de la secousse de caméra
     [SerializeField] private float shakeDuration = 0.3f; // Durée de la secousse
@@ -281,7 +282,8 @@ public class FlashTheCar : MonoBehaviour
                     else
                     {
                         if (screenIndicator != null)
-                            screenIndicator.ShowScreen(FlashScreenIndicator.ScreenType.Parfait);
+                            PlayScreenSound(FlashScreenIndicator.ScreenType.Parfait);
+                        screenIndicator.ShowScreen(FlashScreenIndicator.ScreenType.Parfait);
                     }
                 }
             }
@@ -383,10 +385,34 @@ public class FlashTheCar : MonoBehaviour
             }
         };
 
+        if (screenType.HasValue)
+            PlayScreenSound(screenType.Value);
+
         if (screenIndicator != null && screenType.HasValue)
             screenIndicator.ShowScreen(screenType.Value, notify);
         else
             notify();
+    }
+
+    private void PlayScreenSound(FlashScreenIndicator.ScreenType screenType)
+    {
+        if (audioSource == null) return;
+
+        AudioClip clipToPlay = null;
+        switch (screenType)
+        {
+            case FlashScreenIndicator.ScreenType.Rate:
+            case FlashScreenIndicator.ScreenType.Innocent:
+                clipToPlay = endMiniGameSound;
+                break;
+            case FlashScreenIndicator.ScreenType.Parfait:
+            case FlashScreenIndicator.ScreenType.Fini:
+                clipToPlay = victorySound;
+                break;
+        }
+
+        if (clipToPlay != null)
+            audioSource.PlayOneShot(clipToPlay);
     }
 
     private IEnumerator FadeAudio(AudioSource source, float from, float to, float duration)

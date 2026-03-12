@@ -303,19 +303,11 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (isGameOver)
-        {
-            if (Input.GetButtonDown("P1_B3") || Input.GetButtonDown("P2_B3"))
-            {
-                RestartGame();
-            }
-            return;
-        }
-
         if (!HasExactlyOneActiveAudioListener())
         {
             EnsureSingleAudioListener();
         }
+
         // Back to menu manager
         if (Input.GetButton("P1_Vertical") ||
             Input.GetButton("P1_Horizontal") ||
@@ -355,6 +347,15 @@ public class GameManager : MonoBehaviour
             quitTimer = 0f;
         }
         //[END] Back to menu manager
+
+        if (isGameOver)
+        {
+            if (Input.GetButtonDown("P1_B3") || Input.GetButtonDown("P2_B3"))
+            {
+                RestartGame();
+            }
+            return;
+        }
     }
 
     void FixedUpdate()

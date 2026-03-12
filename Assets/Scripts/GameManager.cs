@@ -16,6 +16,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int lives;
     public int Lives { get; private set; }
 
+    [Header("Debug")]
+
+    [SerializeField] public TMP_Text difficultyDebugText;
+
     [Header("Difficulté progressive")]
     [SerializeField] private float difficultyFactor = 0f;
     public float DifficultyFactor => difficultyFactor;
@@ -159,6 +163,9 @@ public class GameManager : MonoBehaviour
         timerUI?.Show(Duration);
         _timerCo = StartCoroutine(CoTimer());
         Debug.Log($"[GameManager] StartTimer {Duration}s (max={maxSeconds}, min={minSeconds}, difficulty={difficultyFactor})");
+
+        //debug
+        difficultyDebugText.text = $"DifficultyFactor: {difficultyFactor:0.0}";
     }
 
     public void StopTimer()

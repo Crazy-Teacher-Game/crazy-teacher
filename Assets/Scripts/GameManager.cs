@@ -83,7 +83,8 @@ public class GameManager : MonoBehaviour
         "MentalMath",
         "Dice",
         "FlashTheCar",
-        "TriPommePoire"
+        "TriPommePoire",
+        "TimerGame",
     };
     private List<string> _minigamePlaylist;
     private int _minigamePlaylistIndex;

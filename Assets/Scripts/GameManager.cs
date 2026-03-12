@@ -72,13 +72,13 @@ public class GameManager : MonoBehaviour
     // Playlist : ordre aléatoire une fois, puis chargement un par un ; à la fin du tableau on reprend au début
     private static readonly string[] MinigameSceneNames =
     {
-        // "BallDropper",
-        // "SlotMachine",
+        "BallDropper",
+        "SlotMachine",
         "PopTheBottle",
-        // "MentalMath",
-        // "Dice",
-        // "FlashTheCar",
-        // "TriPommePoire"
+        "MentalMath",
+        "Dice",
+        "FlashTheCar",
+        "TriPommePoire"
     };
     private List<string> _minigamePlaylist;
     private int _minigamePlaylistIndex;

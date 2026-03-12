@@ -40,13 +40,8 @@ public class PopTheBottle : MonoBehaviour
             Debug.LogError("[PopTheBottle] Bottle does not have a SpriteRenderer! Add one to the Bottle GameObject.");
         }
 
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.OnTimerEnded += HandleTimerEnded;
-            GameManager.Instance.StartTimer(10);
-        }
-
-        gameManager.StartTimer(10f, 5f);
+        GameManager.Instance.StartTimer(10f, 5f);
+        GameManager.Instance.OnTimerEnded += HandleTimerEnded;
     }
 
     void Update()

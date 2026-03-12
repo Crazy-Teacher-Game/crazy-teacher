@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class TestMiniGame : MonoBehaviour
 {
-    [SerializeField] float durationSeconds = 5f; //DURÉE DU MINI JEU
+    [SerializeField] float durationSeconds = 5f; //DURÉE MAX DU MINI JEU
+    [SerializeField] float minDurationSeconds = 3f; //DURÉE MIN DU MINI JEU
     [SerializeField] public GameManager gameManager;
 
     void Start() //ptet faire autre chose pour l'appeler après un delay
     {
         // 1) Démarrer le timer commun à l’entrée du mini-jeu
-        gameManager.StartTimer(durationSeconds);
+        gameManager.StartTimer(durationSeconds, minDurationSeconds);
 
         // 2) Option : si le timer finit => on considère que c’est un échec
         gameManager.OnTimerEnded += HandleTimeout;

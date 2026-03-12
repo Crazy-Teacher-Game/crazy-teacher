@@ -15,7 +15,8 @@ public class DiceNumberPrompt : MonoBehaviour
     [SerializeField] private float nextDelay = 0.1f;
 
     [Header("Game Settings")]
-    [SerializeField] private float gameDuration = 30f; // Timer duration in seconds
+    [SerializeField] private float gameDuration = 30f; // Timer max duration in seconds
+    [SerializeField] private float gameMinDuration = 15f; // Timer min duration in seconds
     [SerializeField] private int targetSuccesses = 5; // Number of correct faces to win
     [SerializeField] private bool standaloneMode = false; // Enable to test without GameManager
 
@@ -96,7 +97,7 @@ public class DiceNumberPrompt : MonoBehaviour
 
         if (!standaloneMode && gameManager != null)
         {
-            gameManager.StartTimer(gameDuration);
+            gameManager.StartTimer(gameDuration, gameMinDuration);
         }
     }
 

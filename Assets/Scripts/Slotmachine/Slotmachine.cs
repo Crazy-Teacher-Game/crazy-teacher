@@ -10,6 +10,7 @@ public class Slotmachine : MonoBehaviour
     [SerializeField] private WheelFrame wheelFrame2;
     [SerializeField] private WheelFrame wheelFrame3;
     [SerializeField] float durationSeconds = 8f;
+    [SerializeField] float minDurationSeconds = 4f;
 
     private int level = 1;
     private bool gameEnded = false;
@@ -21,7 +22,7 @@ public class Slotmachine : MonoBehaviour
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnTimerEnded += HandleTimerEnded;
-            GameManager.Instance.StartTimer(durationSeconds);
+            GameManager.Instance.StartTimer(durationSeconds, minDurationSeconds);
         }
 
         // Wheels start spinning immediately

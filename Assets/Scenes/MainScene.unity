@@ -607,6 +607,8 @@ MonoBehaviour:
   startingLives: 2
   difficulty: 1
   lives: 0
+  difficultyFactor: 0
+  gamesBeforeDifficultyIncrease: 3
   timerRunning: 0
   remainingTime: 0
   duration: 0

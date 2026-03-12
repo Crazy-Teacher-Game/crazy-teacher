@@ -26,6 +26,7 @@ public class FlashTheCar : MonoBehaviour
     private float spawnChance; // Calculated based on difficulty for fast cars
 
     private GameObject[] cars;
+    private Transform[] carTransforms;
     private float[] originalY;
     private float[] carSpeeds;
     private float[] carWorldX;
@@ -49,10 +50,12 @@ public class FlashTheCar : MonoBehaviour
         carSpeeds = new float[6];
         carWorldX = new float[6];
         carIsFast = new bool[6];
+        carTransforms = new Transform[6];
 
         for (int i = 0; i < 6; i++)
         {
-            originalY[i] = cars[i].transform.position.y;
+            carTransforms[i] = cars[i].transform;
+            originalY[i] = carTransforms[i].position.y;
             cars[i].SetActive(false);
         }
 
@@ -79,7 +82,7 @@ public class FlashTheCar : MonoBehaviour
         isFirstCar = false;
         carSpeeds[carIndex] = carIsFast[carIndex] ? fastSpeed * (1f + GameManager.Instance.DifficultyFactor) : normalSpeed;
         carWorldX[carIndex] = carIsFast[carIndex] ? fixedWorldXFast : fixedWorldX;
-        cars[carIndex].transform.position = new Vector3(carWorldX[carIndex], originalY[carIndex], startZ);
+        carTransforms[carIndex].position = new Vector3(carWorldX[carIndex], originalY[carIndex], startZ);
 
         inputWindowOpen = false;
         hasPressedThisTurn = false;
@@ -96,13 +99,13 @@ public class FlashTheCar : MonoBehaviour
         {
             if (cars[i].activeSelf)
             {
-                float newZ = cars[i].transform.position.z - carSpeeds[i];
-                cars[i].transform.position = new Vector3(carWorldX[i], cars[i].transform.position.y, newZ);
+                float newZ = carTransforms[i].position.z - carSpeeds[i];
+                carTransforms[i].position = new Vector3(carWorldX[i], carTransforms[i].position.y, newZ);
 
                 if (newZ < destroyZ)
                 {
                     cars[i].SetActive(false);
-                    cars[i].transform.position = new Vector3(carWorldX[i], originalY[i], startZ);
+                    carTransforms[i].position = new Vector3(carWorldX[i], originalY[i], startZ);
                 }
             }
         }
@@ -110,7 +113,7 @@ public class FlashTheCar : MonoBehaviour
         // Step 2 — Track current car (lastCarIndex) for input and triggering
         if (lastCarIndex >= 0 && cars[lastCarIndex].activeSelf)
         {
-            float curZ = cars[lastCarIndex].transform.position.z;
+            float curZ = carTransforms[lastCarIndex].position.z;
 
             // Enter window
             if (curZ >= zoneMin && curZ <= zoneMax && !hasPressedThisTurn)

@@ -73,8 +73,8 @@ public class GameManager : MonoBehaviour
     private string currentGame = "";
     public ControlType CurrentControlType { get; private set; }
     private bool isGameOver = false;
+    private bool gameStarted = false;
 
-    // Playlist : ordre aléatoire une fois, puis chargement un par un ; à la fin du tableau on reprend au début
     private static readonly string[] MinigameSceneNames =
     {
         "BallDropper",
@@ -91,7 +91,15 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        LoadNextMiniGame();
+    }
+
+    public void StartGame()
+    {
+        if (!gameStarted)
+        {
+            gameStarted = true;
+            LoadNextMiniGame();
+        }
     }
 
 
@@ -304,11 +312,19 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        if (isGameOver)
+        {
+            if (Input.GetButtonDown("P1_B3") || Input.GetButtonDown("P2_B3"))
+            {
+                RestartGame();
+            }
+            return;
+        }
+
         if (!HasExactlyOneActiveAudioListener())
         {
             EnsureSingleAudioListener();
         }
-
         // Back to menu manager
         if (Input.GetButton("P1_Vertical") ||
             Input.GetButton("P1_Horizontal") ||
@@ -348,15 +364,6 @@ public class GameManager : MonoBehaviour
             quitTimer = 0f;
         }
         //[END] Back to menu manager
-
-        if (isGameOver)
-        {
-            if (Input.GetButtonDown("P1_B3") || Input.GetButtonDown("P2_B3"))
-            {
-                RestartGame();
-            }
-            return;
-        }
     }
 
     void FixedUpdate()

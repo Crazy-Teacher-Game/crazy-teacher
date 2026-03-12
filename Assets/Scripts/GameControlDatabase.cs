@@ -11,7 +11,8 @@ public static class GameControlsDatabase
             {"Dice", ControlType.JoystickX },
             {"MentalMath", ControlType.ButtonsFGH },
             {"PopTheBottle", ControlType.JoystickY},
-            {"FlashTheCar", ControlType.ButtonF}
+            {"FlashTheCar", ControlType.ButtonF},
+            {"TimerGame", ControlType.ButtonF},
         };
 
     public static ControlType GetControlType(string sceneName)

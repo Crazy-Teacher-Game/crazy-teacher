@@ -48,6 +48,7 @@ public class FlashTheCar : MonoBehaviour
     private bool[] carIsFast;
 
     private FlashPhotoStrip photoStrip;
+    [SerializeField] private FlashScreenIndicator screenIndicator;
 
     private int lastCarIndex = -1;
     private bool isFirstCar = true;
@@ -194,8 +195,17 @@ public class FlashTheCar : MonoBehaviour
                     {
                         // Voiture rapide ratée → fail
                         gameEnded = true;
-                        photoStrip.Cleanup();
-                        GameManager.Instance.NotifyFail();
+                        if (screenIndicator != null)
+                            screenIndicator.ShowScreen(FlashScreenIndicator.ScreenType.Rate, () =>
+                            {
+                                photoStrip.Cleanup();
+                                GameManager.Instance.NotifyFail();
+                            });
+                        else
+                        {
+                            photoStrip.Cleanup();
+                            GameManager.Instance.NotifyFail();
+                        }
                     }
                 }
             }
@@ -244,18 +254,43 @@ public class FlashTheCar : MonoBehaviour
                 {
                     // Voiture normale dans la zone → fail
                     gameEnded = true;
-                    photoStrip.Cleanup();
-                    GameManager.Instance.NotifyFail();
+                    if (screenIndicator != null)
+                        screenIndicator.ShowScreen(FlashScreenIndicator.ScreenType.Innocent, () =>
+                        {
+                            photoStrip.Cleanup();
+                            GameManager.Instance.NotifyFail();
+                        });
+                    else
+                    {
+                        photoStrip.Cleanup();
+                        GameManager.Instance.NotifyFail();
+                    }
                 }
                 else
                 {
                     // Voiture rapide → success
                     flashCount++;
-                    if (flashCount >= requiredFlashes)
+                    bool isFinalFlash = flashCount >= requiredFlashes;
+
+                    if (isFinalFlash)
                     {
                         gameEnded = true;
-                        photoStrip.Cleanup();
-                        GameManager.Instance.NotifyWin();
+                        if (screenIndicator != null)
+                            screenIndicator.ShowScreen(FlashScreenIndicator.ScreenType.Fini, () =>
+                            {
+                                photoStrip.Cleanup();
+                                GameManager.Instance.NotifyWin();
+                            });
+                        else
+                        {
+                            photoStrip.Cleanup();
+                            GameManager.Instance.NotifyWin();
+                        }
+                    }
+                    else
+                    {
+                        if (screenIndicator != null)
+                            screenIndicator.ShowScreen(FlashScreenIndicator.ScreenType.Parfait);
                     }
                 }
             }
@@ -335,11 +370,29 @@ public class FlashTheCar : MonoBehaviour
         if (!gameEnded)
         {
             gameEnded = true;
-            photoStrip.Cleanup();
-            if (anyFastCarPassedZone)
-                GameManager.Instance.NotifyFail();
+            if (screenIndicator != null)
+            {
+                if (anyFastCarPassedZone)
+                    screenIndicator.ShowScreen(FlashScreenIndicator.ScreenType.Fini, () =>
+                    {
+                        photoStrip.Cleanup();
+                        GameManager.Instance.NotifyFail();
+                    });
+                else
+                    screenIndicator.ShowScreen(FlashScreenIndicator.ScreenType.Fini, () =>
+                    {
+                        photoStrip.Cleanup();
+                        GameManager.Instance.NotifyWin();
+                    });
+            }
             else
-                GameManager.Instance.NotifyWin();
+            {
+                photoStrip.Cleanup();
+                if (anyFastCarPassedZone)
+                    GameManager.Instance.NotifyFail();
+                else
+                    GameManager.Instance.NotifyWin();
+            }
         }
     }
 

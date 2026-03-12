@@ -9,7 +9,7 @@ public class FlashTheCar : MonoBehaviour
     [SerializeField] private GameObject car3;
     [SerializeField] private GameObject car4_race;
     [SerializeField] private GameObject car5_taxi;
-    [SerializeField] private GameObject car6_police;
+    // car6_police retiré
     private float fixedWorldX = 206.19f;
     private float fixedWorldXFast = 211.4f;
     private float normalSpeed = 0.5f;
@@ -17,9 +17,9 @@ public class FlashTheCar : MonoBehaviour
     private float startZ = 310f;
 
     // State variables
-    private float destroyZ = -30f;
-    private float zoneMin = 230f;
-    private float zoneMax = 263f;
+    private float destroyZ = -130f;
+    private float zoneMin = 220f;
+    private float zoneMax = 260f;
     private float timerDuration = 30f;
     private float timerMinDuration = 10f;
     private int requiredFlashes = 3;
@@ -44,15 +44,15 @@ public class FlashTheCar : MonoBehaviour
 
     void Start()
     {
-        cars = new GameObject[] { car1, car2, car3, car4_race, car5_taxi, car6_police };
+        cars = new GameObject[] { car1, car2, car3, car4_race, car5_taxi };
 
-        originalY = new float[6];
-        carSpeeds = new float[6];
-        carWorldX = new float[6];
-        carIsFast = new bool[6];
-        carTransforms = new Transform[6];
+        originalY = new float[5];
+        carSpeeds = new float[5];
+        carWorldX = new float[5];
+        carIsFast = new bool[5];
+        carTransforms = new Transform[5];
 
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < 5; i++)
         {
             carTransforms[i] = cars[i].transform;
             originalY[i] = carTransforms[i].position.y;
@@ -72,8 +72,8 @@ public class FlashTheCar : MonoBehaviour
         int carIndex;
         do
         {
-            carIndex = Random.Range(0, 6);
-        } while (carIndex == lastCarIndex);
+            carIndex = Random.Range(0, 5);
+        } while (carIndex == lastCarIndex || cars[carIndex].activeSelf);
 
         lastCarIndex = carIndex;
         cars[carIndex].SetActive(true);
@@ -95,7 +95,7 @@ public class FlashTheCar : MonoBehaviour
         if (gameEnded) return;
 
         // Step 1 — Move all active cars and clean up
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < 5; i++)
         {
             if (cars[i].activeSelf)
             {
@@ -125,12 +125,12 @@ public class FlashTheCar : MonoBehaviour
             if (curZ < zoneMin && inputWindowOpen)
             {
                 inputWindowOpen = false;
-                if (carIsFast[lastCarIndex] && lastCarIndex != 5)
+                if (carIsFast[lastCarIndex])
                 {
                     anyFastCarPassedZone = true;
                     if (!hasPressedThisTurn)
                     {
-                        // Fast non-police car missed → fail
+                        // Voiture rapide ratée → fail
                         gameEnded = true;
                         GameManager.Instance.NotifyFail();
                     }
@@ -154,7 +154,7 @@ public class FlashTheCar : MonoBehaviour
 
     private bool AnyCarInZone()
     {
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < 5; i++)
         {
             if (cars[i].activeSelf && cars[i].transform.position.z >= zoneMin && cars[i].transform.position.z <= zoneMax)
             {
@@ -176,21 +176,16 @@ public class FlashTheCar : MonoBehaviour
                 hasPressedThisTurn = true;
                 inputWindowOpen = false;
 
-                if (lastCarIndex == 5)
+                // car6_police retiré, plus de vérification sur l'index 5
+                if (!carIsFast[lastCarIndex])
                 {
-                    // Police in zone → fail
-                    gameEnded = true;
-                    GameManager.Instance.NotifyFail();
-                }
-                else if (!carIsFast[lastCarIndex])
-                {
-                    // Normal car in zone → fail
+                    // Voiture normale dans la zone → fail
                     gameEnded = true;
                     GameManager.Instance.NotifyFail();
                 }
                 else
                 {
-                    // Fast non-police → success
+                    // Voiture rapide → success
                     flashCount++;
                     if (flashCount >= requiredFlashes)
                     {

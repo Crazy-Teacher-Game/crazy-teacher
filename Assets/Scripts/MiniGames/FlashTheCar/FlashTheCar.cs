@@ -30,7 +30,7 @@ public class FlashTheCar : MonoBehaviour
     // car6_police retiré
     private float fixedWorldX = 206.19f;
     private float fixedWorldXFast = 211.4f;
-    private float normalSpeed = 0.5f;
+    private float normalSpeed = 0.4f;
     private float fastSpeed = 1f;
     private float startZ = 310f;
 
@@ -39,8 +39,9 @@ public class FlashTheCar : MonoBehaviour
     private float zoneMin = 220f;
     private float zoneMax = 260f;
     private float timerDuration = 30f;
-    private float timerMinDuration = 10f;
+    private float timerMinDuration = 8f;
     private int requiredFlashes = 3;
+    [SerializeField] private float inputArmDelay = 0.75f;
     private float spawnChance; // Calculated based on difficulty for fast cars
 
     private GameObject[] cars;
@@ -62,6 +63,8 @@ public class FlashTheCar : MonoBehaviour
     private bool anyFastCarPassedZone = false;
     private int flashCount = 0;
     private bool gameEnded = false;
+    private bool terminalNotificationSent = false;
+    private bool inputArmed = false;
 
     void Start()
     {
@@ -103,6 +106,8 @@ public class FlashTheCar : MonoBehaviour
             GameManager.Instance.OnTimerEnded += HandleTimerEnded;
             GameManager.Instance.StartTimer(timerDuration, timerMinDuration);
         }
+
+        StartCoroutine(ArmInputAfterDelay());
         LaunchNewCar();
     }
 
@@ -140,7 +145,7 @@ public class FlashTheCar : MonoBehaviour
 
         lastCarIndex = carIndex;
         float difficulty = GameManager.Instance != null ? GameManager.Instance.DifficultyFactor : 0f;
-        spawnChance = 0.5f + 0.4f * difficulty;
+        spawnChance = 0.5f + 0.9f * difficulty;
         carIsFast[carIndex] = !isFirstCar && (Random.value < spawnChance);
         isFirstCar = false;
         carSpeeds[carIndex] = carIsFast[carIndex] ? fastSpeed * (1f + difficulty) : normalSpeed;
@@ -219,7 +224,7 @@ public class FlashTheCar : MonoBehaviour
                     if (!hasPressedThisTurn)
                     {
                         // Voiture rapide ratée → fail
-                        EndGame(false, FlashScreenIndicator.ScreenType.Rate);
+                        EndGame(false, FlashScreenIndicator.ScreenType.Rate, "Missed fast car in window");
                     }
                 }
             }
@@ -258,6 +263,12 @@ public class FlashTheCar : MonoBehaviour
         if (Input.GetButtonDown("P1_B1"))
         {
             StartCoroutine(TriggerFlash());
+
+            if (!inputArmed)
+            {
+                return;
+            }
+
             if (inputWindowOpen && !hasPressedThisTurn)
             {
                 hasPressedThisTurn = true;
@@ -267,7 +278,7 @@ public class FlashTheCar : MonoBehaviour
                 if (!carIsFast[lastCarIndex])
                 {
                     // Voiture normale dans la zone → fail
-                    EndGame(false, FlashScreenIndicator.ScreenType.Innocent);
+                    EndGame(false, FlashScreenIndicator.ScreenType.Innocent, "Pressed normal car in window");
                 }
                 else
                 {
@@ -277,7 +288,7 @@ public class FlashTheCar : MonoBehaviour
 
                     if (isFinalFlash)
                     {
-                        EndGame(true, FlashScreenIndicator.ScreenType.Fini);
+                        EndGame(true, FlashScreenIndicator.ScreenType.Fini, "Reached required flashes");
                     }
                     else
                     {
@@ -358,21 +369,44 @@ public class FlashTheCar : MonoBehaviour
         }
     }
 
-    private void HandleTimerEnded()
+    private IEnumerator ArmInputAfterDelay()
     {
-        EndGame(!anyFastCarPassedZone, FlashScreenIndicator.ScreenType.Fini);
+        if (inputArmDelay > 0f)
+            yield return new WaitForSeconds(inputArmDelay);
+
+        if (!gameEnded)
+            inputArmed = true;
     }
 
-    private void EndGame(bool isWin, FlashScreenIndicator.ScreenType? screenType = null)
+    private void HandleTimerEnded()
+    {
+        // Product rule: reaching the finish screen is always a win.
+        EndGame(true, FlashScreenIndicator.ScreenType.Fini, "Timer ended (finish screen)");
+    }
+
+    private void EndGame(bool isWin, FlashScreenIndicator.ScreenType? screenType = null, string reason = null)
     {
         if (gameEnded) return;
         gameEnded = true;
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnTimerEnded -= HandleTimerEnded;
+        }
+
+        Debug.Log($"[FlashTheCar] EndGame accepted - isWin={isWin}, screen={screenType}, reason={reason}");
 
         if (ambientAudioSource != null)
             StartCoroutine(FadeAudio(ambientAudioSource, ambientAudioSource.volume, 0f, ambientFadeOutDuration));
 
         System.Action notify = () =>
         {
+            if (terminalNotificationSent)
+            {
+                return;
+            }
+
+            terminalNotificationSent = true;
             photoStrip.Cleanup();
             if (GameManager.Instance != null)
             {

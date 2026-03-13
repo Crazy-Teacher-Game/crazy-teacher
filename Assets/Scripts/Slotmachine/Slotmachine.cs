@@ -18,6 +18,7 @@ public class Slotmachine : MonoBehaviour
     [SerializeField] private AudioClip victorySound;
     [SerializeField] private float victoryVolume = 1f;
     [SerializeField] private float endNotifyDelay = 2f;
+    [SerializeField] private GameObject fondgris;
 
     [Header("Audio")]
     [SerializeField] private AudioClip slotMachine7;
@@ -258,7 +259,19 @@ public class Slotmachine : MonoBehaviour
     {
         if (gameEnded) return;
         isResetting = true;
+        SetFondColor(new Color(1f, 0.42f, 0.42f, 1f));
         StartCoroutine(ResetAfterDelay());
+    }
+
+    private void SetFondColor(Color color)
+    {
+        if (fondgris != null)
+        {
+            var image = fondgris.GetComponent<Image>();
+            if (image != null) { image.color = color; return; }
+            var sr = fondgris.GetComponent<SpriteRenderer>();
+            if (sr != null) { sr.color = color; return; }
+        }
     }
 
     private IEnumerator ResetAfterDelay()
@@ -266,6 +279,7 @@ public class Slotmachine : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
         if (!gameEnded)
         {
+            SetFondColor(new Color(1f, 1f, 1f, 1f));
             RestartStoppedWheelsOnly();
             level = 1;
         }

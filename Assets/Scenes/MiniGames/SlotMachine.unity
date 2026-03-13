@@ -272,14 +272,13 @@ MonoBehaviour:
   wheel1: {fileID: 1597861402}
   wheel2: {fileID: 2114939260}
   wheel3: {fileID: 2015744377}
-  durationSeconds: 8
-  minDurationSeconds: 4
   screenIndicator: {fileID: 158253894}
   endMiniGameSound: {fileID: 8300000, guid: 198307cec7ed65143a6401b5f1f853ac, type: 3}
   endMiniGameVolume: 2
   victorySound: {fileID: 8300000, guid: 2e7718402476e604789b0b4b94ca8d1e, type: 3}
   victoryVolume: 1
   endNotifyDelay: 2
+  fondgris: {fileID: 1738235278}
   slotMachine7: {fileID: 8300000, guid: 6ba8c1ec7355c5747be5bfdc06d9d6d5, type: 3}
   slotMachine7Volume: 1.2
   slotMachineAmbiance: {fileID: 8300000, guid: 3fd34d697d9bd994591877fb8a9b6b33, type: 3}

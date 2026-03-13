@@ -279,8 +279,20 @@ MonoBehaviour:
   minDurationSeconds: 4
   screenIndicator: {fileID: 158253894}
   endMiniGameSound: {fileID: 8300000, guid: 198307cec7ed65143a6401b5f1f853ac, type: 3}
+  endMiniGameVolume: 2
   victorySound: {fileID: 8300000, guid: 2e7718402476e604789b0b4b94ca8d1e, type: 3}
+  victoryVolume: 1
   endNotifyDelay: 2
+  slotMachine7: {fileID: 8300000, guid: 6ba8c1ec7355c5747be5bfdc06d9d6d5, type: 3}
+  slotMachine7Volume: 1.2
+  slotMachineAmbiance: {fileID: 8300000, guid: 3fd34d697d9bd994591877fb8a9b6b33, type: 3}
+  slotMachineAmbianceVolume: 0.6
+  slotMachineStop: {fileID: 8300000, guid: ce7a9a79bb8a27c4a8914eef0f3b8ad3, type: 3}
+  slotMachineStopVolume: 0.9
+  slotMachineWheel: {fileID: 8300000, guid: e2b501e7e613d754a8edd7a108990e85, type: 3}
+  slotMachineWheelVolume: 0.7
+  ambianceFadeInDuration: 1
+  ambianceFadeOutDuration: 2
   backgroundColor: {r: 0, g: 0, b: 0, a: 0.25}
   backgroundSprite: {fileID: 0}
   backgroundSortingOrder: -200

@@ -14,8 +14,22 @@ public class Slotmachine : MonoBehaviour
     [SerializeField] float minDurationSeconds = 4f;
     [SerializeField] private FlashScreenIndicator screenIndicator;
     [SerializeField] private AudioClip endMiniGameSound;
+    [SerializeField] private float endMiniGameVolume = 1f;
     [SerializeField] private AudioClip victorySound;
+    [SerializeField] private float victoryVolume = 1f;
     [SerializeField] private float endNotifyDelay = 2f;
+
+    [Header("Audio")]
+    [SerializeField] private AudioClip slotMachine7;
+    [SerializeField] private float slotMachine7Volume = 1f;
+    [SerializeField] private AudioClip slotMachineAmbiance;
+    [SerializeField] private float slotMachineAmbianceVolume = 1f;
+    [SerializeField] private AudioClip slotMachineStop;
+    [SerializeField] private float slotMachineStopVolume = 1f;
+    [SerializeField] private AudioClip slotMachineWheel;
+    [SerializeField] private float slotMachineWheelVolume = 1f;
+    [SerializeField] private float ambianceFadeInDuration = 1f;
+    [SerializeField] private float ambianceFadeOutDuration = 1f;
 
     [Header("Background")]
     [SerializeField] private Color backgroundColor = new Color(0f, 0f, 0f, 0.25f);
@@ -27,7 +41,12 @@ public class Slotmachine : MonoBehaviour
     private bool isResetting = false;
     private bool isStoppingCurrentWheel = false;
     private bool btnDownLastUpdate = false;
-    private AudioSource audioSource;
+    private AudioSource endAudioSource;
+    private AudioSource fxAudioSource;
+    private AudioSource ambianceAudioSource;
+    private AudioSource wheelAudioSource;
+    private Coroutine ambianceFadeCoroutine;
+    private bool wheelLoopPlaying = false;
     private GameObject backgroundCanvasGO;
 
     void Start()
@@ -39,7 +58,8 @@ public class Slotmachine : MonoBehaviour
         }
 
         CreateBackground();
-        audioSource = gameObject.AddComponent<AudioSource>();
+        InitializeAudioSources();
+        FadeAmbianceIn();
 
         // Wheels start spinning immediately
         if (wheel1 != null) wheel1.StartSpin();
@@ -49,6 +69,8 @@ public class Slotmachine : MonoBehaviour
 
     void Update()
     {
+        UpdateWheelLoopSound();
+
         if (gameEnded || isResetting || isStoppingCurrentWheel)
         {
             btnDownLastUpdate = Input.GetButton("P1_B1");
@@ -85,6 +107,7 @@ public class Slotmachine : MonoBehaviour
             yield break;
 
         bool pass = currentWheel.LastStopWasSeven;
+        PlayStopResultSound(pass);
         if (!pass)
         {
             TriggerMiss();
@@ -103,6 +126,106 @@ public class Slotmachine : MonoBehaviour
         {
             EndGame(true, FlashScreenIndicator.ScreenType.Parfait);
         }
+    }
+
+    private void InitializeAudioSources()
+    {
+        endAudioSource = gameObject.AddComponent<AudioSource>();
+        endAudioSource.playOnAwake = false;
+
+        fxAudioSource = gameObject.AddComponent<AudioSource>();
+        fxAudioSource.playOnAwake = false;
+
+        ambianceAudioSource = gameObject.AddComponent<AudioSource>();
+        ambianceAudioSource.playOnAwake = false;
+        ambianceAudioSource.loop = true;
+        ambianceAudioSource.clip = slotMachineAmbiance;
+        ambianceAudioSource.volume = 0f;
+        if (slotMachineAmbiance != null)
+            ambianceAudioSource.Play();
+
+        wheelAudioSource = gameObject.AddComponent<AudioSource>();
+        wheelAudioSource.playOnAwake = false;
+        wheelAudioSource.loop = true;
+        wheelAudioSource.clip = slotMachineWheel;
+        wheelAudioSource.volume = slotMachineWheelVolume;
+    }
+
+    private void FadeAmbianceIn()
+    {
+        if (ambianceAudioSource == null || slotMachineAmbiance == null) return;
+        if (ambianceFadeCoroutine != null)
+            StopCoroutine(ambianceFadeCoroutine);
+        ambianceFadeCoroutine = StartCoroutine(FadeAudio(ambianceAudioSource, 0f, slotMachineAmbianceVolume, ambianceFadeInDuration));
+    }
+
+    private void FadeAmbianceOut()
+    {
+        if (ambianceAudioSource == null) return;
+        if (ambianceFadeCoroutine != null)
+            StopCoroutine(ambianceFadeCoroutine);
+        ambianceFadeCoroutine = StartCoroutine(FadeAudio(ambianceAudioSource, ambianceAudioSource.volume, 0f, ambianceFadeOutDuration));
+    }
+
+    private IEnumerator FadeAudio(AudioSource source, float from, float to, float duration)
+    {
+        if (source == null)
+            yield break;
+
+        if (duration <= 0f)
+        {
+            source.volume = to;
+            yield break;
+        }
+
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            source.volume = Mathf.Lerp(from, to, elapsed / duration);
+            yield return null;
+        }
+
+        source.volume = to;
+    }
+
+    private bool AnyWheelTurning()
+    {
+        bool wheel1Turning = wheel1 != null && (wheel1.IsSpinning || wheel1.IsStopping);
+        bool wheel2Turning = wheel2 != null && (wheel2.IsSpinning || wheel2.IsStopping);
+        bool wheel3Turning = wheel3 != null && (wheel3.IsSpinning || wheel3.IsStopping);
+        return wheel1Turning || wheel2Turning || wheel3Turning;
+    }
+
+    private void UpdateWheelLoopSound()
+    {
+        if (wheelAudioSource == null || slotMachineWheel == null)
+            return;
+
+        wheelAudioSource.volume = slotMachineWheelVolume;
+        bool shouldPlay = AnyWheelTurning();
+        if (shouldPlay && !wheelLoopPlaying)
+        {
+            wheelAudioSource.Play();
+            wheelLoopPlaying = true;
+        }
+        else if (!shouldPlay && wheelLoopPlaying)
+        {
+            wheelAudioSource.Stop();
+            wheelLoopPlaying = false;
+        }
+    }
+
+    private void PlayStopResultSound(bool isSeven)
+    {
+        if (fxAudioSource == null)
+            return;
+
+        if (isSeven && slotMachine7 != null)
+            fxAudioSource.PlayOneShot(slotMachine7, slotMachine7Volume);
+
+        if (slotMachineStop != null)
+            fxAudioSource.PlayOneShot(slotMachineStop, slotMachineStopVolume);
     }
 
     private Wheel GetCurrentWheel()
@@ -168,6 +291,7 @@ public class Slotmachine : MonoBehaviour
         if (wheel2 != null) wheel2.Stop();
         if (wheel3 != null) wheel3.Stop();
 
+        FadeAmbianceOut();
         PlayEndScreenSound(screenType);
 
         if (screenIndicator != null)
@@ -192,21 +316,24 @@ public class Slotmachine : MonoBehaviour
 
     private void PlayEndScreenSound(FlashScreenIndicator.ScreenType screenType)
     {
-        if (audioSource == null) return;
+        if (endAudioSource == null) return;
 
         AudioClip clipToPlay = null;
+        float volumeToPlay = 1f;
         switch (screenType)
         {
             case FlashScreenIndicator.ScreenType.Rate:
                 clipToPlay = endMiniGameSound;
+                volumeToPlay = endMiniGameVolume;
                 break;
-            case FlashScreenIndicator.ScreenType.Fini:
+            case FlashScreenIndicator.ScreenType.Parfait:
                 clipToPlay = victorySound;
+                volumeToPlay = victoryVolume;
                 break;
         }
 
         if (clipToPlay != null)
-            audioSource.PlayOneShot(clipToPlay);
+            endAudioSource.PlayOneShot(clipToPlay, volumeToPlay);
     }
 
     private void CreateBackground()
@@ -238,6 +365,16 @@ public class Slotmachine : MonoBehaviour
         {
             GameManager.Instance.OnTimerEnded -= HandleTimerEnded;
         }
+
+        if (ambianceFadeCoroutine != null)
+        {
+            StopCoroutine(ambianceFadeCoroutine);
+            ambianceFadeCoroutine = null;
+        }
+
+        if (wheelAudioSource != null)
+            wheelAudioSource.Stop();
+
         if (backgroundCanvasGO != null)
         {
             Destroy(backgroundCanvasGO);

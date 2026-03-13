@@ -4,14 +4,14 @@ using UnityEngine.UI;
 
 public class Slotmachine : MonoBehaviour
 {
+    private const float MinSpinSpeed = 6f;
+    private const float MaxSpinSpeed = 10f;
+    private const float MaxDurationSeconds = 20f;
+    private const float MinDurationSeconds = 6f;
+
     [SerializeField] private Wheel wheel1;
     [SerializeField] private Wheel wheel2;
     [SerializeField] private Wheel wheel3;
-    [SerializeField] private WheelFrame wheelFrame1;
-    [SerializeField] private WheelFrame wheelFrame2;
-    [SerializeField] private WheelFrame wheelFrame3;
-    [SerializeField] float durationSeconds = 8f;
-    [SerializeField] float minDurationSeconds = 4f;
     [SerializeField] private FlashScreenIndicator screenIndicator;
     [SerializeField] private AudioClip endMiniGameSound;
     [SerializeField] private float endMiniGameVolume = 1f;
@@ -52,11 +52,20 @@ public class Slotmachine : MonoBehaviour
 
     void Start()
     {
+        float difficultyFactor = 0f;
         if (GameManager.Instance != null)
         {
+            difficultyFactor = Mathf.Clamp01(GameManager.Instance.DifficultyFactor);
             GameManager.Instance.OnTimerEnded += HandleTimerEnded;
-            GameManager.Instance.StartTimer(durationSeconds, minDurationSeconds);
+            GameManager.Instance.StartTimer(MaxDurationSeconds, MinDurationSeconds);
         }
+        else
+        {
+            Debug.LogWarning("[Slotmachine] GameManager not found. Using default spin speed and no shared timer.");
+        }
+
+        float spinSpeed = Mathf.Lerp(MinSpinSpeed, MaxSpinSpeed, difficultyFactor);
+        SetWheelsSpinSpeed(spinSpeed);
 
         if (useRuntimeBackground)
             CreateBackground();
@@ -67,6 +76,13 @@ public class Slotmachine : MonoBehaviour
         if (wheel1 != null) wheel1.StartSpin();
         if (wheel2 != null) wheel2.StartSpin();
         if (wheel3 != null) wheel3.StartSpin();
+    }
+
+    private void SetWheelsSpinSpeed(float spinSpeed)
+    {
+        if (wheel1 != null) wheel1.SetSpinSpeed(spinSpeed);
+        if (wheel2 != null) wheel2.SetSpinSpeed(spinSpeed);
+        if (wheel3 != null) wheel3.SetSpinSpeed(spinSpeed);
     }
 
     void Update()
@@ -242,7 +258,6 @@ public class Slotmachine : MonoBehaviour
     {
         if (gameEnded) return;
         isResetting = true;
-        SetAllFrames(Color.red);
         StartCoroutine(ResetAfterDelay());
     }
 
@@ -251,7 +266,6 @@ public class Slotmachine : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
         if (!gameEnded)
         {
-            SetAllFrames(Color.yellow);
             RestartStoppedWheelsOnly();
             level = 1;
         }
@@ -272,12 +286,6 @@ public class Slotmachine : MonoBehaviour
             wheel.StartSpin();
     }
 
-    private void SetAllFrames(Color color)
-    {
-        wheelFrame1.SetColor(color);
-        wheelFrame2.SetColor(color);
-        wheelFrame3.SetColor(color);
-    }
 
     private void HandleTimerEnded()
     {

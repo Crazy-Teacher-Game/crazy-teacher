@@ -6,13 +6,13 @@ public class Wheel : MonoBehaviour
 {
     [SerializeField] private GameObject[] slotPrefabs;
     [SerializeField] private float stopSmoothDuration = 0.15f;
-    [SerializeField] private int symbolsSortingOrder = 10;
+    [SerializeField] private int symbolsSortingOrder = 8;
     [SerializeField] private float symbolsLocalZ = -0.01f;
 
     private GameObject wheel;
     private GameObject[] instantiatedObjects;
     private float spaceBetweenObjects = 2f;
-    private float spinSpeed = 8f;
+    private float spinSpeed = 6f;
 
     //spin index, random float between 0 and spaceBetweenObjects
     private float spinIndex;
@@ -29,6 +29,11 @@ public class Wheel : MonoBehaviour
     public bool IsSpinning => isSpinning;
     public bool IsStopping => isStopping;
     public bool LastStopWasSeven => lastStopWasSeven;
+
+    public void SetSpinSpeed(float speed)
+    {
+        spinSpeed = Mathf.Max(0f, speed);
+    }
 
     public bool Stop()
     {

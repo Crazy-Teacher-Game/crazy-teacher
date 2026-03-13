@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 using System;
+using Anatidae;
 
 public class GameManager : MonoBehaviour
 {
@@ -40,6 +41,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int roundsPlayed;
     public int RoundsPlayed { get; private set; }
     public int currentRound = 0;
+    public int Score { get; private set; }
+    [SerializeField] private GameOverManager gameOverManager;
 
     [Header("UI")]
     [SerializeField] public TimerUI timerUI;
@@ -49,6 +52,7 @@ public class GameManager : MonoBehaviour
     public event Action OnMinigameWon;
     public event Action OnMinigameFailed;
     private ScenesLoader scenesLoader;
+    private StartMenuLoader startMenuLoader;
     private AudioListener _activeAudioListener;
 
     // Back to menu manager
@@ -74,6 +78,9 @@ public class GameManager : MonoBehaviour
     public ControlType CurrentControlType { get; private set; }
     private bool isGameOver = false;
     private bool gameStarted = false;
+    private bool replayTextShown = false;
+    private bool isTransitioning = false;
+    private bool highscoreInputWasShown = false;
 
     private static readonly string[] MinigameSceneNames =
     {
@@ -115,12 +122,20 @@ public class GameManager : MonoBehaviour
             return;
         }
         scenesLoader = GetComponent<ScenesLoader>();
+        startMenuLoader = GetComponent<StartMenuLoader>();
+        if (startMenuLoader == null)
+            startMenuLoader = FindObjectOfType<StartMenuLoader>();
         Lives = startingLives;
         livesUI?.SetLives(Lives);
         RoundsPlayed = 0;
         BuildAndShufflePlaylist();
 
         EnsureSingleAudioListener();
+    }
+
+    public void RegisterGameOverManager(GameOverManager manager)
+    {
+        gameOverManager = manager;
     }
 
     void OnEnable()
@@ -139,10 +154,10 @@ public class GameManager : MonoBehaviour
         RoundsPlayed++;
         currentRound++;
 
-        // Augmente la difficulté de 0.1 après chaque jeu, sauf les 3 premiers
+        // Augmente la difficulté de 5% après chaque jeu, sauf les 3 premiers
         if (currentRound > gamesBeforeDifficultyIncrease)
         {
-            difficultyFactor = Mathf.Min(1f, difficultyFactor + 0.1f);
+            difficultyFactor = Mathf.Min(1f, difficultyFactor + 0.05f);
             Debug.Log($"[GameManager] DifficultyFactor increased to {difficultyFactor}");
         }
     }
@@ -207,9 +222,12 @@ public class GameManager : MonoBehaviour
     //ACTIONS QUI SE LANCENT QUAND ON GAGNE OU PERD UN MINI-JEU
     public void NotifyWin()
     {
+        if (isTransitioning) return;
+        isTransitioning = true;
         StopTimer();
         OnMinigameWon?.Invoke();
-        Debug.Log("[GameManager] Minigame WON");
+        int gained = Mathf.RoundToInt((1f + difficultyFactor) * 10f);
+        Score += gained;
         scenesLoader.UnloadMiniGame(currentGame);
         AddRound();
         LoadNextMiniGame();
@@ -217,6 +235,8 @@ public class GameManager : MonoBehaviour
 
     public void NotifyFail()
     {
+        if (isTransitioning) return;
+        isTransitioning = true;
         Debug.Log($"[GameManager] NotifyFail() called - Lives BEFORE LoseLife: {Lives}, currentGame: {currentGame}");
         StopTimer();
         OnMinigameFailed?.Invoke();
@@ -246,6 +266,7 @@ public class GameManager : MonoBehaviour
     {
         string nextGame = GetNextGameInPlaylist();
         currentGame = nextGame;
+        isTransitioning = false;
         scenesLoader.LoadMiniGame(nextGame);
         Debug.Log("[GameManager] Loading next mini-game: " + nextGame);
     }
@@ -294,12 +315,19 @@ public class GameManager : MonoBehaviour
     {
         isGameOver = true;
         scenesLoader.LoadGameOverScene();
+        StartCoroutine(WaitFor3Seconds());
+        IEnumerator WaitFor3Seconds()
+        {
+            yield return new WaitForSeconds(3f);
+            LoadHighscoreInterface();
+        }
         Debug.Log("GAME OVER !");
     }
 
     private void RestartGame()
     {
         isGameOver = false;
+        gameStarted = false;
         scenesLoader.UnloadGameOverScene();
         Lives = startingLives;
         livesUI?.SetLives(Lives);
@@ -307,20 +335,18 @@ public class GameManager : MonoBehaviour
         difficultyFactor = 0f;
         RoundsPlayed = 0;
         BuildAndShufflePlaylist();
-        LoadNextMiniGame();
+        replayTextShown = false;
+        isTransitioning = false;
+        highscoreInputWasShown = false;
+
+        if (startMenuLoader != null)
+            startMenuLoader.ReloadMenu();
+        else
+            StartGame();
     }
 
     void Update()
     {
-        if (isGameOver)
-        {
-            if (Input.GetButtonDown("P1_B3") || Input.GetButtonDown("P2_B3"))
-            {
-                RestartGame();
-            }
-            return;
-        }
-
         if (!HasExactlyOneActiveAudioListener())
         {
             EnsureSingleAudioListener();
@@ -363,7 +389,26 @@ public class GameManager : MonoBehaviour
             quit = false;
             quitTimer = 0f;
         }
-        //[END] Back to menu manager
+
+        if (isGameOver)
+        {
+            if (HighscoreManager.IsHighscoreInputScreenShown)
+                highscoreInputWasShown = true;
+
+            if (highscoreInputWasShown && !HighscoreManager.IsHighscoreInputScreenShown && !replayTextShown && gameOverManager != null)
+            {
+                gameOverManager.ShowReplayText();
+                replayTextShown = true;
+            }
+
+            if (highscoreInputWasShown && !HighscoreManager.IsHighscoreInputScreenShown &&
+                (Input.GetButtonDown("P1_B3") || Input.GetButtonDown("P2_B3")))
+            {
+                RestartGame();
+            }
+
+            return;
+        }
     }
 
     void FixedUpdate()
@@ -402,6 +447,10 @@ public class GameManager : MonoBehaviour
     private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         EnsureSingleAudioListener();
+        if (scene.name == "GameOverScene")
+        {
+            gameOverManager = FindObjectOfType<GameOverManager>();
+        }
     }
 
     private void EnsureSingleAudioListener()
@@ -507,4 +556,10 @@ public class GameManager : MonoBehaviour
         livesUI.SetLives(Lives);
         Debug.Log("[GameManager] LivesUI registered successfully");
     }
+
+    private void LoadHighscoreInterface()
+    {
+        HighscoreManager.ShowHighscoreInput(Score);
+    }
+
 }

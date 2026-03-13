@@ -88,11 +88,11 @@ public class GameManager : MonoBehaviour
         "SlotMachine",
         "PopTheBottle",
         "MentalMath",
-        "Dice",
-        "FlashTheCar",
-        "TriPommePoire",
-        "Loop",
-        "ExplodeTheBalloon",
+        // "Dice",
+        // "FlashTheCar",
+        // "TriPommePoire",
+        // "Loop",
+        // "ExplodeTheBalloon",
     };
     private List<string> _minigamePlaylist;
     private int _minigamePlaylistIndex;

@@ -41,7 +41,7 @@ public class TimerUI : MonoBehaviour
             float t = duration <= 0.0001f ? 0f : Mathf.Clamp01(remaining / duration);
             fillBar.fillAmount = t;
             // Lerp color from green (full) to red (empty)
-            fillBar.color = Color.Lerp(Color.red, Color.green, t);
+            // fillBar.color = Color.Lerp(Color.red, Color.green, t);
         }
     }
 

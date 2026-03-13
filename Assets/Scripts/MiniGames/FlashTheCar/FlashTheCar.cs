@@ -30,8 +30,8 @@ public class FlashTheCar : MonoBehaviour
     // car6_police retiré
     private float fixedWorldX = 206.19f;
     private float fixedWorldXFast = 211.4f;
-    private float normalSpeed = 0.4f;
-    private float fastSpeed = 1f;
+    private float normalSpeed = 0.35f;
+    private float fastSpeed = 0.8f;
     private float startZ = 310f;
 
     // State variables
@@ -148,7 +148,7 @@ public class FlashTheCar : MonoBehaviour
         spawnChance = 0.5f + 0.9f * difficulty;
         carIsFast[carIndex] = !isFirstCar && (Random.value < spawnChance);
         isFirstCar = false;
-        carSpeeds[carIndex] = carIsFast[carIndex] ? fastSpeed * (1f + difficulty) : normalSpeed;
+        carSpeeds[carIndex] = carIsFast[carIndex] ? fastSpeed * (0.5f + difficulty) : normalSpeed;
         carWorldX[carIndex] = carIsFast[carIndex] ? fixedWorldXFast : fixedWorldX;
 
         bool isFast = carIsFast[carIndex];

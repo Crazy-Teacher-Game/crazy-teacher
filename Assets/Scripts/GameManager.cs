@@ -84,9 +84,9 @@ public class GameManager : MonoBehaviour
 
     private static readonly string[] MinigameSceneNames =
     {
-        // "BallDropper",
-        // "SlotMachine",
-        // "PopTheBottle",
+        "BallDropper",
+        "SlotMachine",
+        "PopTheBottle",
         "MentalMath",
         "Dice",
         "FlashTheCar",

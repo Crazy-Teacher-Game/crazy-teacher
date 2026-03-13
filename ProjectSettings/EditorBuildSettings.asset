@@ -47,4 +47,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MiniGames/Loop.unity
     guid: d8628e714308e4883b38467cf4d8d72f
+  - enabled: 1
+    path: Assets/Scenes/MiniGames/ExplodeTheBalloon.unity
+    guid: eea3e6864d13f4e76b4c30ef022fa551
   m_configObjects: {}

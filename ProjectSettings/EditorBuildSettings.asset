@@ -45,6 +45,6 @@ EditorBuildSettings:
     path: Assets/Scenes/MiniGames/FlashTheCar.unity
     guid: b3ef0441eb5fcbe4cb1533cced18d331
   - enabled: 1
-    path: Assets/Scenes/MiniGames/TimerGame.unity
-    guid: 5d73455c31efe44e08e4a147bb8be68a
+    path: Assets/Scenes/MiniGames/Loop.unity
+    guid: d8628e714308e4883b38467cf4d8d72f
   m_configObjects: {}

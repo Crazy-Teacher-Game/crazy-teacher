@@ -32,6 +32,7 @@ public class Slotmachine : MonoBehaviour
     [SerializeField] private float ambianceFadeOutDuration = 1f;
 
     [Header("Background")]
+    [SerializeField] private bool useRuntimeBackground = false;
     [SerializeField] private Color backgroundColor = new Color(0f, 0f, 0f, 0.25f);
     [SerializeField] private Sprite backgroundSprite;
     [SerializeField] private int backgroundSortingOrder = -200;
@@ -57,7 +58,8 @@ public class Slotmachine : MonoBehaviour
             GameManager.Instance.StartTimer(durationSeconds, minDurationSeconds);
         }
 
-        CreateBackground();
+        if (useRuntimeBackground)
+            CreateBackground();
         InitializeAudioSources();
         FadeAmbianceIn();
 

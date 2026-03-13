@@ -6,6 +6,8 @@ public class Wheel : MonoBehaviour
 {
     [SerializeField] private GameObject[] slotPrefabs;
     [SerializeField] private float stopSmoothDuration = 0.15f;
+    [SerializeField] private int symbolsSortingOrder = 10;
+    [SerializeField] private float symbolsLocalZ = -0.01f;
 
     private GameObject wheel;
     private GameObject[] instantiatedObjects;
@@ -86,8 +88,19 @@ public class Wheel : MonoBehaviour
         for (int i = 0; i < numObjects; i++)
         {
             float y = minY + Mathf.Repeat(loop - currentSpinIndex, totalHeight);
-            instantiatedObjects[i].transform.localPosition = new Vector3(0f, y, 0f);
+            instantiatedObjects[i].transform.localPosition = new Vector3(0f, y, symbolsLocalZ);
             loop += spacing;
+        }
+    }
+
+    private void ApplySymbolSorting(GameObject instance)
+    {
+        if (instance == null) return;
+
+        SpriteRenderer[] renderers = instance.GetComponentsInChildren<SpriteRenderer>(true);
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            renderers[i].sortingOrder = symbolsSortingOrder;
         }
     }
 
@@ -115,9 +128,10 @@ public class Wheel : MonoBehaviour
         {
             GameObject instance = Instantiate(prefab, wheel.transform);
             // Position the instance based on the index
-            instance.transform.localPosition = new Vector3(0, -100, 0);
+            instance.transform.localPosition = new Vector3(0, -100, symbolsLocalZ);
             //change name of the instance to the name of the prefab
             instance.name = prefab.name;
+            ApplySymbolSorting(instance);
 
             instantiatedObjects[prefabIndex] = instance;
             prefabIndex++;

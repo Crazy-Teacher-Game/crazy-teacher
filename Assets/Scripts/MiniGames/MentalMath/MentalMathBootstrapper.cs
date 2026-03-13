@@ -123,15 +123,14 @@ public class MentalMathBootstrapper : MonoBehaviour
 		Debug.Log("[MentalMathBootstrapper] Created new MiniGame_CalculManager");
 
 		// Wire UI references by scene object names
-		var calcTextObj = GameObject.Find("calculation-value");
-		var propTextObj = GameObject.Find("proposition-value");
-		var successImgObj = GameObject.Find("SucessImage");
-		var failImgObj = GameObject.Find("FailImage");
+		var allTMPs = Object.FindObjectsOfType<TMP_Text>(true);
+		var calcText = System.Array.Find(allTMPs, t => t.gameObject.name == "calculation-value");
+		var propText = System.Array.Find(allTMPs, t => t.gameObject.name == "proposition-value");
+		var progressText = System.Array.Find(allTMPs, t => t.gameObject.name == "progress-value");
 
-		var calcText = calcTextObj ? calcTextObj.GetComponent<TMPro.TMP_Text>() : null;
-		var propText = propTextObj ? propTextObj.GetComponent<TMPro.TMP_Text>() : null;
-		var successImg = successImgObj ? successImgObj.GetComponent<Image>() : null;
-		var failImg = failImgObj ? failImgObj.GetComponent<Image>() : null;
+		var allImages = Object.FindObjectsOfType<Image>(true);
+		var successImg = System.Array.Find(allImages, img => img.gameObject.name == "SucessImage");
+		var failImg = System.Array.Find(allImages, img => img.gameObject.name == "FailImage");
 
 		// Hide feedback images immediately to match default state
 		if (successImg != null) successImg.enabled = false;
@@ -144,6 +143,8 @@ public class MentalMathBootstrapper : MonoBehaviour
 				?.SetValue(ui, calcText);
 			typeof(CalculUIManager).GetField("propositionsText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
 				?.SetValue(ui, propText);
+			typeof(CalculUIManager).GetField("progressText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+				?.SetValue(ui, progressText);
 			typeof(CalculUIManager).GetField("successImage", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
 				?.SetValue(ui, successImg);
 			typeof(CalculUIManager).GetField("failImage", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
@@ -161,5 +162,19 @@ public class MentalMathBootstrapper : MonoBehaviour
 			typeof(MiniGame_CalculManager).GetField("calculUIManager", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
 				?.SetValue(mgr, ui);
 		}
+	}
+
+	private Transform FindChildRecursive(Transform parent, string name)
+	{
+		foreach (Transform child in parent)
+		{
+			if (child.name == name)
+				return child;
+			
+			var found = FindChildRecursive(child, name);
+			if (found != null)
+				return found;
+		}
+		return null;
 	}
 }

@@ -3,13 +3,11 @@ using System.Collections.Generic;
 
 public class CalculLogic : MonoBehaviour
 {
-    private int correctAnswerIndex;
-    private int correctAnswer;
-
     public struct CalculationData
     {
         public string Question;
         public List<int> Answers;
+        public int CorrectAnswerIndex;
     }
 
     public CalculationData GenerateCalculation()
@@ -56,8 +54,6 @@ public class CalculLogic : MonoBehaviour
             result = a / b;
         }
 
-        correctAnswer = result;
-
         List<int> answers = new List<int>();
         answers.Add(result);
 
@@ -75,20 +71,15 @@ public class CalculLogic : MonoBehaviour
             (answers[i], answers[rnd]) = (answers[rnd], answers[i]);
         }
 
-        correctAnswerIndex = answers.IndexOf(result);
+        int finalCorrectIndex = answers.IndexOf(result);
 
         var data = new CalculationData
         {
             Question = $"{a} {operation} {b}",
-            Answers = answers
+            Answers = answers,
+            CorrectAnswerIndex = finalCorrectIndex
         };
         
         return data;
-    }
-
-    public bool CheckAnswer(int index)
-    {
-        bool ok = index == correctAnswerIndex;
-        return ok;
     }
 }

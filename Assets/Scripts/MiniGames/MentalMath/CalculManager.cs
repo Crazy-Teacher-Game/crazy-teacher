@@ -23,8 +23,14 @@ public class MiniGame_CalculManager : MonoBehaviour
         GameManager.Instance.StartTimer(15f, 8f);
         wrongAttempts = 0;
         correctAnswers = 0;
-        GenerateNewCalculation();
+        StartCoroutine(DelayedStart());
         Debug.Log($"[MiniGame_CalculManager] Start() complete - calculLogic={(calculLogic != null)}, calculUIManager={(calculUIManager != null)}");
+    }
+
+    private System.Collections.IEnumerator DelayedStart()
+    {
+        yield return null;
+        GenerateNewCalculation();
     }
 
     void OnDestroy()
@@ -51,15 +57,13 @@ public class MiniGame_CalculManager : MonoBehaviour
         calculUIManager.DisplayCalculation(calcul);
     }
 
-    public bool OnAnswerSelected(int index)
+    public void OnAnswerSelected(int index, bool correct)
     {
         // Check if game is over (no lives left)
         if (GameManager.Instance.Lives <= 0)
         {
-            return false;
+            return;
         }
-        
-        bool correct = calculLogic.CheckAnswer(index);
 
         if (correct)
         {
@@ -69,11 +73,11 @@ public class MiniGame_CalculManager : MonoBehaviour
             if (correctAnswers >= REQUIRED_CORRECT_ANSWERS)
             {
                 GameManager.Instance.NotifyWin();
-                return true;
+                return;
             }
 
             // Generate next calculation if not yet won
-            return true;
+            return;
         }
         
         wrongAttempts++;
@@ -81,9 +85,8 @@ public class MiniGame_CalculManager : MonoBehaviour
         if (wrongAttempts >= 3)
         {
             GameManager.Instance.NotifyFail();
-            return false;
+            return;
         }
-        return false; 
     }
 
     private void HandleTimerEnded()

@@ -13,6 +13,9 @@ public class Slotmachine : MonoBehaviour
     [SerializeField] float durationSeconds = 8f;
     [SerializeField] float minDurationSeconds = 4f;
     [SerializeField] private FlashScreenIndicator screenIndicator;
+    [SerializeField] private AudioClip endMiniGameSound;
+    [SerializeField] private AudioClip victorySound;
+    [SerializeField] private float endNotifyDelay = 2f;
 
     [Header("Background")]
     [SerializeField] private Color backgroundColor = new Color(0f, 0f, 0f, 0.25f);
@@ -24,6 +27,7 @@ public class Slotmachine : MonoBehaviour
     private bool isResetting = false;
     private bool isStoppingCurrentWheel = false;
     private bool btnDownLastUpdate = false;
+    private AudioSource audioSource;
     private GameObject backgroundCanvasGO;
 
     void Start()
@@ -35,6 +39,7 @@ public class Slotmachine : MonoBehaviour
         }
 
         CreateBackground();
+        audioSource = gameObject.AddComponent<AudioSource>();
 
         // Wheels start spinning immediately
         if (wheel1 != null) wheel1.StartSpin();
@@ -96,7 +101,7 @@ public class Slotmachine : MonoBehaviour
         }
         else
         {
-            EndGame(true, FlashScreenIndicator.ScreenType.Fini);
+            EndGame(true, FlashScreenIndicator.ScreenType.Parfait);
         }
     }
 
@@ -163,6 +168,18 @@ public class Slotmachine : MonoBehaviour
         if (wheel2 != null) wheel2.Stop();
         if (wheel3 != null) wheel3.Stop();
 
+        PlayEndScreenSound(screenType);
+
+        if (screenIndicator != null)
+            screenIndicator.ShowScreen(screenType);
+
+        StartCoroutine(NotifyEndResultAfterDelay(isWin));
+    }
+
+    private IEnumerator NotifyEndResultAfterDelay(bool isWin)
+    {
+        yield return new WaitForSeconds(endNotifyDelay);
+
         System.Action notify = () =>
         {
             if (GameManager.Instance == null) return;
@@ -170,10 +187,26 @@ public class Slotmachine : MonoBehaviour
             else GameManager.Instance.NotifyFail();
         };
 
-        if (screenIndicator != null)
-            screenIndicator.ShowScreen(screenType, notify);
-        else
-            notify();
+        notify();
+    }
+
+    private void PlayEndScreenSound(FlashScreenIndicator.ScreenType screenType)
+    {
+        if (audioSource == null) return;
+
+        AudioClip clipToPlay = null;
+        switch (screenType)
+        {
+            case FlashScreenIndicator.ScreenType.Rate:
+                clipToPlay = endMiniGameSound;
+                break;
+            case FlashScreenIndicator.ScreenType.Fini:
+                clipToPlay = victorySound;
+                break;
+        }
+
+        if (clipToPlay != null)
+            audioSource.PlayOneShot(clipToPlay);
     }
 
     private void CreateBackground()

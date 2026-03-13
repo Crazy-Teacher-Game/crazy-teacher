@@ -50,6 +50,7 @@ public class GameManager : MonoBehaviour
     public event Action OnMinigameWon;
     public event Action OnMinigameFailed;
     private ScenesLoader scenesLoader;
+    private StartMenuLoader startMenuLoader;
     private AudioListener _activeAudioListener;
 
     // Back to menu manager
@@ -116,6 +117,9 @@ public class GameManager : MonoBehaviour
             return;
         }
         scenesLoader = GetComponent<ScenesLoader>();
+        startMenuLoader = GetComponent<StartMenuLoader>();
+        if (startMenuLoader == null)
+            startMenuLoader = FindObjectOfType<StartMenuLoader>();
         Lives = startingLives;
         livesUI?.SetLives(Lives);
         RoundsPlayed = 0;
@@ -307,6 +311,7 @@ public class GameManager : MonoBehaviour
     private void RestartGame()
     {
         isGameOver = false;
+        gameStarted = false;
         scenesLoader.UnloadGameOverScene();
         Lives = startingLives;
         livesUI?.SetLives(Lives);
@@ -314,7 +319,11 @@ public class GameManager : MonoBehaviour
         difficultyFactor = 0f;
         RoundsPlayed = 0;
         BuildAndShufflePlaylist();
-        LoadNextMiniGame();
+
+        if (startMenuLoader != null)
+            startMenuLoader.ReloadMenu();
+        else
+            StartGame();
     }
 
     void Update()

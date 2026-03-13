@@ -76,6 +76,13 @@ public class StartMenuLoader : MonoBehaviour
         GameManager.Instance.StartGame();
     }
 
+    public void ReloadMenu()
+    {
+        menuLoaded = false;
+        inputDetected = false;
+        StartCoroutine(LoadStartMenuSequence());
+    }
+
     private bool DetectAnyInput()
     {
         if (Input.GetButtonDown("P1_B1") || Input.GetButtonDown("P1_B2") || Input.GetButtonDown("P1_B3") ||

@@ -13,6 +13,7 @@ public static class GameControlsDatabase
             {"PopTheBottle", ControlType.JoystickY},
             {"FlashTheCar", ControlType.ButtonF},
             {"TimerGame", ControlType.ButtonF},
+            {"Loop", ControlType.JoystickY},
         };
 
     public static ControlType GetControlType(string sceneName)

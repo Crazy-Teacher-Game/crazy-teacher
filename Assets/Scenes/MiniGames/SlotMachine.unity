@@ -173,6 +173,7 @@ MonoBehaviour:
   wheelFrame2: {fileID: 544421603}
   wheelFrame3: {fileID: 1302114042}
   durationSeconds: 8
+  minDurationSeconds: 4
 --- !u!1 &227408251
 GameObject:
   m_ObjectHideFlags: 0
@@ -208,7 +209,7 @@ Camera:
   m_GameObject: {fileID: 227408251}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 2
+  m_ClearFlags: 3
   m_BackGroundColor: {r: 0.047058824, g: 0.3019608, b: 0.14117648, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2

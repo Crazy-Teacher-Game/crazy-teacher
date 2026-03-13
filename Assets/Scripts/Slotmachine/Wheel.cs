@@ -5,6 +5,7 @@ using UnityEngine;
 public class Wheel : MonoBehaviour
 {
     [SerializeField] private GameObject[] slotPrefabs;
+    [SerializeField] private float stopSmoothDuration = 0.15f;
 
     private GameObject wheel;
     private GameObject[] instantiatedObjects;
@@ -17,36 +18,77 @@ public class Wheel : MonoBehaviour
     private int offsetMargin = 3;
 
     private bool isSpinning = true;
+    private bool isStopping = false;
+    private float stopElapsed = 0f;
+    private float stopStartSpinIndex = 0f;
+    private float stopTargetSpinIndex = 0f;
+    private bool lastStopWasSeven = false;
+
+    public bool IsSpinning => isSpinning;
+    public bool IsStopping => isStopping;
+    public bool LastStopWasSeven => lastStopWasSeven;
 
     public bool Stop()
     {
-        isSpinning = false;
-        //find the object nearest with the Y position nearest to 0 in instantiatedObjects
-        //devide spinIndex by two then round to the ciel the value
-        // if (numObjects == 0)
-        // {
-        //     Debug.Log("Error: numObjects is 0 in Wheel.Stop()");
-        //     //Debug element name
-        //     Debug.Log("Wheel name: " + wheel.name);
-        // }
-        // if (spaceBetweenObjects == 0f)
-        // {
-        //     Debug.Log("Error: spaceBetweenObjects is 0 in Wheel.Stop()");
-        // }
-        int nearestIndex = Mathf.RoundToInt(spinIndex / spaceBetweenObjects) % numObjects - offsetMargin - 1;
-        if (nearestIndex < 0) nearestIndex += numObjects;
-        string nearestObjectName = instantiatedObjects[nearestIndex].name;
+        if (instantiatedObjects == null || instantiatedObjects.Length == 0)
+            return false;
 
-        if (nearestObjectName == "Seven")
+        numObjects = instantiatedObjects.Length;
+
+        if (!isSpinning || isStopping)
+            return false;
+
+        float spacing = spaceBetweenObjects;
+        float totalHeight = numObjects * spacing;
+        float current = Mathf.Repeat(spinIndex, totalHeight);
+
+        int selectedIndex = 0;
+        float bestSignedDelta = float.MaxValue;
+        for (int i = 0; i < numObjects; i++)
         {
-            return true;
+            float baseTarget = Mathf.Repeat((i - offsetMargin) * spacing, totalHeight);
+            float forwardDelta = baseTarget - current;
+            if (forwardDelta < 0f) forwardDelta += totalHeight;
+
+            // Pick the nearest notch on the ring: small backward motion is allowed.
+            float signedDelta = forwardDelta;
+            if (signedDelta > totalHeight * 0.5f)
+                signedDelta -= totalHeight;
+
+            if (Mathf.Abs(signedDelta) < Mathf.Abs(bestSignedDelta))
+            {
+                bestSignedDelta = signedDelta;
+                selectedIndex = i;
+            }
         }
-        return false;
+
+        lastStopWasSeven = instantiatedObjects[selectedIndex].name == "Seven";
+        stopStartSpinIndex = spinIndex;
+        stopTargetSpinIndex = spinIndex + bestSignedDelta;
+        stopElapsed = 0f;
+        isStopping = true;
+        return true;
     }
 
     public void StartSpin()
     {
+        isStopping = false;
         isSpinning = true;
+    }
+
+    private void UpdateVisuals(float currentSpinIndex)
+    {
+        float spacing = spaceBetweenObjects;
+        float totalHeight = numObjects * spacing;
+        float minY = -offsetMargin * spacing;
+
+        float loop = 0f;
+        for (int i = 0; i < numObjects; i++)
+        {
+            float y = minY + Mathf.Repeat(loop - currentSpinIndex, totalHeight);
+            instantiatedObjects[i].transform.localPosition = new Vector3(0f, y, 0f);
+            loop += spacing;
+        }
     }
 
     void Awake()
@@ -86,24 +128,36 @@ public class Wheel : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (!isSpinning) return;
+        if (instantiatedObjects == null || instantiatedObjects.Length == 0)
+            return;
+
         numObjects = instantiatedObjects.Length;
 
         float spacing = spaceBetweenObjects;
         float totalHeight = numObjects * spacing;
-        float minY = -offsetMargin * spacing;     // your chosen start offset
 
-        // advance the scroll (positive = move down visually; flip sign if you want the other way)
-        spinIndex = Mathf.Repeat(spinIndex + spinSpeed * Time.deltaTime, totalHeight);
-
-        float loop = 0f;
-        for (int i = 0; i < numObjects; i++)
+        if (isStopping)
         {
-            // Wrap each item within [minY, minY + totalHeight)
-            float y = minY + Mathf.Repeat(loop - spinIndex, totalHeight);
-            instantiatedObjects[i].transform.localPosition = new Vector3(0f, y, 0f);
-            loop += spacing;
+            stopElapsed += Time.deltaTime;
+            float duration = Mathf.Max(0.01f, stopSmoothDuration);
+            float t = Mathf.Clamp01(stopElapsed / duration);
+            float eased = 1f - Mathf.Pow(1f - t, 3f); // Ease out cubic
+
+            float current = Mathf.Lerp(stopStartSpinIndex, stopTargetSpinIndex, eased);
+            spinIndex = current;
+
+            if (t >= 1f)
+            {
+                spinIndex = Mathf.Repeat(stopTargetSpinIndex, totalHeight);
+                isStopping = false;
+                isSpinning = false;
+            }
+        }
+        else if (isSpinning)
+        {
+            spinIndex = Mathf.Repeat(spinIndex + spinSpeed * Time.deltaTime, totalHeight);
         }
 
+        UpdateVisuals(spinIndex);
     }
 }

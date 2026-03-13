@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 using System;
+using Anatidae;
 
 public class GameManager : MonoBehaviour
 {
@@ -294,6 +295,12 @@ public class GameManager : MonoBehaviour
     {
         isGameOver = true;
         scenesLoader.LoadGameOverScene();
+        // StartCoroutine(WaitFor3Seconds());
+        // IEnumerator WaitFor3Seconds()
+        // {
+        //     yield return new WaitForSeconds(3f);
+        //     LoadHighscoreInterface();
+        // }
         Debug.Log("GAME OVER !");
     }
 
@@ -506,5 +513,11 @@ public class GameManager : MonoBehaviour
         livesUI = ui;
         livesUI.SetLives(Lives);
         Debug.Log("[GameManager] LivesUI registered successfully");
+    }
+
+    private void LoadHighscoreInterface()
+    {
+        HighscoreManager.ShowHighscores();
+        Debug.Log("[GameManager] HighscoreInterface loaded");
     }
 }

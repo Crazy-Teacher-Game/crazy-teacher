@@ -21,6 +21,7 @@ public class ScenesLoader : MonoBehaviour
         yield return new WaitForSeconds(2f);
         yield return StartCoroutine(UnloadTransitionSceneCoroutine("LoadingScene"));
         yield return StartCoroutine(LoadMiniGameCoroutine(sceneName));
+        GameManager.Instance.ShowDescription(sceneName);
         Debug.Log($"[ScenesLoader] LoadMiniGameSequence END: {sceneName}");
     }
 

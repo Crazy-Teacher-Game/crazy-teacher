@@ -82,6 +82,9 @@ public class GameManager : MonoBehaviour
     private bool isTransitioning = false;
     private bool highscoreInputWasShown = false;
 
+    public TMP_Text descriptionText;
+    private bool isDescriptionShowing = false;
+
     private static readonly string[] MinigameSceneNames =
     {
         "BallDropper",
@@ -179,9 +182,37 @@ public class GameManager : MonoBehaviour
         livesUI?.SetLives(Lives);
     }
 
+    //GESTION DE LA DESCRIPTION
+    public void ShowDescription(string sceneName)
+    {
+        string description = GameDescriptionDatabase.GetDescription(sceneName);
+        if (!string.IsNullOrEmpty(description) && descriptionText != null)
+        {
+            StartCoroutine(CoShowDescription(description));
+        }
+    }
+
+    private IEnumerator CoShowDescription(string description)
+    {
+        isDescriptionShowing = true;
+        descriptionText.text = description;
+        descriptionText.gameObject.SetActive(true);
+        yield return new WaitForSeconds(1f);
+        descriptionText.gameObject.SetActive(false);
+        isDescriptionShowing = false;
+    }
+
     //GESTION DU TIMER
     public void StartTimer(float maxSeconds, float minSeconds)
     {
+        StartCoroutine(CoStartTimer(maxSeconds, minSeconds));
+    }
+
+    private IEnumerator CoStartTimer(float maxSeconds, float minSeconds)
+    {
+        while (isDescriptionShowing)
+            yield return null;
+
         StopTimer(); //pour être sur qu'on en a pas deux qui tournent
         float computed = (maxSeconds - minSeconds) * (1f - difficultyFactor) + minSeconds;
         Duration = Mathf.Max(0f, computed);

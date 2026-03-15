@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
+
 public class TimerGame : MonoBehaviour
 {
     // pour le GM
@@ -12,12 +13,29 @@ public class TimerGame : MonoBehaviour
     public TMP_Text timerToFindText;
     public TMP_Text playerTimerText;
 
+    public GameObject tennaDefault;
+    public GameObject tennaWinPrefab;
+    public AudioSource audioSource;
+    public AudioClip buttonSound;
+    public AudioClip winSound;
+    public AudioClip loseSound;
+    public Animator moveAnimator;
+
+    public GameObject winPrefab;
+    public GameObject losePrefab;
+
+    public GameObject HidersPrefab;
+
+    public TMP_Text timer2;
+    public TMP_Text timer3;
+    public TMP_Text timer4;
+
     private int timerToFind;
     private float playerTimer = 0f;
     private bool timerRunning = false;
     private bool gameEnded = false;
     private float startDelay = 1f;
-    private float hideTextTime = 1.5f;
+    private float hideTextTime = 5f;
 
     void Start()
     {
@@ -39,6 +57,9 @@ public class TimerGame : MonoBehaviour
         if (timerRunning)
         {
             SetTextOpacity(playerTimerText, 0f);
+            SetTextOpacity(timer2, 0f);
+            SetTextOpacity(timer3, 0f);
+            SetTextOpacity(timer4, 0f);
         }
     }
 
@@ -50,19 +71,38 @@ public class TimerGame : MonoBehaviour
         {
             playerTimer += Time.deltaTime;
             playerTimerText.text = playerTimer.ToString("F2");
+            timer2.text = playerTimer.ToString("F2");
+            timer3.text = playerTimer.ToString("F2");
+            timer4.text = playerTimer.ToString("F2");
 
             if (Input.GetButtonDown("P1_B1"))
             {
+                HidersPrefab.SetActive(false);
+                if (audioSource != null && buttonSound != null)
+                    audioSource.PlayOneShot(buttonSound);
+                if (moveAnimator != null)
+                    moveAnimator.SetTrigger("Move");
                 timerRunning = false;
                 SetTextOpacity(playerTimerText, 1f);
+                timer2.text = Random.Range(5, timerToFind).ToString();
+                timer3.text = Random.Range(5, timerToFind).ToString();
+                timer4.text = Random.Range(5, timerToFind).ToString();
                 //arrondi à l'entier le plus proche pour pas montrer notre marge d'erreur
                 if (Mathf.Abs(playerTimer - timerToFind) <= 0.7f)
                 {
-                    playerTimerText.text = Mathf.CeilToInt(playerTimer) + "s";
+                    playerTimerText.text = Mathf.CeilToInt(playerTimer).ToString();
+                    tennaDefault.SetActive(false);
+                    tennaWinPrefab.SetActive(true);
+                    winPrefab.SetActive(true);
+                    if (audioSource != null && winSound != null)
+                        audioSource.PlayOneShot(winSound);
                 }
                 else
                 {
-                    playerTimerText.text = playerTimer.ToString("F2") + "s";
+                    playerTimerText.text = playerTimer.ToString("F2");
+                    losePrefab.SetActive(true);
+                    if (audioSource != null && loseSound != null)
+                        audioSource.PlayOneShot(loseSound);
                 }
 
                 gameEnded = true;

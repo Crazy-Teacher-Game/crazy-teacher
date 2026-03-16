@@ -9,6 +9,8 @@ public class Cup : MonoBehaviour
     public Transform rotationCenter;
     public float rotationSpeedDegreesPerSecond = 70f;
     public Vector3 rotationAxis = Vector3.up;
+    public AudioSource audioSource;
+    public AudioClip rightInHoleSound;
     void Start()
     {
         UpdateScoreUI();
@@ -40,6 +42,11 @@ public class Cup : MonoBehaviour
             globalScore++;
             Destroy(other.gameObject);
             UpdateScoreUI();
+            float minPitch = 0.5f;
+            float maxPitch = 1.0f;
+            float t = Mathf.InverseLerp(1, 4, globalScore);
+            audioSource.pitch = Mathf.Lerp(minPitch, maxPitch, t);
+            audioSource.PlayOneShot(rightInHoleSound);
         }
     }
 

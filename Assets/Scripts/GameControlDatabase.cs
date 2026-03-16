@@ -5,7 +5,7 @@ public static class GameControlsDatabase
     private static Dictionary<string, ControlType> controlMap =
         new Dictionary<string, ControlType>()
         {
-            { "BallDropper", ControlType.JoystickY },
+            { "DropTheFish", ControlType.JoystickY },
             { "TriPommePoire", ControlType.JoystickX },
             { "SlotMachine", ControlType.ButtonF },
             {"Dice", ControlType.JoystickX },

@@ -5,7 +5,7 @@ public static class GameDescriptionDatabase
     private static Dictionary<string, string> descriptionMap =
         new Dictionary<string, string>()
         {
-            { "BallDropper", "Fais tomber !" },
+            { "DropTheFish", "Fais tomber !" },
             { "TriPommePoire", "Trie !" },
             { "SlotMachine", "Arrête !" },
             { "Dice", "Tourne !" },

@@ -253,6 +253,8 @@ MonoBehaviour:
   rotationCenter: {fileID: 1299209135}
   rotationSpeedDegreesPerSecond: 70
   rotationAxis: {x: 0, y: 1, z: 0}
+  audioSource: {fileID: 890436617}
+  rightInHoleSound: {fileID: 8300000, guid: 996ff7bd3a0de422997bf5d02935de6d, type: 3}
 --- !u!23 &162265975
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -382,6 +384,8 @@ MonoBehaviour:
   rotationCenter: {fileID: 1299209135}
   rotationSpeedDegreesPerSecond: 70
   rotationAxis: {x: 0, y: 1, z: 0}
+  audioSource: {fileID: 890436617}
+  rightInHoleSound: {fileID: 8300000, guid: 996ff7bd3a0de422997bf5d02935de6d, type: 3}
 --- !u!23 &278209608
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -511,6 +515,8 @@ MonoBehaviour:
   rotationCenter: {fileID: 1299209135}
   rotationSpeedDegreesPerSecond: 70
   rotationAxis: {x: 0, y: 1, z: 0}
+  audioSource: {fileID: 890436617}
+  rightInHoleSound: {fileID: 8300000, guid: 996ff7bd3a0de422997bf5d02935de6d, type: 3}
 --- !u!23 &675595425
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -751,6 +757,7 @@ GameObject:
   - component: {fileID: 890436614}
   - component: {fileID: 890436613}
   - component: {fileID: 890436612}
+  - component: {fileID: 890436617}
   m_Layer: 0
   m_Name: ocean
   m_TagString: Untagged
@@ -851,6 +858,102 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 74.615}
+--- !u!82 &890436617
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 890436611}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 0.66
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &1299209132
 GameObject:
   m_ObjectHideFlags: 0
@@ -971,6 +1074,8 @@ MonoBehaviour:
   rotationCenter: {fileID: 1299209135}
   rotationSpeedDegreesPerSecond: 70
   rotationAxis: {x: 0, y: 1, z: 0}
+  audioSource: {fileID: 890436617}
+  rightInHoleSound: {fileID: 8300000, guid: 996ff7bd3a0de422997bf5d02935de6d, type: 3}
 --- !u!23 &1668523365
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1392,14 +1497,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2066892551}
-  m_LocalRotation: {x: 0, y: 0.6773254, z: 0, w: 0.73568356}
-  m_LocalPosition: {x: -5.47, y: 0.09, z: -6.22}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.009, y: -0.096, z: -10.152}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 85.27, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2831471685906017067
 MonoBehaviour:
   m_ObjectHideFlags: 0

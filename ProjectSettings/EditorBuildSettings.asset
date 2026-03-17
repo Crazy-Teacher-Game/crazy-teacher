@@ -24,7 +24,7 @@ EditorBuildSettings:
     path: Assets/Scenes/MiniGames/SlotMachine.unity
     guid: fe8baaf2380f2004d99b895f5c231d6f
   - enabled: 1
-    path: Assets/Scenes/MiniGames/BallDropper.unity
+    path: Assets/Scenes/MiniGames/DropTheFish.unity
     guid: 3b721db360f6b46ddb6ffb24048029c3
   - enabled: 1
     path: Assets/Scenes/MiniGames/TriPommePoire.unity

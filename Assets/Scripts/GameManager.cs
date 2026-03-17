@@ -48,12 +48,20 @@ public class GameManager : MonoBehaviour
     [SerializeField] public TimerUI timerUI;
     [SerializeField] private LivesUI livesUI;
 
+    [Header("Minigame Result UI")]
+    [SerializeField] private GameObject winSprite;
+    [SerializeField] private GameObject failSprite;
+    [SerializeField] private float resultDisplayTime = 1.5f;
+
     //ACTION À EFFECTUER À LA FIN D'UN MINI-JEU
     public event Action OnMinigameWon;
     public event Action OnMinigameFailed;
     private ScenesLoader scenesLoader;
     private StartMenuLoader startMenuLoader;
     private AudioListener _activeAudioListener;
+    private AudioSource audioSource;
+    public AudioClip winSound;
+    public AudioClip failSound;
 
     // Back to menu manager
     private float afkTimer = 0f;
@@ -87,7 +95,7 @@ public class GameManager : MonoBehaviour
 
     private static readonly string[] MinigameSceneNames =
     {
-        "BallDropper",
+        "DropTheFish",
         "SlotMachine",
         "PopTheBottle",
         "MentalMath",
@@ -136,6 +144,13 @@ public class GameManager : MonoBehaviour
         BuildAndShufflePlaylist();
 
         EnsureSingleAudioListener();
+
+        audioSource = GetComponent<AudioSource>();
+
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
     }
 
     public void RegisterGameOverManager(GameOverManager manager)
@@ -257,10 +272,18 @@ public class GameManager : MonoBehaviour
     {
         if (isTransitioning) return;
         isTransitioning = true;
+        StartCoroutine(CoNotifyWin());
+    }
+
+    private IEnumerator CoNotifyWin()
+    {
         StopTimer();
         OnMinigameWon?.Invoke();
         int gained = Mathf.RoundToInt((1f + difficultyFactor) * 10f);
         Score += gained;
+        if (winSound != null)
+            audioSource.PlayOneShot(winSound);
+        yield return StartCoroutine(ShowWinResult());
         scenesLoader.UnloadMiniGame(currentGame);
         AddRound();
         LoadNextMiniGame();
@@ -270,21 +293,25 @@ public class GameManager : MonoBehaviour
     {
         if (isTransitioning) return;
         isTransitioning = true;
-        Debug.Log($"[GameManager] NotifyFail() called - Lives BEFORE LoseLife: {Lives}, currentGame: {currentGame}");
+
+        StartCoroutine(CoNotifyFail());
+    }
+
+    private IEnumerator CoNotifyFail()
+    {
         StopTimer();
         OnMinigameFailed?.Invoke();
-        Debug.Log("[GameManager] Minigame FAILED, rest of lives: " + Lives);
+        if (failSound != null)
+            audioSource.PlayOneShot(failSound);
+        yield return StartCoroutine(ShowFailResult());
         LoseLife();
-        Debug.Log($"[GameManager] NotifyFail() - Lives AFTER LoseLife: {Lives}");
         if (Lives > 0)
         {
-            Debug.Log($"[GameManager] NotifyFail() - Lives > 0, calling LoadNextMiniGame");
             scenesLoader.UnloadMiniGame(currentGame);
             LoadNextMiniGame();
         }
         else
         {
-            Debug.Log($"[GameManager] NotifyFail() - No lives left, calling GameOver");
             scenesLoader.UnloadMiniGame(currentGame);
             GameOver();
         }
@@ -593,6 +620,20 @@ public class GameManager : MonoBehaviour
     private void LoadHighscoreInterface()
     {
         HighscoreManager.ShowHighscoreInput(Score);
+    }
+
+    private IEnumerator ShowWinResult()
+    {
+        winSprite.SetActive(true);
+        yield return new WaitForSeconds(resultDisplayTime);
+        winSprite.SetActive(false);
+    }
+
+    private IEnumerator ShowFailResult()
+    {
+        failSprite.SetActive(true);
+        yield return new WaitForSeconds(resultDisplayTime);
+        failSprite.SetActive(false);
     }
 
 }

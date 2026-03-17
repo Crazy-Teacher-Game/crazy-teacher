@@ -5,7 +5,8 @@ using UnityEngine.Networking;
 using System.Collections;
 using System.Text;
 
-namespace Anatidae {
+namespace Anatidae
+{
 
     public class HighscoreManager : MonoBehaviour
     {
@@ -30,7 +31,7 @@ namespace Anatidae {
         }
 
         public static HighscoreManager Instance { get; private set; }
-        public static List<HighscoreEntry> Highscores { get; private set;}
+        public static List<HighscoreEntry> Highscores { get; private set; }
         public static bool HasFetchedHighscores { get; private set; }
         public static bool IsHighscoreInputScreenShown { get; private set; }
         public static string PlayerName;
@@ -40,10 +41,12 @@ namespace Anatidae {
 
         void Awake()
         {
-            if (Instance == null){
+            if (Instance == null)
+            {
                 Instance = this;
             }
-            else{
+            else
+            {
                 Destroy(gameObject);
             }
 
@@ -58,7 +61,8 @@ namespace Anatidae {
 
         public static void ShowHighscores()
         {
-            if (Instance.highscoreUi is null){
+            if (Instance.highscoreUi is null)
+            {
                 Debug.LogError("HighscoreUI de HighscoreManager n'est pas défini.");
                 return;
             }
@@ -68,17 +72,19 @@ namespace Anatidae {
 
         public static void HideHighscores()
         {
-            if (Instance.highscoreUi is null){
+            if (Instance.highscoreUi is null)
+            {
                 Debug.LogError("HighscoreUI de HighscoreManager n'est pas défini.");
                 return;
             }
 
             Instance.highscoreUi.gameObject.SetActive(false);
         }
-        
+
         public static void ShowHighscoreInput(int highscore)
         {
-            if (Instance.highscoreNameInput is null){
+            if (Instance.highscoreNameInput is null)
+            {
                 Debug.LogError("HighscoreNameInput de HighscoreManager n'est pas défini.");
                 return;
             }
@@ -89,12 +95,13 @@ namespace Anatidae {
 
         public static void DisableHighscoreInput()
         {
-            if (Instance.highscoreNameInput is null){
+            if (Instance.highscoreNameInput is null)
+            {
                 Debug.LogError("HighscoreNameInput de HighscoreManager n'est pas défini.");
                 return;
             }
 
-            Instance.highscoreNameInput.gameObject.SetActive(false); 
+            Instance.highscoreNameInput.gameObject.SetActive(false);
             IsHighscoreInputScreenShown = false;
         }
 
@@ -111,12 +118,15 @@ namespace Anatidae {
             else
             {
                 string data = request.downloadHandler.text;
-                try {
+                try
+                {
                     HighscoreData highscoreData = JsonUtility.FromJson<HighscoreData>(data);
                     Highscores = highscoreData.highscores;
                     HasFetchedHighscores = true;
                     Debug.Log("HighscoreManager: Highscores fetched!");
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     Debug.LogError(e);
                 }
             }
@@ -124,20 +134,30 @@ namespace Anatidae {
 
         public static IEnumerator SetHighscore(string name, int score)
         {
-            Debug.Log(JsonUtility.ToJson(new HighscoreEntry { name = name, score = score }));
+            byte[] jsonBody = Encoding.UTF8.GetBytes(JsonUtility.ToJson(new HighscoreEntry { name = name, score = score }));
+            Debug.Log(Encoding.UTF8.GetString(jsonBody));
 
-            UnityWebRequest request = new UnityWebRequest("http://localhost:3000/api/?game=" + GameName)
+            UnityWebRequest customApiRequest = new UnityWebRequest(GameManager.Config.API_URL, UnityWebRequest.kHttpVerbPOST)
+            {
+                uploadHandler = new UploadHandlerRaw(jsonBody) { contentType = "application/json" },
+                downloadHandler = new DownloadHandlerBuffer()
+            };
+            customApiRequest.SetRequestHeader("x-api-key", GameManager.Config.API_KEY);
+
+            yield return customApiRequest.SendWebRequest();
+            if (customApiRequest.result == UnityWebRequest.Result.ConnectionError || customApiRequest.result == UnityWebRequest.Result.ProtocolError)
+                Debug.LogError("Custom API error: " + customApiRequest.error);
+
+            UnityWebRequest localRequest = new UnityWebRequest("http://localhost:3000/api/?game=" + GameName)
             {
                 method = UnityWebRequest.kHttpVerbPOST,
-                uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(JsonUtility.ToJson(new HighscoreEntry { name = name, score = score })))
-                {
-                    contentType = "application/json"
-                }
+                uploadHandler = new UploadHandlerRaw(jsonBody) { contentType = "application/json" },
+                downloadHandler = new DownloadHandlerBuffer()
             };
-            
-            yield return request.SendWebRequest();
-            if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
-                Debug.LogError(request.error);
+
+            yield return localRequest.SendWebRequest();
+            if (localRequest.result == UnityWebRequest.Result.ConnectionError || localRequest.result == UnityWebRequest.Result.ProtocolError)
+                Debug.LogError("Local API error: " + localRequest.error);
 
             yield return FetchHighscores();
         }
@@ -146,10 +166,11 @@ namespace Anatidae {
         {
             return IsHighscore(null, score);
         }
-        
+
         public static bool IsHighscore(string name, int score)
         {
-            if (!HasFetchedHighscores) {
+            if (!HasFetchedHighscores)
+            {
                 Debug.LogError("HighscoreManager: IsHighscore() appelé avant que les highscores ne soient récupérés. Appelez la coroutine FetchHighscores() avant d'utiliser IsHighscore().");
                 return false;
             }
@@ -158,9 +179,11 @@ namespace Anatidae {
             {
                 if (Highscores == null || Highscores.Count < NumHighscores || score > Highscores[NumHighscores - 1].score)
                     return true;
-            } else {
+            }
+            else
+            {
                 HighscoreEntry? entry = Highscores.Find(entry => entry.name == name);
-                if(entry?.score < score)
+                if (entry?.score < score)
                     return true;
             }
             return false;

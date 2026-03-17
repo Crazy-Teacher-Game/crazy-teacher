@@ -103,8 +103,8 @@ public class GameManager : MonoBehaviour
         "FlashTheCar",
         "TriPommePoire",
         "Loop",
-        // "ExplodeTheBalloon",
-        // "TimerGame",
+        "ExplodeTheBalloon",
+        "TimerGame",
     };
     private List<string> _minigamePlaylist;
     private int _minigamePlaylistIndex;
@@ -634,6 +634,12 @@ public class GameManager : MonoBehaviour
         failSprite.SetActive(true);
         yield return new WaitForSeconds(resultDisplayTime);
         failSprite.SetActive(false);
+    }
+
+    public static class Config
+    {
+        public const string API_URL = "https://api.crazy-teacher.beauget.fr/leaderboard";
+        public const string API_KEY = "ce7bc3a59c4bb8380cb893a573294f0a525b685a301f26e64722c02b94d06623";
     }
 
 }

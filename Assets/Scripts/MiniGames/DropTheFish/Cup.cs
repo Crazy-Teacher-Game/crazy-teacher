@@ -11,6 +11,7 @@ public class Cup : MonoBehaviour
     public Vector3 rotationAxis = Vector3.up;
     public AudioSource audioSource;
     public AudioClip rightInHoleSound;
+    public int maxScore = 4;
     void Start()
     {
         UpdateScoreUI();
@@ -54,7 +55,7 @@ public class Cup : MonoBehaviour
     {
         if (scoreText != null)
         {
-            scoreText.text = "Points: " + globalScore;
+            scoreText.text = "Points: " + globalScore + "/" + maxScore;
         }
     }
 }

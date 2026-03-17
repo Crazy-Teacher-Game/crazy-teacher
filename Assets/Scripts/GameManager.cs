@@ -88,6 +88,7 @@ public class GameManager : MonoBehaviour
     private bool gameStarted = false;
     private bool replayTextShown = false;
     private bool isTransitioning = false;
+    private bool minigameEnded = false;
     private bool highscoreInputWasShown = false;
 
     public TMP_Text descriptionText;
@@ -178,7 +179,6 @@ public class GameManager : MonoBehaviour
         if (currentRound > gamesBeforeDifficultyIncrease)
         {
             difficultyFactor = Mathf.Min(1f, difficultyFactor + 0.05f);
-            Debug.Log($"[GameManager] DifficultyFactor increased to {difficultyFactor}");
         }
     }
 
@@ -186,9 +186,7 @@ public class GameManager : MonoBehaviour
     public void LoseLife()
     {
         Lives--;
-        Debug.Log($"[GameManager] LoseLife called - Lives now {Lives}, livesUI={(livesUI != null)}");
         livesUI?.SetLives(Lives);
-        Debug.Log($"[GameManager] LoseLife -> {Lives} left");
     }
 
     public void ResetLives()
@@ -228,14 +226,13 @@ public class GameManager : MonoBehaviour
         while (isDescriptionShowing)
             yield return null;
 
-        StopTimer(); //pour être sur qu'on en a pas deux qui tournent
+        StopTimer();
         float computed = (maxSeconds - minSeconds) * (1f - difficultyFactor) + minSeconds;
         Duration = Mathf.Max(0f, computed);
         RemainingTime = Duration;
         TimerRunning = true;
         timerUI?.Show(Duration);
         _timerCo = StartCoroutine(CoTimer());
-        Debug.Log($"[GameManager] StartTimer {Duration}s (max={maxSeconds}, min={minSeconds}, difficulty={difficultyFactor})");
 
         //debug
         difficultyDebugText.text = $"DifficultyFactor: {difficultyFactor:0.0}";
@@ -247,12 +244,10 @@ public class GameManager : MonoBehaviour
         _timerCo = null;
         TimerRunning = false;
         timerUI?.Hide();
-        Debug.Log("[GameManager] StopTimer");
     }
 
     IEnumerator CoTimer()
     {
-        Debug.Log($"[GameManager] CoTimer started - Duration={Duration}, timerUI={timerUI != null}");
         while (RemainingTime > 0f)
         {
             RemainingTime -= Time.deltaTime;
@@ -261,15 +256,17 @@ public class GameManager : MonoBehaviour
             yield return null;
         }
 
-        Debug.Log($"[GameManager] CoTimer ended - invoking OnTimerEnded, subscribers count={(OnTimerEnded != null ? OnTimerEnded.GetInvocationList().Length : 0)}");
+        if (minigameEnded) yield break;
+
         TimerRunning = false;
         OnTimerEnded?.Invoke();
-        Debug.Log($"[GameManager] OnTimerEnded invoked");
     }
 
     //ACTIONS QUI SE LANCENT QUAND ON GAGNE OU PERD UN MINI-JEU
     public void NotifyWin()
     {
+        if (minigameEnded) return;
+        minigameEnded = true;
         if (isTransitioning) return;
         isTransitioning = true;
         StartCoroutine(CoNotifyWin());
@@ -291,9 +288,10 @@ public class GameManager : MonoBehaviour
 
     public void NotifyFail()
     {
+        if (minigameEnded) return;
+        minigameEnded = true;
         if (isTransitioning) return;
         isTransitioning = true;
-
         StartCoroutine(CoNotifyFail());
     }
 
@@ -324,11 +322,11 @@ public class GameManager : MonoBehaviour
 
     private void LoadNextMiniGame()
     {
+        minigameEnded = false;
         string nextGame = GetNextGameInPlaylist();
         currentGame = nextGame;
         isTransitioning = false;
         scenesLoader.LoadMiniGame(nextGame);
-        Debug.Log("[GameManager] Loading next mini-game: " + nextGame);
     }
 
     private void BuildAndShufflePlaylist()
@@ -381,7 +379,6 @@ public class GameManager : MonoBehaviour
             yield return new WaitForSeconds(3f);
             LoadHighscoreInterface();
         }
-        Debug.Log("GAME OVER !");
     }
 
     private void RestartGame()
@@ -482,7 +479,6 @@ public class GameManager : MonoBehaviour
         {
             if (!afk)
             {
-                Debug.Log("You will be kicked in 2 seconds");
                 afk = true;
             }
         }
@@ -498,7 +494,6 @@ public class GameManager : MonoBehaviour
 
         if (quitTimer >= timeBeforeQuit)
         {
-            Debug.Log("QUITTING...");
             GoBackToMenu();
         }
         //[END] Back to menu manager
@@ -604,17 +599,13 @@ public class GameManager : MonoBehaviour
 
     public void RegisterTimerUI(TimerUI ui)
     {
-        Debug.Log($"[GameManager] RegisterTimerUI called - old timerUI={(timerUI != null)}, new ui={(ui != null)}, ui.InstanceID={ui?.GetInstanceID()}");
         timerUI = ui;
-        Debug.Log("[GameManager] TimerUI registered successfully");
     }
 
     public void RegisterLivesUI(LivesUI ui)
     {
-        Debug.Log($"[GameManager] RegisterLivesUI called - old livesUI={(livesUI != null)}, new ui={(ui != null)}, ui.InstanceID={ui?.GetInstanceID()}, current Lives={Lives}");
         livesUI = ui;
         livesUI.SetLives(Lives);
-        Debug.Log("[GameManager] LivesUI registered successfully");
     }
 
     private void LoadHighscoreInterface()

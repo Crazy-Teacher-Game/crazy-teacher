@@ -8,7 +8,10 @@ public class Platform : MonoBehaviour
     public float minDurationSeconds = 8f;
     void Start()
     {
-        GameManager.Instance.StartTimer(durationSeconds, minDurationSeconds);
+        if (!GameManager.Instance.TimerRunning)
+        {
+            GameManager.Instance.StartTimer(durationSeconds, minDurationSeconds);
+        }
         GameManager.Instance.OnTimerEnded += HandleTimeout;
         GameManager.Instance.OnMinigameWon += AfterWin;
     }
@@ -32,11 +35,20 @@ public class Platform : MonoBehaviour
     }
     void AfterWin()
     {
-        GameManager.Instance.AddRound();
         GameObject[] balls = GameObject.FindGameObjectsWithTag("ball");
         foreach (GameObject ball in balls)
         {
             Destroy(ball);
+        }
+        GameManager.Instance.NotifyWin();
+    }
+
+    void OnDisable()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnTimerEnded -= HandleTimeout;
+            GameManager.Instance.OnMinigameWon -= AfterWin;
         }
     }
 }

@@ -471,6 +471,15 @@ public class FlashTheCar : MonoBehaviour
         source.volume = to;
     }
 
+    void OnDisable()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnTimerEnded -= HandleTimerEnded;
+        }
+        if (photoStrip != null) photoStrip.Cleanup();
+    }
+
     void OnDestroy()
     {
         if (GameManager.Instance != null)

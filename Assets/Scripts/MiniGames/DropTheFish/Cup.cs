@@ -55,7 +55,7 @@ public class Cup : MonoBehaviour
     {
         if (scoreText != null)
         {
-            scoreText.text = "Points: " + globalScore + "/" + maxScore;
+            scoreText.text = globalScore + "/" + maxScore;
         }
     }
 }

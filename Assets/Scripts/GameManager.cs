@@ -103,8 +103,8 @@ public class GameManager : MonoBehaviour
         "FlashTheCar",
         "TriPommePoire",
         "Loop",
-        "ExplodeTheBalloon",
-        "TimerGame",
+        // "ExplodeTheBalloon",
+        // "TimerGame",
     };
     private List<string> _minigamePlaylist;
     private int _minigamePlaylistIndex;

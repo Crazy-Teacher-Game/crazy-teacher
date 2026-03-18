@@ -326,6 +326,8 @@ MonoBehaviour:
   redPrefabs: []
   bluePrefabs: []
   currentFruitName: 
+  fruitsATrouverMin: 4
+  fruitsATrouverMax: 12
   fruitsATrouver: 6
   fruitsATrouverText: {fileID: 1931339380}
   timerDuration: 30
@@ -371,10 +373,12 @@ MonoBehaviour:
   - {fileID: 8689920586243723175, guid: ed7a8c0639425462cbf2f86fee153582, type: 3}
   - {fileID: 1682342886814077298, guid: 48c16993c29fe47639214595e4d581f0, type: 3}
   currentFruitName: 
+  fruitsATrouverMin: 4
+  fruitsATrouverMax: 12
   fruitsATrouver: 6
   fruitsATrouverText: {fileID: 1931339380}
-  timerDuration: 30
-  timerMinDuration: 3
+  timerDuration: 12
+  timerMinDuration: 5
   audioSource: {fileID: 493406891}
   correctSound: {fileID: 8300000, guid: 73a57c75aaf0a48a190ceb9c037d66c9, type: 3}
   wrongSound: {fileID: 8300000, guid: db68170631bed44fdbe5cc97eb43d247, type: 3}

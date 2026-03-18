@@ -13,7 +13,9 @@ public class TriPommePoire : MonoBehaviour
 
     [SerializeField] public string currentFruitName;
 
-    public int fruitsATrouver = 6;
+    public int fruitsATrouverMin = 4;
+    public int fruitsATrouverMax = 12;
+    public int fruitsATrouver;
     public TMP_Text fruitsATrouverText;
 
     private GameObject lastSpawnedFruit;
@@ -30,6 +32,8 @@ public class TriPommePoire : MonoBehaviour
 
     void Start()
     {
+        float difficulty = GameManager.Instance != null ? GameManager.Instance.DifficultyFactor : 0f;
+        fruitsATrouver = Mathf.Clamp(Mathf.RoundToInt(Mathf.Lerp(fruitsATrouverMin, fruitsATrouverMax, difficulty)), fruitsATrouverMin, fruitsATrouverMax);
         SpawnRandomFruit(Vector3.zero);
         GameManager.Instance.OnTimerEnded += HandleTimeout;
         GameManager.Instance.StartTimer(timerDuration, timerMinDuration);

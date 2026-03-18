@@ -27,6 +27,9 @@ public class TriPommePoire : MonoBehaviour
     public AudioClip correctSound;
     public AudioClip wrongSound;
 
+    public GameObject wrongAnimationTarget;
+    public string wrongAnimationTrigger = "Move";
+
     private bool hasReturnedToCenter = true;
     private bool gameEnded = false;
 
@@ -61,7 +64,7 @@ public class TriPommePoire : MonoBehaviour
             }
             else
             {
-                audioSource.PlayOneShot(wrongSound);
+                HandleWrongAnswer();
             }
             hasReturnedToCenter = false;
         }
@@ -76,7 +79,7 @@ public class TriPommePoire : MonoBehaviour
             }
             else
             {
-                audioSource.PlayOneShot(wrongSound);
+                HandleWrongAnswer();
             }
             hasReturnedToCenter = false;
         }
@@ -88,6 +91,14 @@ public class TriPommePoire : MonoBehaviour
             gameEnded = true;
             StartCoroutine(WinAfterDelay());
         }
+    }
+
+    void HandleWrongAnswer()
+    {
+        audioSource.PlayOneShot(wrongSound);
+        GameManager.Instance.RemoveTime(1f);
+        if (wrongAnimationTarget != null)
+            wrongAnimationTarget.GetComponent<Animator>().SetTrigger(wrongAnimationTrigger);
     }
 
     IEnumerator WinAfterDelay()

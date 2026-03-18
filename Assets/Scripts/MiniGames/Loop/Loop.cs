@@ -13,13 +13,13 @@ public class Loop : MonoBehaviour
     [Header("Zoom Configuration")]
     [SerializeField] private float minScale = 0.5f;
     [SerializeField] private float maxScale = 2.0f;
-    [SerializeField] private float zoomSpeed = 1.5f;
+    private readonly float zoomSpeed = 1f;
     private float currentScale = 1.0f;
 
     [Header("Sweet Spot Configuration")]
     [SerializeField] private float minTargetScale = 0.7f;
     [SerializeField] private float maxTargetScale = 1.8f;
-    [SerializeField] private float acceptableRange = 0.005f;
+    [SerializeField] private float acceptableRange = 0.01f;
     private float targetScale;
 
     [Header("Debug")]

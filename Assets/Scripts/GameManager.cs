@@ -227,7 +227,7 @@ public class GameManager : MonoBehaviour
             canvas.sortingOrder = 100;
         }
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1.5f);
 
         if (canvas != null)
             canvas.sortingOrder = originalSortOrder;

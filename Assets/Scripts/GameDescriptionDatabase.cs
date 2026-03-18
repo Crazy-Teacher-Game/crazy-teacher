@@ -7,11 +7,11 @@ public static class GameDescriptionDatabase
         {
             { "DropTheFish", "Fais tomber !" },
             { "TriPommePoire", "Trie !" },
-            { "SlotMachine", "Arrête !" },
+            { "SlotMachine", "777 !" },
             { "Dice", "Tourne !" },
             { "MentalMath", "Résous !" },
             { "PopTheBottle", "Secoue !" },
-            { "FlashTheCar", "Flashes !" },
+            { "FlashTheCar", "Flash !" },
             { "TimerGame", "Devine !" },
             { "Loop", "Dezoome !" },
             { "ExplodeTheBalloon", "Gonfle !" },

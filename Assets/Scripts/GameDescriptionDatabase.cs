@@ -13,7 +13,7 @@ public static class GameDescriptionDatabase
             { "PopTheBottle", "Secoue !" },
             { "FlashTheCar", "Flash !" },
             { "TimerGame", "Devine !" },
-            { "Loop", "Dezoome !" },
+            { "Loop", "Zoom !" },
             { "ExplodeTheBalloon", "Explose !" },
         };
 

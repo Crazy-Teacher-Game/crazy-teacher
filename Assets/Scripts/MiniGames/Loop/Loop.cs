@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
@@ -10,66 +8,51 @@ public class Loop : MonoBehaviour
     [SerializeField] private SpriteRenderer objectRenderer;
     [SerializeField] private Material blurMaterial;
 
-    [Header("Zoom Configuration")]
+    [Header("Zoom")]
     [SerializeField] private float minScale = 0.5f;
     [SerializeField] private float maxScale = 2.0f;
-    private readonly float zoomSpeed = 1f;
-    private float currentScale = 1.0f;
+    [SerializeField] private float zoomSpeed = 0.4f;
 
-    [Header("Sweet Spot Configuration")]
+    [Header("Sweet Spot")]
     [SerializeField] private float minTargetScale = 0.7f;
     [SerializeField] private float maxTargetScale = 1.8f;
-    [SerializeField] private float acceptableRange = 0.01f;
-    private float targetScale;
+    [SerializeField] private float acceptableRange = 0.15f;
+    [SerializeField] private float minimumStartDistance = 0.4f;
 
-    [Header("Debug")]
-    [SerializeField] private bool debugMode = false;
-    [SerializeField] private TextMeshProUGUI debugText;
-    private bool wasInZone = false;
+    [Header("Visual Feedback")]
+    [SerializeField] private float blurFalloffRange = 0.6f;
 
     [Header("Validation")]
-    private float timeInZone = 0f;
     [SerializeField] private float requiredTimeInZone = 0.4f;
 
     [Header("Timer")]
     [SerializeField] private float timerDuration = 12f;
     [SerializeField] private float minTimerDuration = 8f;
 
-    private bool gameEnded = false;
+    [Header("Debug")]
+    [SerializeField] private bool debugMode = false;
+    [SerializeField] private TextMeshProUGUI debugText;
+
+    private float currentScale;
+    private float targetScale;
+    private float timeInZone;
+    private bool hasInteracted;
+    private bool wasInZone;
+    private bool gameEnded;
     private Material objectMaterial;
 
     void Start()
     {
-        if (loupeTransform == null)
-        {
-            Debug.LogError("[Loop] loupeTransform not assigned!");
-            return;
-        }
-
-        if (objectRenderer == null)
-        {
-            Debug.LogError("[Loop] objectRenderer not assigned!");
-            return;
-        }
-
-        if (blurMaterial == null)
-        {
-            Debug.LogError("[Loop] blurMaterial not assigned!");
-            return;
-        }
+        if (!ValidateReferences()) return;
 
         objectMaterial = new Material(blurMaterial);
         objectRenderer.material = objectMaterial;
 
-        targetScale = Random.Range(minTargetScale, maxTargetScale);
-        targetScale = Mathf.Clamp(targetScale, minScale + acceptableRange, maxScale - acceptableRange);
+        targetScale = PickTargetScale();
+        currentScale = PickStartScale(targetScale);
 
-        currentScale = 1.0f;
-
-        float initialBlur = CalculateBlurFromScale(currentScale);
-        objectMaterial.SetFloat("_BlurAmount", initialBlur);
-
-        loupeTransform.localScale = new Vector3(currentScale, currentScale, currentScale);
+        ApplyScale(currentScale);
+        ApplyBlur(currentScale);
 
         if (GameManager.Instance == null)
         {
@@ -85,33 +68,40 @@ public class Loop : MonoBehaviour
     {
         if (gameEnded || GameManager.Instance == null) return;
 
+        HandleInput();
+        ApplyBlur(currentScale);
+        HandleValidation();
+
+        if (debugMode) UpdateDebugDisplay();
+    }
+
+    private void HandleInput()
+    {
         float verticalInput = Input.GetAxis("P1_Vertical");
 
-        if (Mathf.Abs(verticalInput) > 0.1f)
-        {
-            currentScale += verticalInput * zoomSpeed * Time.deltaTime;
-            currentScale = Mathf.Clamp(currentScale, minScale, maxScale);
+        if (Mathf.Abs(verticalInput) <= 0.1f) return;
 
-            loupeTransform.localScale = new Vector3(currentScale, currentScale, currentScale);
-        }
+        hasInteracted = true;
+        currentScale += verticalInput * zoomSpeed * Time.deltaTime;
+        currentScale = Mathf.Clamp(currentScale, minScale, maxScale);
+        ApplyScale(currentScale);
+    }
 
-        float blurAmount = CalculateBlurFromScale(currentScale);
-        objectMaterial.SetFloat("_BlurAmount", blurAmount);
+    private void HandleValidation()
+    {
+        if (!hasInteracted) return;
 
-        bool currentlyInZone = IsInAcceptableZone(currentScale);
+        bool inZone = IsInAcceptableZone(currentScale);
 
-        if (currentlyInZone)
+        if (inZone)
         {
             timeInZone += Time.deltaTime;
 
             if (timeInZone >= requiredTimeInZone)
             {
                 gameEnded = true;
-                if (GameManager.Instance != null)
-                {
-                    if (debugMode) Debug.Log($"[Loop] 🎉 VICTORY! Final scale={currentScale:F4}, target was {targetScale:F4}");
-                    GameManager.Instance.NotifyWin();
-                }
+                if (debugMode) Debug.Log($"[Loop] VICTORY! scale={currentScale:F3}, target={targetScale:F3}");
+                GameManager.Instance.NotifyWin();
             }
         }
         else
@@ -119,20 +109,7 @@ public class Loop : MonoBehaviour
             timeInZone = 0f;
         }
 
-        if (debugMode)
-        {
-            UpdateDebugSystem(currentlyInZone);
-        }
-
-        wasInZone = currentlyInZone;
-    }
-
-    private float CalculateBlurFromScale(float scale)
-    {
-        float distanceFromTarget = Mathf.Abs(scale - targetScale);
-        float normalizedDistance = distanceFromTarget / acceptableRange;
-        float blurAmount = Mathf.Clamp01(normalizedDistance);
-        return blurAmount;
+        wasInZone = inZone;
     }
 
     private bool IsInAcceptableZone(float scale)
@@ -140,61 +117,91 @@ public class Loop : MonoBehaviour
         return Mathf.Abs(scale - targetScale) <= acceptableRange;
     }
 
-    private void HandleTimerEnded()
+    private void ApplyBlur(float scale)
     {
-        if (!gameEnded)
-        {
-            gameEnded = true;
-            if (GameManager.Instance != null)
-            {
-                GameManager.Instance.NotifyFail();
-            }
-        }
+        float distance = Mathf.Abs(scale - targetScale);
+        float blur = Mathf.Clamp01(distance / blurFalloffRange);
+        objectMaterial.SetFloat("_BlurAmount", blur);
     }
 
-    private void UpdateDebugSystem(bool currentlyInZone)
+    private void ApplyScale(float scale)
+    {
+        loupeTransform.localScale = Vector3.one * scale;
+    }
+
+    private float PickTargetScale()
+    {
+        float target = Random.Range(minTargetScale, maxTargetScale);
+        return Mathf.Clamp(target, minScale + acceptableRange, maxScale - acceptableRange);
+    }
+
+    private float PickStartScale(float target)
+    {
+        float safeMin = minScale;
+        float safeMax = maxScale;
+        float exclusionLow = target - minimumStartDistance;
+        float exclusionHigh = target + minimumStartDistance;
+
+        float lowRangeSize = Mathf.Max(0f, exclusionLow - safeMin);
+        float highRangeSize = Mathf.Max(0f, safeMax - exclusionHigh);
+        float totalRange = lowRangeSize + highRangeSize;
+
+        if (totalRange <= 0f) return safeMin;
+
+        float roll = Random.Range(0f, totalRange);
+        if (roll < lowRangeSize)
+            return safeMin + roll;
+        else
+            return exclusionHigh + (roll - lowRangeSize);
+    }
+
+    private void HandleTimerEnded()
+    {
+        if (gameEnded) return;
+        gameEnded = true;
+        GameManager.Instance?.NotifyFail();
+    }
+
+    private bool ValidateReferences()
+    {
+        if (loupeTransform == null) { Debug.LogError("[Loop] loupeTransform not assigned!"); return false; }
+        if (objectRenderer == null) { Debug.LogError("[Loop] objectRenderer not assigned!"); return false; }
+        if (blurMaterial == null)   { Debug.LogError("[Loop] blurMaterial not assigned!");   return false; }
+        return true;
+    }
+
+    private void UpdateDebugDisplay()
     {
         float distance = Mathf.Abs(currentScale - targetScale);
-        
+        bool inZone = IsInAcceptableZone(currentScale);
+
         if (debugText != null)
         {
-            string statusColor = currentlyInZone ? "#00FF00" : "#FF0000";
-            string statusText = currentlyInZone ? "IN ZONE ✅" : "OUT OF ZONE ❌";
-            
-            debugText.text = $"<color={statusColor}><b>{statusText}</b></color>\n\n" +
-                             $"Current Scale: <b>{currentScale:F4}</b>\n" +
-                             $"Target Scale: <b>{targetScale:F4}</b>\n" +
-                             $"Distance: <b>{distance:F4}</b>\n" +
-                             $"Acceptable Range: <b>±{acceptableRange:F4}</b>\n\n" +
-                             $"Time in Zone: <b>{timeInZone:F2}s</b> / {requiredTimeInZone:F2}s\n" +
-                             $"Progress: <b>{(timeInZone / requiredTimeInZone * 100f):F1}%</b>";
+            string color = inZone ? "#00FF00" : "#FF0000";
+            string status = inZone ? "IN ZONE" : "OUT OF ZONE";
+
+            debugText.text =
+                $"<color={color}><b>{status}</b></color>\n\n" +
+                $"Scale: <b>{currentScale:F3}</b> | Target: <b>{targetScale:F3}</b>\n" +
+                $"Distance: <b>{distance:F3}</b> | Range: <b>+/-{acceptableRange:F3}</b>\n" +
+                $"Interacted: <b>{hasInteracted}</b>\n\n" +
+                $"Time in Zone: <b>{timeInZone:F2}s</b> / {requiredTimeInZone:F2}s\n" +
+                $"Progress: <b>{(timeInZone / requiredTimeInZone * 100f):F0}%</b>";
         }
-        
-        if (currentlyInZone && !wasInZone)
-        {
-            Debug.Log($"[Loop] ✅ <color=green>ENTERED ZONE</color> | Scale={currentScale:F4} | Target={targetScale:F4} | Distance={distance:F4}");
-        }
-        else if (!currentlyInZone && wasInZone)
-        {
-            Debug.Log($"[Loop] ❌ <color=red>LEFT ZONE</color> | Scale={currentScale:F4} | Time accumulated: {timeInZone:F2}s (RESET)");
-        }
-        else if (currentlyInZone && Mathf.FloorToInt(timeInZone / 0.5f) > Mathf.FloorToInt((timeInZone - Time.deltaTime) / 0.5f))
-        {
-            Debug.Log($"[Loop] ⏱️ <color=yellow>MAINTAINING ZONE</color> | TimeInZone={timeInZone:F2}s / {requiredTimeInZone:F2}s ({(timeInZone / requiredTimeInZone * 100f):F0}%)");
-        }
+
+        if (inZone && !wasInZone)
+            Debug.Log($"[Loop] ENTERED ZONE | scale={currentScale:F3} target={targetScale:F3} dist={distance:F3}");
+        else if (!inZone && wasInZone)
+            Debug.Log($"[Loop] LEFT ZONE | scale={currentScale:F3} accumulated={timeInZone:F2}s");
     }
 
     void OnDestroy()
     {
         if (GameManager.Instance != null)
-        {
             GameManager.Instance.OnTimerEnded -= HandleTimerEnded;
-        }
 
         if (objectMaterial != null)
-        {
             Destroy(objectMaterial);
-        }
     }
 
     void OnDisable()

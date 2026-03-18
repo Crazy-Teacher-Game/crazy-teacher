@@ -19,7 +19,7 @@ public class Loop : MonoBehaviour
     [Header("Sweet Spot Configuration")]
     [SerializeField] private float minTargetScale = 0.7f;
     [SerializeField] private float maxTargetScale = 1.8f;
-    [SerializeField] private float acceptableRange = 0.01f;
+    [SerializeField] private float acceptableRange = 0.005f;
     private float targetScale;
 
     [Header("Debug")]
@@ -29,7 +29,7 @@ public class Loop : MonoBehaviour
 
     [Header("Validation")]
     private float timeInZone = 0f;
-    [SerializeField] private float requiredTimeInZone = 1.5f;
+    [SerializeField] private float requiredTimeInZone = 0.4f;
 
     [Header("Timer")]
     [SerializeField] private float timerDuration = 12f;

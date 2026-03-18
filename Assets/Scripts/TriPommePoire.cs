@@ -21,6 +21,10 @@ public class TriPommePoire : MonoBehaviour
     public float timerDuration = 5f;
     public float timerMinDuration = 3f;
 
+    public AudioSource audioSource;
+    public AudioClip correctSound;
+    public AudioClip wrongSound;
+
     private bool hasReturnedToCenter = true;
     private bool gameEnded = false;
 
@@ -49,7 +53,12 @@ public class TriPommePoire : MonoBehaviour
             if (currentFruitName == "red")
             {
                 fruitsATrouver--;
+                audioSource.PlayOneShot(correctSound);
                 SpawnRandomFruit(Vector3.left);
+            }
+            else
+            {
+                audioSource.PlayOneShot(wrongSound);
             }
             hasReturnedToCenter = false;
         }
@@ -59,7 +68,12 @@ public class TriPommePoire : MonoBehaviour
             if (currentFruitName == "blue")
             {
                 fruitsATrouver--;
+                audioSource.PlayOneShot(correctSound);
                 SpawnRandomFruit(Vector3.right);
+            }
+            else
+            {
+                audioSource.PlayOneShot(wrongSound);
             }
             hasReturnedToCenter = false;
         }

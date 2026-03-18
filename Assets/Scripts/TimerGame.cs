@@ -103,7 +103,7 @@ public class TimerGame : MonoBehaviour
                 //arrondi à l'entier le plus proche pour pas montrer notre marge d'erreur
                 if (Mathf.Abs(playerTimer - timerToFind) <= 0.7f)
                 {
-                    playerTimerText.text = Mathf.CeilToInt(playerTimer).ToString();
+                    playerTimerText.text = timerToFind.ToString("F2");
                     tennaDefault.SetActive(false);
                     tennaWinPrefab.SetActive(true);
                     //winPrefab.SetActive(true);

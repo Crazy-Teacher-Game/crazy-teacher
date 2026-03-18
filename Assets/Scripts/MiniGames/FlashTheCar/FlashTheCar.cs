@@ -31,7 +31,7 @@ public class FlashTheCar : MonoBehaviour
     private float fixedWorldX = 206.19f;
     private float fixedWorldXFast = 211.4f;
     private float normalSpeed = 0.35f;
-    private float fastSpeed = 0.6f;
+    private float fastSpeed = 0.5f;
     private float startZ = 310f;
 
     // State variables

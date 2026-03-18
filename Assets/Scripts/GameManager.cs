@@ -96,16 +96,7 @@ public class GameManager : MonoBehaviour
 
     private static readonly string[] MinigameSceneNames =
     {
-        "DropTheFish",
-        "SlotMachine",
-        "PopTheBottle",
-        "MentalMath",
-        "Dice",
-        "FlashTheCar",
         "TriPommePoire",
-        "Loop",
-        "ExplodeTheBalloon",
-        "TimerGame",
     };
     private List<string> _minigamePlaylist;
     private int _minigamePlaylistIndex;
@@ -240,14 +231,7 @@ public class GameManager : MonoBehaviour
         }
 
         yield return new WaitForSeconds(1.85f);
-
-        if (canvas != null)
-        {
-            canvas.renderMode = originalMode;
-            if (originalMode == RenderMode.ScreenSpaceCamera)
-                canvas.worldCamera = originalCam;
-            canvas.sortingOrder = 100;
-        }
+         //retrait du repassage en world space, comme ça on a le timer au dessus de tous les jeux en tout
 
         descriptionText.gameObject.SetActive(false);
         isDescriptionShowing = false;

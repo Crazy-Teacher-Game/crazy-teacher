@@ -167,8 +167,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -397, y: -276.9}
-  m_SizeDelta: {x: 200, y: 102.599}
+  m_AnchoredPosition: {x: -317.4342, y: -276.9}
+  m_SizeDelta: {x: 359.1315, y: 102.599}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &123507763
 MonoBehaviour:
@@ -253,7 +253,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: -50.407227, w: 0}
+  m_margin: {x: 0, y: 0, z: -194.38342, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -302,8 +302,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -76, y: -276.9}
-  m_SizeDelta: {x: 200, y: 102.599}
+  m_AnchoredPosition: {x: 10.512, y: -276.9}
+  m_SizeDelta: {x: 373.0239, y: 102.599}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &164561114
 MonoBehaviour:
@@ -388,7 +388,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: -50.407227, w: 0}
+  m_margin: {x: 0, y: 0, z: -281.52686, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -1107,7 +1107,7 @@ Canvas:
   m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -1
   m_TargetDisplay: 0
 --- !u!224 &863341247
 RectTransform:
@@ -1165,7 +1165,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -152, y: 80.927734}
+  m_AnchoredPosition: {x: -111, y: 80.927}
   m_SizeDelta: {x: 255.7595, y: 52.1446}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &880978431
@@ -1188,7 +1188,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Le temps est :'
+  m_text: 'Objectif :'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: c002f664939ac473aaee23262a45b7df, type: 2}
   m_sharedMaterial: {fileID: -5700883744974695611, guid: c002f664939ac473aaee23262a45b7df, type: 2}
@@ -1251,7 +1251,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: -124.38684, w: 0}
+  m_margin: {x: 0, y: 0, z: -10.524658, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -2045,8 +2045,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 248, y: -276.9}
-  m_SizeDelta: {x: 200, y: 102.599}
+  m_AnchoredPosition: {x: 338.51733, y: -276.9}
+  m_SizeDelta: {x: 381.0347, y: 102.599}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1588962066
 MonoBehaviour:
@@ -2131,7 +2131,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: -50.407227, w: 0}
+  m_margin: {x: 0, y: 0, z: -274.31836, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0

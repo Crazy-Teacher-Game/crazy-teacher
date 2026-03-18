@@ -41,7 +41,6 @@ public class TriPommePoire : MonoBehaviour
 
         float horizontalInput = Input.GetAxisRaw("P1_Horizontal");
 
-        fruitsATrouverText.text = "Formes à trier: " + fruitsATrouver;
         // Si le joystick est revenu au centre, on autorise un nouvel input
         if (Mathf.Abs(horizontalInput) < 0.2f)
         {
@@ -77,6 +76,8 @@ public class TriPommePoire : MonoBehaviour
             }
             hasReturnedToCenter = false;
         }
+
+        fruitsATrouverText.text = "Formes à trier: " + fruitsATrouver;
 
         if (fruitsATrouver <= 0)
         {

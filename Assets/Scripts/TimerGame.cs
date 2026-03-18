@@ -39,7 +39,7 @@ public class TimerGame : MonoBehaviour
 
     void Start()
     {
-        timerToFind = Random.Range(5, 11);
+        timerToFind = Random.Range(5, 10);
         timerToFindText.text = timerToFind.ToString();
         playerTimerText.text = "0.00";
 
@@ -97,9 +97,12 @@ public class TimerGame : MonoBehaviour
                     moveAnimator.SetTrigger("Move");
                 timerRunning = false;
                 SetTextOpacity(playerTimerText, 1f);
-                timer2.text = Random.Range(5, timerToFind).ToString();
-                timer3.text = Random.Range(5, timerToFind).ToString();
-                timer4.text = Random.Range(5, timerToFind).ToString();
+                SetTextOpacity(timer2, 1f);
+                SetTextOpacity(timer3, 1f);
+                SetTextOpacity(timer4, 1f);
+                timer2.text = Random.Range(5, timerToFind).ToString("F2");
+                timer3.text = Random.Range(5, timerToFind).ToString("F2");
+                timer4.text = Random.Range(5, timerToFind).ToString("F2");
                 //arrondi à l'entier le plus proche pour pas montrer notre marge d'erreur
                 if (Mathf.Abs(playerTimer - timerToFind) <= 0.7f)
                 {
@@ -128,7 +131,7 @@ public class TimerGame : MonoBehaviour
     {
                 yield return new WaitForSeconds(2f);
 
-                if (Mathf.Abs(playerTimer - timerToFind) <= 0.5f)
+                if (Mathf.Abs(playerTimer - timerToFind) <= 0.7f)
                 {
                     GameManager.Instance.NotifyWin();
                 }

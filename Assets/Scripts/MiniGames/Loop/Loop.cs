@@ -29,7 +29,7 @@ public class Loop : MonoBehaviour
 
     [Header("Validation")]
     private float timeInZone = 0f;
-    [SerializeField] private float requiredTimeInZone = 0.7f;
+    [SerializeField] private float requiredTimeInZone = 0.4f;
 
     [Header("Timer")]
     [SerializeField] private float timerDuration = 12f;

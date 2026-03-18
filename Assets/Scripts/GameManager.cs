@@ -96,6 +96,16 @@ public class GameManager : MonoBehaviour
 
     private static readonly string[] MinigameSceneNames =
     {
+        "DropTheFish",
+        "PopTheBottle",
+        "SlotMachine", 
+        "MentalMath",
+        "Dice",
+        "FlashTheCar",
+        "TriPommePoire",
+        "Loop",
+        "ExplodeTheBalloon",
+        "TimerGame",
         "TriPommePoire",
         "DropTheFish",
         "SlotMachine",

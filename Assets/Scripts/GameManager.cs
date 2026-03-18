@@ -210,7 +210,28 @@ public class GameManager : MonoBehaviour
         isDescriptionShowing = true;
         descriptionText.text = description;
         descriptionText.gameObject.SetActive(true);
+
+        // Relance l'animation si un Animator est présent
+        Animator animator = descriptionText.GetComponent<Animator>();
+        if (animator != null)
+        {
+            animator.Play(0, -1, 0f);
+        }
+
+        // Force le Canvas au premier plan pour ne pas être masqué par les scènes de mini-jeux
+        Canvas canvas = descriptionText.GetComponentInParent<Canvas>();
+        int originalSortOrder = 0;
+        if (canvas != null)
+        {
+            originalSortOrder = canvas.sortingOrder;
+            canvas.sortingOrder = 100;
+        }
+
         yield return new WaitForSeconds(1f);
+
+        if (canvas != null)
+            canvas.sortingOrder = originalSortOrder;
+
         descriptionText.gameObject.SetActive(false);
         isDescriptionShowing = false;
     }

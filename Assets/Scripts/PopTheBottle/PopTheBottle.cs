@@ -9,6 +9,7 @@ public class PopTheBottle : MonoBehaviour
     [SerializeField] private Sprite baseBottle;
     [SerializeField] private Sprite botteShaken;
     [SerializeField] private Sprite botteShaken2;
+    [SerializeField] private Sprite bottlePopped;
     private RectTransform bottleRectTransform;
 
     private SpriteRenderer bottleSpriteRenderer;
@@ -17,23 +18,29 @@ public class PopTheBottle : MonoBehaviour
     private float initializedBottleY = 0f;
     private int bottleState = 0;// -1: down, 0: middle, 1: up
     private int lastBottleState = 0;
+    [Header("UI")]
+    [SerializeField] private RectTransform saturationBarFill; // Pivot en bas, hauteur max = hauteur souhaitée à 100%
+
+    [Header("Difficulté")]
+    [SerializeField] private int bottleSaturationMin = 30;
+    [SerializeField] private int bottleSaturationMax = 80;
     private int bottleSaturation = 0;
-    private int bottleSaturationMax = 60; //facile : 30, moyen : 60, difficile : 100
+    private int bottleSaturationTarget;
     private float winPercentage = 0f;
     private bool gameEnded = false;
 
     [Header("Audio - Ambiance")]
     [SerializeField] private AudioClip ambianceSound;
-    [SerializeField] [Range(0f, 1f)] private float ambianceVolume = 1f;
+    [SerializeField][Min(0f)] private float ambianceVolume = 1f;
     [SerializeField] private float ambianceFadeInDuration = 1f;
 
     [Header("Audio - Effets")]
     [SerializeField] private AudioClip shakeDownSound;
-    [SerializeField] [Range(0f, 1f)] private float shakeDownVolume = 1f;
+    [SerializeField][Min(0f)] private float shakeDownVolume = 1f;
     [SerializeField] private AudioClip shakeUpSound;
-    [SerializeField] [Range(0f, 1f)] private float shakeUpVolume = 1f;
+    [SerializeField][Min(0f)] private float shakeUpVolume = 1f;
     [SerializeField] private AudioClip popSound;
-    [SerializeField] [Range(0f, 1f)] private float popVolume = 1f;
+    [SerializeField][Min(0f)] private float popVolume = 1f;
 
     [Header("Audio - Fade Global")]
     [SerializeField] private float globalFadeInDuration = 0.5f;
@@ -60,6 +67,9 @@ public class PopTheBottle : MonoBehaviour
             Debug.LogError("[PopTheBottle] Bottle does not have a SpriteRenderer! Add one to the Bottle GameObject.");
         }
 
+        float difficulty = GameManager.Instance != null ? GameManager.Instance.DifficultyFactor : 0f;
+        bottleSaturationTarget = Mathf.RoundToInt(Mathf.Lerp(bottleSaturationMin, bottleSaturationMax, difficulty));
+
         // Ambiance (loop)
         if (ambianceSound != null)
         {
@@ -85,8 +95,10 @@ public class PopTheBottle : MonoBehaviour
         if (gameEnded) return;
 
         // Check for win
-        if (bottleSaturation >= bottleSaturationMax)
+        if (bottleSaturation >= bottleSaturationTarget)
         {
+            if (bottleSpriteRenderer != null && bottlePopped != null)
+                bottleSpriteRenderer.sprite = bottlePopped;
             if (fxAudioSource != null && popSound != null)
                 fxAudioSource.PlayOneShot(popSound, popVolume);
             EndGame(true);
@@ -149,7 +161,13 @@ public class PopTheBottle : MonoBehaviour
         }
 
         // Calculate win percentage
-        winPercentage = (float)bottleSaturation / bottleSaturationMax * 100f;
+        winPercentage = (float)bottleSaturation / bottleSaturationTarget * 100f;
+
+        if (saturationBarFill != null)
+        {
+            float t = (float)bottleSaturation / bottleSaturationTarget * 10;
+            saturationBarFill.localScale = new Vector3(1f, t, 1f);
+        }
     }
 
     private void HandleTimerEnded()

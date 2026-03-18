@@ -196,4 +196,10 @@ public class Loop : MonoBehaviour
             Destroy(objectMaterial);
         }
     }
+
+    void OnDisable()
+    {
+        if (GameManager.Instance != null)
+            GameManager.Instance.OnTimerEnded -= HandleTimerEnded;
+    }
 }

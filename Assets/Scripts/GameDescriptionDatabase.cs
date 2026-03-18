@@ -14,7 +14,7 @@ public static class GameDescriptionDatabase
             { "FlashTheCar", "Flash !" },
             { "TimerGame", "Devine !" },
             { "Loop", "Dezoome !" },
-            { "ExplodeTheBalloon", "Gonfle !" },
+            { "ExplodeTheBalloon", "Explose !" },
         };
 
     public static string GetDescription(string sceneName)

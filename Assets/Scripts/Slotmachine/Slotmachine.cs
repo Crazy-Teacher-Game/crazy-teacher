@@ -324,17 +324,18 @@ public class Slotmachine : MonoBehaviour
         if (wheel3 != null) wheel3.Stop();
 
         FadeAllSoundsOut();
-        PlayEndScreenSound(screenType);
+        // PlayEndScreenSound(screenType);
 
-        if (screenIndicator != null)
-            screenIndicator.ShowScreen(screenType);
+        // if (screenIndicator != null)
+        //     screenIndicator.ShowScreen(screenType);
 
         StartCoroutine(NotifyEndResultAfterDelay(isWin));
     }
 
     private IEnumerator NotifyEndResultAfterDelay(bool isWin)
     {
-        yield return new WaitForSeconds(endNotifyDelay);
+        // yield return new WaitForSeconds(endNotifyDelay);
+        yield return new WaitForSeconds(0f);
 
         System.Action notify = () =>
         {

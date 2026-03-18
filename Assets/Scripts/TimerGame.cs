@@ -106,16 +106,16 @@ public class TimerGame : MonoBehaviour
                     playerTimerText.text = Mathf.CeilToInt(playerTimer).ToString();
                     tennaDefault.SetActive(false);
                     tennaWinPrefab.SetActive(true);
-                    winPrefab.SetActive(true);
-                    if (audioSource != null && winSound != null)
-                        audioSource.PlayOneShot(winSound);
+                    //winPrefab.SetActive(true);
+                    // if (audioSource != null && winSound != null)
+                       // audioSource.PlayOneShot(winSound);
                 }
                 else
                 {
                     playerTimerText.text = playerTimer.ToString("F2");
-                    losePrefab.SetActive(true);
-                    if (audioSource != null && loseSound != null)
-                        audioSource.PlayOneShot(loseSound);
+                    //losePrefab.SetActive(true);
+                    //if (audioSource != null && loseSound != null)
+                        // audioSource.PlayOneShot(loseSound);
                 }
 
                 gameEnded = true;

@@ -358,11 +358,12 @@ public class GameManager : MonoBehaviour
     private IEnumerator CoNotifyWin()
     {
         StopTimer();
+        FadeOutGameTheme();
         OnMinigameWon?.Invoke();
         int gained = Mathf.RoundToInt((1f + difficultyFactor) * 10f);
         Score += gained;
         if (winSound != null)
-            audioSource.PlayOneShot(winSound);
+             audioSource.PlayOneShot(winSound, winSoundVolume);
         yield return StartCoroutine(ShowWinResult());
         yield return scenesLoader.UnloadMiniGame(currentGame);
         isTransitioning = false;
@@ -382,9 +383,10 @@ public class GameManager : MonoBehaviour
     private IEnumerator CoNotifyFail()
     {
         StopTimer();
+        FadeOutGameTheme();
         OnMinigameFailed?.Invoke();
         if (failSound != null)
-            audioSource.PlayOneShot(failSound);
+            audioSource.PlayOneShot(failSound, failSoundVolume);
         yield return StartCoroutine(ShowFailResult());
         LoseLife();
         if (Lives > 0)
@@ -411,6 +413,7 @@ public class GameManager : MonoBehaviour
         minigameEnded = false;
         string nextGame = GetNextGameInPlaylist();
         currentGame = nextGame;
+        PlayGameTheme();
         scenesLoader.LoadMiniGame(nextGame);
     }
 
@@ -462,9 +465,104 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator CoGameOver()
     {
+        if (gameOverSound1 != null)
+            audioSource.PlayOneShot(gameOverSound1, gameOverSound1Volume);
+        if (gameOverSound2 != null)
+            StartCoroutine(CoPlayGameOverSound2());
+
         yield return scenesLoader.LoadGameOverScene();
         yield return new WaitForSeconds(3f);
         LoadHighscoreInterface();
+    }
+
+    private IEnumerator CoPlayGameOverSound2()
+    {
+        if (gameOverSound2Delay > 0f)
+            yield return new WaitForSeconds(gameOverSound2Delay);
+        audioSource.PlayOneShot(gameOverSound2, gameOverSound2Volume);
+    }
+
+    // ─── Audio ───
+
+    public void PlayMenuTheme()
+    {
+        if (_menuThemeCo != null) StopCoroutine(_menuThemeCo);
+        _menuThemeCo = StartCoroutine(CoPlayMenuTheme());
+    }
+
+    private IEnumerator CoPlayMenuTheme()
+    {
+        if (menuIntroClip != null)
+        {
+            musicSource.clip = menuIntroClip;
+            musicSource.loop = false;
+            musicSource.volume = menuIntroVolume;
+            musicSource.Play();
+            yield return new WaitForSeconds(menuIntroClip.length);
+        }
+        if (menuLoopClip != null)
+        {
+            musicSource.clip = menuLoopClip;
+            musicSource.loop = true;
+            musicSource.volume = menuLoopVolume;
+            musicSource.Play();
+        }
+    }
+
+    public void StopMenuTheme()
+    {
+        if (_menuThemeCo != null) StopCoroutine(_menuThemeCo);
+        _menuThemeCo = null;
+        musicSource.Stop();
+    }
+
+    public void PlaySFX(AudioClip clip, float volume = 1f)
+    {
+        if (clip != null)
+            audioSource.PlayOneShot(clip, volume);
+    }
+
+    private void PlayGameTheme()
+    {
+        if (gameThemeClip == null) return;
+        if (_gameThemeFadeCo != null) StopCoroutine(_gameThemeFadeCo);
+        _gameThemeFadeCo = null;
+
+        // pitch = 1 + difficultyFactor → de x1 (diff=0) à x2 (diff=1)
+        // AudioSource.pitch contrôle vitesse ET pitch simultanément
+        float pitch = 1f + difficultyFactor;
+
+        gameThemeSource.clip = gameThemeClip;
+        gameThemeSource.volume = gameThemeVolume;
+        gameThemeSource.pitch = pitch;
+        gameThemeSource.loop = true;
+        gameThemeSource.Play();
+    }
+
+    private void FadeOutGameTheme()
+    {
+        if (_gameThemeFadeCo != null) StopCoroutine(_gameThemeFadeCo);
+        _gameThemeFadeCo = StartCoroutine(CoFadeOutGameTheme());
+    }
+
+    private IEnumerator CoFadeOutGameTheme()
+    {
+        if (gameThemeSource == null || !gameThemeSource.isPlaying)
+            yield break;
+
+        float startVolume = gameThemeSource.volume;
+        float elapsed = 0f;
+
+        while (elapsed < gameThemeFadeDuration)
+        {
+            elapsed += Time.deltaTime;
+            gameThemeSource.volume = Mathf.Lerp(startVolume, 0f, elapsed / gameThemeFadeDuration);
+            yield return null;
+        }
+
+        gameThemeSource.Stop();
+        gameThemeSource.volume = gameThemeVolume;
+        _gameThemeFadeCo = null;
     }
 
     private void RestartGame()

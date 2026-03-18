@@ -57,7 +57,6 @@ public class MentalMathBootstrapper : MonoBehaviour
 				livesUI.SetLives(gm.Lives);
 			}
 
-			// Réactiver le TimerUI s'il était caché
 			if (timerUI != null && !timerUI.gameObject.activeSelf)
 			{
 				Debug.Log("[MentalMathBootstrapper] TimerUI was inactive, reactivating");
@@ -85,7 +84,6 @@ public class MentalMathBootstrapper : MonoBehaviour
 
 	private void EnsureMentalMath(Canvas canvas)
 	{
-		// Détruire les anciens composants s'ils existent (ils peuvent avoir des références cassées après un rechargement)
 		var oldLogic = Object.FindObjectOfType<CalculLogic>();
 		var oldUI = Object.FindObjectOfType<CalculUIManager>();
 		var oldMgr = Object.FindObjectOfType<MiniGame_CalculManager>();
@@ -123,32 +121,80 @@ public class MentalMathBootstrapper : MonoBehaviour
 		Debug.Log("[MentalMathBootstrapper] Created new MiniGame_CalculManager");
 
 		// Wire UI references by scene object names
-		var allTMPs = Object.FindObjectsOfType<TMP_Text>(true);
-		var calcText = System.Array.Find(allTMPs, t => t.gameObject.name == "calculation-value");
-		var propText = System.Array.Find(allTMPs, t => t.gameObject.name == "proposition-value");
-		var progressText = System.Array.Find(allTMPs, t => t.gameObject.name == "progress-value");
+		var calcTextObj = GameObject.Find("calculation-value");
+		var propTextObj = GameObject.Find("proposition-value");
+		var successImgObj = GameObject.Find("SucessImage");
+		var failImgObj = GameObject.Find("FailImage");
 
-		var allImages = Object.FindObjectsOfType<Image>(true);
-		var successImg = System.Array.Find(allImages, img => img.gameObject.name == "SucessImage");
-		var failImg = System.Array.Find(allImages, img => img.gameObject.name == "FailImage");
+		var calcText = calcTextObj ? calcTextObj.GetComponent<TMPro.TMP_Text>() : null;
+		var refTMP = propTextObj ? propTextObj.GetComponent<TMPro.TMP_Text>() : null;
+		var successImg = successImgObj ? successImgObj.GetComponent<Image>() : null;
+		var failImg = failImgObj ? failImgObj.GetComponent<Image>() : null;
 
 		// Hide feedback images immediately to match default state
 		if (successImg != null) successImg.enabled = false;
 		if (failImg != null) failImg.enabled = false;
+
+		// Replace proposition-value with 3 image+text slots in a HorizontalLayoutGroup
+		Image labelImg1 = null, labelImg2 = null, labelImg3 = null;
+		TMPro.TMP_Text answerTxt1 = null, answerTxt2 = null, answerTxt3 = null;
+
+		if (propTextObj != null)
+		{
+			var propRect = propTextObj.GetComponent<RectTransform>();
+			var propParent = propTextObj.transform.parent;
+
+			// Hide original text
+			propTextObj.SetActive(false);
+
+			// Outer container at the same position
+			var container = new GameObject("AnswersContainer");
+			container.transform.SetParent(propParent, false);
+			var containerRect = container.AddComponent<RectTransform>();
+			if (propRect != null)
+			{
+				containerRect.anchorMin = propRect.anchorMin;
+				containerRect.anchorMax = propRect.anchorMax;
+				containerRect.anchoredPosition = propRect.anchoredPosition;
+				// Hauteur copiée, largeur calculée : 3 slots * 200 + 2 espaces * 30
+				// 3 slots * 270 + 2 espaces * 30 = 870
+				containerRect.sizeDelta = new Vector2(870, propRect.sizeDelta.y);
+				containerRect.pivot = propRect.pivot;
+			}
+			var outerHLG = container.AddComponent<HorizontalLayoutGroup>();
+			outerHLG.spacing = 30;
+			outerHLG.childAlignment = TextAnchor.MiddleCenter;
+			outerHLG.childControlWidth = false;
+			outerHLG.childControlHeight = false;
+			outerHLG.childForceExpandWidth = false;
+			outerHLG.childForceExpandHeight = false;
+
+			(labelImg1, answerTxt1) = CreateAnswerSlot(container.transform, 1, refTMP);
+			(labelImg2, answerTxt2) = CreateAnswerSlot(container.transform, 2, refTMP);
+			(labelImg3, answerTxt3) = CreateAnswerSlot(container.transform, 3, refTMP);
+		}
 
 		// Assign fields via reflection (private serialized)
 		if (ui != null)
 		{
 			typeof(CalculUIManager).GetField("questionText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
 				?.SetValue(ui, calcText);
-			typeof(CalculUIManager).GetField("propositionsText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-				?.SetValue(ui, propText);
-			typeof(CalculUIManager).GetField("progressText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-				?.SetValue(ui, progressText);
 			typeof(CalculUIManager).GetField("successImage", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
 				?.SetValue(ui, successImg);
 			typeof(CalculUIManager).GetField("failImage", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
 				?.SetValue(ui, failImg);
+			typeof(CalculUIManager).GetField("answerText1", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+				?.SetValue(ui, answerTxt1);
+			typeof(CalculUIManager).GetField("answerText2", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+				?.SetValue(ui, answerTxt2);
+			typeof(CalculUIManager).GetField("answerText3", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+				?.SetValue(ui, answerTxt3);
+			typeof(CalculUIManager).GetField("answerLabelImage1", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+				?.SetValue(ui, labelImg1);
+			typeof(CalculUIManager).GetField("answerLabelImage2", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+				?.SetValue(ui, labelImg2);
+			typeof(CalculUIManager).GetField("answerLabelImage3", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+				?.SetValue(ui, labelImg3);
 		}
 
 		var gm = Object.FindObjectOfType<GameManager>();
@@ -164,17 +210,49 @@ public class MentalMathBootstrapper : MonoBehaviour
 		}
 	}
 
-	private Transform FindChildRecursive(Transform parent, string name)
+	private (Image, TMPro.TMP_Text) CreateAnswerSlot(Transform parent, int index, TMPro.TMP_Text refTMP)
 	{
-		foreach (Transform child in parent)
+		// Slot: image + text côte à côte
+		var slot = new GameObject($"AnswerSlot{index}");
+		slot.transform.SetParent(parent, false);
+		var slotRect = slot.AddComponent<RectTransform>();
+		slotRect.sizeDelta = new Vector2(270, 90);
+
+		var hlg = slot.AddComponent<HorizontalLayoutGroup>();
+		hlg.spacing = 10;
+		hlg.childAlignment = TextAnchor.MiddleCenter;
+		hlg.childControlWidth = false;
+		hlg.childControlHeight = false;
+		hlg.childForceExpandWidth = false;
+		hlg.childForceExpandHeight = false;
+
+		// Image (label bouton B1/B2/B3)
+		var imgGO = new GameObject($"B{index}Label");
+		imgGO.transform.SetParent(slot.transform, false);
+		var imgRect = imgGO.AddComponent<RectTransform>();
+		imgRect.sizeDelta = new Vector2(90, 90);
+		var img = imgGO.AddComponent<Image>();
+		img.preserveAspect = true;
+
+		// TMP (valeur de la réponse)
+		var txtGO = new GameObject($"AnswerText{index}");
+		txtGO.transform.SetParent(slot.transform, false);
+		var txtRect = txtGO.AddComponent<RectTransform>();
+		txtRect.sizeDelta = new Vector2(160, 80);
+		var txt = txtGO.AddComponent<TMPro.TextMeshProUGUI>();
+
+		if (refTMP != null)
 		{
-			if (child.name == name)
-				return child;
-			
-			var found = FindChildRecursive(child, name);
-			if (found != null)
-				return found;
+			txt.font = refTMP.font;
+			txt.fontSize = refTMP.fontSize;
+			txt.color = refTMP.color;
 		}
-		return null;
+		else
+		{
+			txt.fontSize = 36;
+		}
+		txt.alignment = TMPro.TextAlignmentOptions.Midline;
+
+		return (img, txt);
 	}
 }

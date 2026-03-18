@@ -5,7 +5,7 @@ using TMPro;
 using Random = UnityEngine.Random;
 
 public class TriPommePoire : MonoBehaviour
-{   
+{
     public GameObject fruitSpawner;
 
     [SerializeField] public GameObject fruit1Prefab;
@@ -20,55 +20,62 @@ public class TriPommePoire : MonoBehaviour
 
     public float timerDuration = 5f;
     public float timerMinDuration = 3f;
-    
+
     private bool hasReturnedToCenter = true;
+    private bool gameEnded = false;
 
     void Start()
     {
         SpawnRandomFruit(Vector3.zero);
+        GameManager.Instance.OnTimerEnded += HandleTimeout;
         GameManager.Instance.StartTimer(timerDuration, timerMinDuration);
     }
 
     void Update()
     {
+        if (gameEnded) return;
+
         float horizontalInput = Input.GetAxisRaw("P1_Horizontal");
 
         fruitsATrouverText.text = "Fruits à trier: " + fruitsATrouver;
-            // Si le joystick est revenu au centre, on autorise un nouvel input
-            if (Mathf.Abs(horizontalInput) < 0.2f)
-            {
-                hasReturnedToCenter = true;
-            }
-            // Si le joystick est à gauche et qu'on attend un fruit rouge
-            else if (horizontalInput < -0.5f && hasReturnedToCenter)
-            {
-                if (currentFruitName == "red")
-                {
-                    fruitsATrouver--;
-                    SpawnRandomFruit(Vector3.left);
-                }
-                hasReturnedToCenter = false;
-            }
-            // Si le joystick est à droite et qu'on attend un fruit bleu
-            else if (horizontalInput > 0.5f && hasReturnedToCenter)
-            {
-                if (currentFruitName == "blue")
-                {
-                    fruitsATrouver--;
-                    SpawnRandomFruit(Vector3.right);
-                }
-                hasReturnedToCenter = false;
-            }
-        
-        if (fruitsATrouver <= 0)
+        // Si le joystick est revenu au centre, on autorise un nouvel input
+        if (Mathf.Abs(horizontalInput) < 0.2f)
         {
-            GameManager.Instance.NotifyWin();
+            hasReturnedToCenter = true;
+        }
+        // Si le joystick est à gauche et qu'on attend un fruit rouge
+        else if (horizontalInput < -0.5f && hasReturnedToCenter)
+        {
+            if (currentFruitName == "red")
+            {
+                fruitsATrouver--;
+                SpawnRandomFruit(Vector3.left);
+            }
+            hasReturnedToCenter = false;
+        }
+        // Si le joystick est à droite et qu'on attend un fruit bleu
+        else if (horizontalInput > 0.5f && hasReturnedToCenter)
+        {
+            if (currentFruitName == "blue")
+            {
+                fruitsATrouver--;
+                SpawnRandomFruit(Vector3.right);
+            }
+            hasReturnedToCenter = false;
         }
 
-        if (fruitsATrouver > 0 && GameManager.Instance.RemainingTime <= 0f)
+        if (fruitsATrouver <= 0)
         {
-            GameManager.Instance.NotifyFail();
+            gameEnded = true;
+            GameManager.Instance.NotifyWin();
         }
+    }
+
+    void HandleTimeout()
+    {
+        if (gameEnded) return;
+        gameEnded = true;
+        GameManager.Instance.NotifyFail();
     }
 
     void SpawnRandomFruit(Vector3 moveDirection)
@@ -103,5 +110,11 @@ public class TriPommePoire : MonoBehaviour
 
         fruit.transform.position = endPos;
         Destroy(fruit);
+    }
+
+    void OnDisable()
+    {
+        if (GameManager.Instance != null)
+            GameManager.Instance.OnTimerEnded -= HandleTimeout;
     }
 }

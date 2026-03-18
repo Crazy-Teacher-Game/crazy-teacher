@@ -8,6 +8,7 @@ public class MiniGame_CalculManager : MonoBehaviour
     private int wrongAttempts;
     private int correctAnswers;
     private const int REQUIRED_CORRECT_ANSWERS = 3;
+    private bool gameEnded = false;
 
     public int CorrectAnswers => correctAnswers;
     public int RequiredCorrectAnswers => REQUIRED_CORRECT_ANSWERS;
@@ -49,7 +50,7 @@ public class MiniGame_CalculManager : MonoBehaviour
 
     public void GenerateNewCalculation()
     {
-        if (calculUIManager == null)
+        if (gameEnded || calculUIManager == null)
         {
             return;
         }
@@ -59,8 +60,7 @@ public class MiniGame_CalculManager : MonoBehaviour
 
     public void OnAnswerSelected(int index, bool correct)
     {
-        // Check if game is over (no lives left)
-        if (GameManager.Instance.Lives <= 0)
+        if (gameEnded || GameManager.Instance.Lives <= 0)
         {
             return;
         }
@@ -69,21 +69,21 @@ public class MiniGame_CalculManager : MonoBehaviour
         {
             correctAnswers++;
 
-            // Check win condition
             if (correctAnswers >= REQUIRED_CORRECT_ANSWERS)
             {
+                gameEnded = true;
                 GameManager.Instance.NotifyWin();
                 return;
             }
 
-            // Generate next calculation if not yet won
             return;
         }
-        
+
         wrongAttempts++;
 
         if (wrongAttempts >= 3)
         {
+            gameEnded = true;
             GameManager.Instance.NotifyFail();
             return;
         }
@@ -91,15 +91,12 @@ public class MiniGame_CalculManager : MonoBehaviour
 
     private void HandleTimerEnded()
     {
-        Debug.Log($"[MiniGame_CalculManager] HandleTimerEnded() called - Instance ID: {GetInstanceID()}, this={(this != null)}, gameObject={(gameObject != null)}");
+        if (gameEnded) return;
+        gameEnded = true;
+
         if (GameManager.Instance != null)
         {
-            Debug.Log($"[MiniGame_CalculManager] Calling NotifyFail from HandleTimerEnded");
             GameManager.Instance.NotifyFail();
-        }
-        else
-        {
-            Debug.LogWarning($"[MiniGame_CalculManager] HandleTimerEnded - GameManager.Instance is NULL!");
         }
     }
 }

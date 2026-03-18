@@ -592,6 +592,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: DroppingFish
       objectReference: {fileID: 0}
+    - target: {fileID: 6911840315201378994, guid: 3ea69363948584f82a41902414326c1e, type: 3}
+      propertyPath: m_TagString
+      value: Untagged
+      objectReference: {fileID: 0}
     - target: {fileID: 9208130840012783952, guid: 3ea69363948584f82a41902414326c1e, type: 3}
       propertyPath: m_RootOrder
       value: 4
@@ -1744,7 +1748,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 0.66
+  m_Volume: 0.79
   m_Pitch: 1
   Loop: 0
   Mute: 0

@@ -93,17 +93,17 @@ public class MentalMathBootstrapper : MonoBehaviour
 		if (oldLogic != null)
 		{
 			Debug.Log("[MentalMathBootstrapper] Destroying old CalculLogic");
-			Object.Destroy(oldLogic.gameObject);
+			DestroyImmediate(oldLogic.gameObject);
 		}
 		if (oldUI != null)
 		{
 			Debug.Log("[MentalMathBootstrapper] Destroying old CalculUIManager");
-			Object.Destroy(oldUI.gameObject);
+			DestroyImmediate(oldUI.gameObject);
 		}
 		if (oldMgr != null)
 		{
 			Debug.Log("[MentalMathBootstrapper] Destroying old MiniGame_CalculManager");
-			Object.Destroy(oldMgr.gameObject);
+			DestroyImmediate(oldMgr.gameObject);
 		}
 
 		// Créer les nouveaux composants sous ce Bootstrapper (qui sera détruit avec la scène)

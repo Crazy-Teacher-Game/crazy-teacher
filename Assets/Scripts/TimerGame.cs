@@ -43,9 +43,22 @@ public class TimerGame : MonoBehaviour
         timerToFindText.text = timerToFind.ToString();
         playerTimerText.text = "0.00";
 
+        GameManager.Instance.OnTimerEnded += HandleTimerEnded;
         GameManager.Instance.StartTimer(gameDuration, minDuration);
         StartCoroutine(StartAfterDelay());
+    }
 
+    void OnDestroy()
+    {
+        if (GameManager.Instance != null)
+            GameManager.Instance.OnTimerEnded -= HandleTimerEnded;
+    }
+
+    void HandleTimerEnded()
+    {
+        if (gameEnded) return;
+        gameEnded = true;
+        GameManager.Instance.NotifyFail();
     }
 
     IEnumerator StartAfterDelay()

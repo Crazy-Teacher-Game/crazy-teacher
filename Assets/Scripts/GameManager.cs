@@ -400,6 +400,10 @@ public class GameManager : MonoBehaviour
         replayTextShown = false;
         isTransitioning = false;
         highscoreInputWasShown = false;
+        OnTimerEnded = null;
+        OnTimerTick = null;
+        OnMinigameWon = null;
+        OnMinigameFailed = null;
 
         if (startMenuLoader != null)
             startMenuLoader.ReloadMenu();

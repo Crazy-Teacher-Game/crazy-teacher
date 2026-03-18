@@ -479,13 +479,4 @@ public class FlashTheCar : MonoBehaviour
         }
         if (photoStrip != null) photoStrip.Cleanup();
     }
-
-    void OnDestroy()
-    {
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.OnTimerEnded -= HandleTimerEnded;
-        }
-        if (photoStrip != null) photoStrip.Cleanup();
-    }
 }

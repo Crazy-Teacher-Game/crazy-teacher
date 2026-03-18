@@ -4,8 +4,8 @@ using TMPro;
 public class Cup : MonoBehaviour
 {
     private static int globalScore = 0;
+    private static bool isWon = false;
     public TMP_Text scoreText;
-    private bool isWon = false;
     public Transform rotationCenter;
     public float rotationSpeedDegreesPerSecond = 70f;
     public Vector3 rotationAxis = Vector3.up;
@@ -15,6 +15,7 @@ public class Cup : MonoBehaviour
     void Start()
     {
         globalScore = 0;
+        isWon = false;
         UpdateScoreUI();
     }
     void Update()

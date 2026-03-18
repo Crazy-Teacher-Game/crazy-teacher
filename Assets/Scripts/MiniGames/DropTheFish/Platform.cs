@@ -12,8 +12,15 @@ public class Platform : MonoBehaviour
         {
             GameManager.Instance.StartTimer(durationSeconds, minDurationSeconds);
         }
-        GameManager.Instance.OnTimerEnded += HandleTimeout;
-        GameManager.Instance.OnMinigameWon += AfterWin;
+    }
+
+    void OnEnable()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnTimerEnded += HandleTimeout;
+            GameManager.Instance.OnMinigameWon += AfterWin;
+        }
     }
 
     void OnTriggerEnter(Collider other)

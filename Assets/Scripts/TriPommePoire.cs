@@ -44,7 +44,7 @@ public class TriPommePoire : MonoBehaviour
             hasReturnedToCenter = true;
         }
         // Si le joystick est à gauche et qu'on attend un fruit rouge
-        else if (horizontalInput < -0.5f && hasReturnedToCenter)
+        else if (horizontalInput < -0.5f && hasReturnedToCenter && !gameEnded)
         {
             if (currentFruitName == "red")
             {
@@ -54,7 +54,7 @@ public class TriPommePoire : MonoBehaviour
             hasReturnedToCenter = false;
         }
         // Si le joystick est à droite et qu'on attend un fruit bleu
-        else if (horizontalInput > 0.5f && hasReturnedToCenter)
+        else if (horizontalInput > 0.5f && hasReturnedToCenter && !gameEnded)
         {
             if (currentFruitName == "blue")
             {
@@ -67,8 +67,14 @@ public class TriPommePoire : MonoBehaviour
         if (fruitsATrouver <= 0)
         {
             gameEnded = true;
-            GameManager.Instance.NotifyWin();
+            StartCoroutine(WinAfterDelay());
         }
+    }
+
+    IEnumerator WinAfterDelay()
+    {
+        yield return new WaitForSeconds(1f);
+        GameManager.Instance.NotifyWin();
     }
 
     void HandleTimeout()
@@ -85,13 +91,18 @@ public class TriPommePoire : MonoBehaviour
             StartCoroutine(MoveAndDestroyFruit(lastSpawnedFruit, moveDirection));
         }
 
-        GameObject prefabToSpawn = Random.Range(0, 2) == 0 ? fruit1Prefab : fruit2Prefab;
-        lastSpawnedFruit = Instantiate(prefabToSpawn, fruitSpawner.transform);
+        if (!gameEnded && fruitsATrouver > 0)
+        {
+            GameObject prefabToSpawn = Random.Range(0, 2) == 0 ? fruit1Prefab : fruit2Prefab;
+            lastSpawnedFruit = Instantiate(prefabToSpawn, fruitSpawner.transform);
 
-        if (prefabToSpawn == fruit1Prefab)
-            currentFruitName = "red";
-        else
-            currentFruitName = "blue";
+            if (prefabToSpawn == fruit1Prefab)
+                currentFruitName = "red";
+            else
+                currentFruitName = "blue";
+        }
+
+
     }
 
     IEnumerator MoveAndDestroyFruit(GameObject fruit, Vector3 direction)

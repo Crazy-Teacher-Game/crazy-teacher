@@ -61,7 +61,24 @@ public class GameManager : MonoBehaviour
     private AudioListener _activeAudioListener;
     private AudioSource audioSource;
     public AudioClip winSound;
+    [SerializeField] [Range(0f, 3f)] private float winSoundVolume = 1f;
     public AudioClip failSound;
+    [SerializeField] [Range(0f, 3f)] private float failSoundVolume = 1f;
+
+    [Header("Audio - Menu Theme")]
+    [SerializeField] private AudioClip menuIntroClip;
+    [SerializeField] [Range(0f, 3f)] private float menuIntroVolume = 1f;
+    [SerializeField] private AudioClip menuLoopClip;
+    [SerializeField] [Range(0f, 3f)] private float menuLoopVolume = 1f;
+
+    [Header("Audio - SFX")]
+    [SerializeField] private AudioClip goSound;
+    [SerializeField] [Range(0f, 3f)] private float goSoundVolume = 1f;
+    [SerializeField] private AudioClip descriptionSound;
+    [SerializeField] [Range(0f, 3f)] private float descriptionSoundVolume = 1f;
+
+    private AudioSource musicSource;
+    private Coroutine _menuThemeCo;
 
     // Back to menu manager
     private float afkTimer = 0f;
@@ -120,6 +137,9 @@ public class GameManager : MonoBehaviour
         if (!gameStarted)
         {
             gameStarted = true;
+            StopMenuTheme();
+            if (goSound != null)
+                audioSource.PlayOneShot(goSound, goSoundVolume);
             LoadNextMiniGame();
         }
     }
@@ -153,6 +173,10 @@ public class GameManager : MonoBehaviour
         {
             audioSource = gameObject.AddComponent<AudioSource>();
         }
+
+        musicSource = gameObject.AddComponent<AudioSource>();
+        musicSource.playOnAwake = false;
+        musicSource.loop = false;
     }
 
     public void RegisterGameOverManager(GameOverManager manager)
@@ -220,6 +244,9 @@ public class GameManager : MonoBehaviour
         isDescriptionShowing = true;
         descriptionText.text = description;
         descriptionText.gameObject.SetActive(true);
+
+        if (descriptionSound != null)
+            audioSource.PlayOneShot(descriptionSound, descriptionSoundVolume);
 
         // Relance l'animation si un Animator est présent
         Animator animator = descriptionText.GetComponent<Animator>();
@@ -312,7 +339,7 @@ public class GameManager : MonoBehaviour
         int gained = Mathf.RoundToInt((1f + difficultyFactor) * 10f);
         Score += gained;
         if (winSound != null)
-            audioSource.PlayOneShot(winSound);
+            audioSource.PlayOneShot(winSound, winSoundVolume);
         yield return StartCoroutine(ShowWinResult());
         yield return scenesLoader.UnloadMiniGame(currentGame);
         isTransitioning = false;
@@ -334,7 +361,7 @@ public class GameManager : MonoBehaviour
         StopTimer();
         OnMinigameFailed?.Invoke();
         if (failSound != null)
-            audioSource.PlayOneShot(failSound);
+            audioSource.PlayOneShot(failSound, failSoundVolume);
         yield return StartCoroutine(ShowFailResult());
         LoseLife();
         if (Lives > 0)
@@ -415,6 +442,46 @@ public class GameManager : MonoBehaviour
         yield return scenesLoader.LoadGameOverScene();
         yield return new WaitForSeconds(3f);
         LoadHighscoreInterface();
+    }
+
+    // ─── Audio ───
+
+    public void PlayMenuTheme()
+    {
+        if (_menuThemeCo != null) StopCoroutine(_menuThemeCo);
+        _menuThemeCo = StartCoroutine(CoPlayMenuTheme());
+    }
+
+    private IEnumerator CoPlayMenuTheme()
+    {
+        if (menuIntroClip != null)
+        {
+            musicSource.clip = menuIntroClip;
+            musicSource.loop = false;
+            musicSource.volume = menuIntroVolume;
+            musicSource.Play();
+            yield return new WaitForSeconds(menuIntroClip.length);
+        }
+        if (menuLoopClip != null)
+        {
+            musicSource.clip = menuLoopClip;
+            musicSource.loop = true;
+            musicSource.volume = menuLoopVolume;
+            musicSource.Play();
+        }
+    }
+
+    public void StopMenuTheme()
+    {
+        if (_menuThemeCo != null) StopCoroutine(_menuThemeCo);
+        _menuThemeCo = null;
+        musicSource.Stop();
+    }
+
+    public void PlaySFX(AudioClip clip, float volume = 1f)
+    {
+        if (clip != null)
+            audioSource.PlayOneShot(clip, volume);
     }
 
     private void RestartGame()

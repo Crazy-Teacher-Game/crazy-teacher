@@ -55,6 +55,7 @@ public class StartMenuLoader : MonoBehaviour
         }
 
         menuLoaded = true;
+        GameManager.Instance.PlayMenuTheme();
     }
 
     private IEnumerator UnloadStartMenuAndStartGame()
@@ -80,6 +81,7 @@ public class StartMenuLoader : MonoBehaviour
     {
         menuLoaded = false;
         inputDetected = false;
+        GameManager.Instance.PlayMenuTheme();
         StartCoroutine(LoadStartMenuSequence());
     }
 

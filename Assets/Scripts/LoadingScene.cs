@@ -11,6 +11,10 @@ public class LoadingScene : MonoBehaviour
     public GameObject ButtonFPrefab;
     public GameObject ButtonsFGHPrefab;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip inputScreenSound;
+    [SerializeField] [Range(0f, 3f)] private float inputScreenSoundVolume = 1f;
+
     private void OnEnable()
     {
         ControlType type = GameManager.Instance.CurrentControlType;
@@ -37,5 +41,8 @@ public class LoadingScene : MonoBehaviour
                 instructionsText.text = "Prépare-toi...";
                 break;
         }
+
+        if (inputScreenSound != null)
+            GameManager.Instance.PlaySFX(inputScreenSound, inputScreenSoundVolume);
     }
 }

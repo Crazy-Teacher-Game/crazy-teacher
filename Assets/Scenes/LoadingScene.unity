@@ -2972,6 +2972,8 @@ MonoBehaviour:
   JoystickXPrefab: {fileID: 1004343449}
   ButtonFPrefab: {fileID: 2101942172}
   ButtonsFGHPrefab: {fileID: 23200645}
+  inputScreenSound: {fileID: 8300000, guid: 6c0ebfb9a9cc52f438f01458436ae6a8, type: 3}
+  inputScreenSoundVolume: 1
 --- !u!1 &2041463557
 GameObject:
   m_ObjectHideFlags: 0

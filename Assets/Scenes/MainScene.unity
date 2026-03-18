@@ -996,7 +996,17 @@ MonoBehaviour:
   failSprite: {fileID: 2084506862}
   resultDisplayTime: 1.5
   winSound: {fileID: 8300000, guid: 2e7718402476e604789b0b4b94ca8d1e, type: 3}
+  winSoundVolume: 1
   failSound: {fileID: 8300000, guid: 198307cec7ed65143a6401b5f1f853ac, type: 3}
+  failSoundVolume: 1
+  menuIntroClip: {fileID: 8300000, guid: 3ac0d2395b8ba5941b53f6f9388f4fa3, type: 3}
+  menuIntroVolume: 1
+  menuLoopClip: {fileID: 8300000, guid: d7db9257e9525434a84fe759eea47c57, type: 3}
+  menuLoopVolume: 1
+  goSound: {fileID: 8300000, guid: 21dcdecc259578345bd69b28e0c86930, type: 3}
+  goSoundVolume: 1
+  descriptionSound: {fileID: 8300000, guid: b0aafc731f585104ea5853eecb246e1b, type: 3}
+  descriptionSoundVolume: 1
   descriptionText: {fileID: 581587737}
 --- !u!114 &799674791
 MonoBehaviour:

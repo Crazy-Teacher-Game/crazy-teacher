@@ -405,7 +405,6 @@ public class FlashTheCar : MonoBehaviour
             }
 
             terminalNotificationSent = true;
-            photoStrip.Cleanup();
             if (GameManager.Instance != null)
             {
                 if (isWin) GameManager.Instance.NotifyWin();

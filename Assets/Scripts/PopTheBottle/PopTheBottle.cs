@@ -22,6 +22,26 @@ public class PopTheBottle : MonoBehaviour
     private float winPercentage = 0f;
     private bool gameEnded = false;
 
+    [Header("Audio - Ambiance")]
+    [SerializeField] private AudioClip ambianceSound;
+    [SerializeField] [Range(0f, 1f)] private float ambianceVolume = 1f;
+    [SerializeField] private float ambianceFadeInDuration = 1f;
+
+    [Header("Audio - Effets")]
+    [SerializeField] private AudioClip shakeDownSound;
+    [SerializeField] [Range(0f, 1f)] private float shakeDownVolume = 1f;
+    [SerializeField] private AudioClip shakeUpSound;
+    [SerializeField] [Range(0f, 1f)] private float shakeUpVolume = 1f;
+    [SerializeField] private AudioClip popSound;
+    [SerializeField] [Range(0f, 1f)] private float popVolume = 1f;
+
+    [Header("Audio - Fade Global")]
+    [SerializeField] private float globalFadeInDuration = 0.5f;
+    [SerializeField] private float globalFadeOutDuration = 1f;
+
+    private AudioSource ambianceAudioSource;
+    private AudioSource fxAudioSource;
+
     void Start()
     {
         bottleRectTransform = bottleObject.GetComponent<RectTransform>();
@@ -40,6 +60,22 @@ public class PopTheBottle : MonoBehaviour
             Debug.LogError("[PopTheBottle] Bottle does not have a SpriteRenderer! Add one to the Bottle GameObject.");
         }
 
+        // Ambiance (loop)
+        if (ambianceSound != null)
+        {
+            ambianceAudioSource = gameObject.AddComponent<AudioSource>();
+            ambianceAudioSource.clip = ambianceSound;
+            ambianceAudioSource.loop = true;
+            ambianceAudioSource.volume = 0f;
+            ambianceAudioSource.Play();
+            StartCoroutine(FadeAudio(ambianceAudioSource, 0f, ambianceVolume, ambianceFadeInDuration));
+        }
+
+        // Source effets
+        fxAudioSource = gameObject.AddComponent<AudioSource>();
+        fxAudioSource.volume = 0f;
+        StartCoroutine(FadeAudio(fxAudioSource, 0f, 1f, globalFadeInDuration));
+
         GameManager.Instance.StartTimer(10f, 5f);
         GameManager.Instance.OnTimerEnded += HandleTimerEnded;
     }
@@ -51,8 +87,9 @@ public class PopTheBottle : MonoBehaviour
         // Check for win
         if (bottleSaturation >= bottleSaturationMax)
         {
-            gameEnded = true;
-            GameManager.Instance.NotifyWin();
+            if (fxAudioSource != null && popSound != null)
+                fxAudioSource.PlayOneShot(popSound, popVolume);
+            EndGame(true);
             return;
         }
 
@@ -99,6 +136,15 @@ public class PopTheBottle : MonoBehaviour
         if (bottleState != lastBottleState)
         {
             bottleSaturation += Mathf.Abs(bottleState - lastBottleState);
+
+            if (fxAudioSource != null)
+            {
+                if (bottleState == -1 && shakeDownSound != null)
+                    fxAudioSource.PlayOneShot(shakeDownSound, shakeDownVolume);
+                else if (bottleState == 1 && shakeUpSound != null)
+                    fxAudioSource.PlayOneShot(shakeUpSound, shakeUpVolume);
+            }
+
             lastBottleState = bottleState;
         }
 
@@ -109,10 +155,41 @@ public class PopTheBottle : MonoBehaviour
     private void HandleTimerEnded()
     {
         if (!gameEnded)
+            EndGame(false);
+    }
+
+    private void EndGame(bool win)
+    {
+        gameEnded = true;
+        GameManager.Instance.OnTimerEnded -= HandleTimerEnded;
+
+        if (ambianceAudioSource != null)
+            StartCoroutine(FadeAudio(ambianceAudioSource, ambianceAudioSource.volume, 0f, globalFadeOutDuration));
+        if (fxAudioSource != null)
+            StartCoroutine(FadeAudio(fxAudioSource, fxAudioSource.volume, 0f, globalFadeOutDuration));
+
+        if (win) GameManager.Instance.NotifyWin();
+        else GameManager.Instance.NotifyFail();
+    }
+
+    private IEnumerator FadeAudio(AudioSource source, float from, float to, float duration)
+    {
+        if (source == null) yield break;
+
+        if (duration <= 0f)
         {
-            gameEnded = true;
-            GameManager.Instance.NotifyFail();
+            source.volume = to;
+            yield break;
         }
+
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            source.volume = Mathf.Lerp(from, to, elapsed / duration);
+            yield return null;
+        }
+        source.volume = to;
     }
 
     void OnDestroy()

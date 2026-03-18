@@ -254,6 +254,17 @@ MonoBehaviour:
   baseBottle: {fileID: 21300000, guid: cad63e4f26835af4597003a6f40be5a4, type: 3}
   botteShaken: {fileID: 21300000, guid: 783e71c6e4511ad4a88186042d436957, type: 3}
   botteShaken2: {fileID: 21300000, guid: bf7679fcd000b5a4caa08773d138ee86, type: 3}
+  ambianceSound: {fileID: 8300000, guid: 784cc37a1ff01eb42ad51a883d3d46fa, type: 3}
+  ambianceVolume: 1
+  ambianceFadeInDuration: 1
+  shakeDownSound: {fileID: 8300000, guid: a1f99f0f5ed9a56458e81d3ec15d2d81, type: 3}
+  shakeDownVolume: 1
+  shakeUpSound: {fileID: 8300000, guid: c891fe8c84bdf1f4992792aede167f68, type: 3}
+  shakeUpVolume: 1
+  popSound: {fileID: 8300000, guid: 00e70c44137f7ee429e79f63d45a178e, type: 3}
+  popVolume: 1
+  globalFadeInDuration: 0.5
+  globalFadeOutDuration: 1
 --- !u!1 &1387392579
 GameObject:
   m_ObjectHideFlags: 0

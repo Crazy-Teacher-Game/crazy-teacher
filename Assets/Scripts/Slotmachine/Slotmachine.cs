@@ -71,7 +71,7 @@ public class Slotmachine : MonoBehaviour
         if (useRuntimeBackground)
             CreateBackground();
         InitializeAudioSources();
-        FadeAmbianceIn();
+        FadeAllSoundsIn();
 
         // Wheels start spinning immediately
         if (wheel1 != null) wheel1.StartSpin();
@@ -151,9 +151,11 @@ public class Slotmachine : MonoBehaviour
     {
         endAudioSource = gameObject.AddComponent<AudioSource>();
         endAudioSource.playOnAwake = false;
+        endAudioSource.volume = 0f;
 
         fxAudioSource = gameObject.AddComponent<AudioSource>();
         fxAudioSource.playOnAwake = false;
+        fxAudioSource.volume = 0f;
 
         ambianceAudioSource = gameObject.AddComponent<AudioSource>();
         ambianceAudioSource.playOnAwake = false;
@@ -167,33 +169,28 @@ public class Slotmachine : MonoBehaviour
         wheelAudioSource.playOnAwake = false;
         wheelAudioSource.loop = true;
         wheelAudioSource.clip = slotMachineWheel;
-        wheelAudioSource.volume = slotMachineWheelVolume;
+        wheelAudioSource.volume = 0f;
     }
 
-    private void FadeAmbianceIn()
+    private void FadeAllSoundsIn()
     {
-        if (ambianceAudioSource == null || slotMachineAmbiance == null) return;
         if (ambianceFadeCoroutine != null)
             StopCoroutine(ambianceFadeCoroutine);
-        ambianceFadeCoroutine = StartCoroutine(FadeAudio(ambianceAudioSource, 0f, slotMachineAmbianceVolume, ambianceFadeInDuration));
+        ambianceFadeCoroutine = StartCoroutine(FadeAllAudioCoroutine(0f, 1f, ambianceFadeInDuration));
     }
 
-    private void FadeAmbianceOut()
+    private void FadeAllSoundsOut()
     {
-        if (ambianceAudioSource == null) return;
         if (ambianceFadeCoroutine != null)
             StopCoroutine(ambianceFadeCoroutine);
-        ambianceFadeCoroutine = StartCoroutine(FadeAudio(ambianceAudioSource, ambianceAudioSource.volume, 0f, ambianceFadeOutDuration));
+        ambianceFadeCoroutine = StartCoroutine(FadeAllAudioCoroutine(1f, 0f, ambianceFadeOutDuration));
     }
 
-    private IEnumerator FadeAudio(AudioSource source, float from, float to, float duration)
+    private IEnumerator FadeAllAudioCoroutine(float fromMultiplier, float toMultiplier, float duration)
     {
-        if (source == null)
-            yield break;
-
         if (duration <= 0f)
         {
-            source.volume = to;
+            ApplyMasterVolumeMultiplier(toMultiplier);
             yield break;
         }
 
@@ -201,11 +198,22 @@ public class Slotmachine : MonoBehaviour
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            source.volume = Mathf.Lerp(from, to, elapsed / duration);
+            ApplyMasterVolumeMultiplier(Mathf.Lerp(fromMultiplier, toMultiplier, elapsed / duration));
             yield return null;
         }
 
-        source.volume = to;
+        ApplyMasterVolumeMultiplier(toMultiplier);
+    }
+
+    private float currentMasterAudioMultiplier = 0f;
+
+    private void ApplyMasterVolumeMultiplier(float multiplier)
+    {
+        currentMasterAudioMultiplier = multiplier;
+        if (endAudioSource != null) endAudioSource.volume = multiplier;
+        if (fxAudioSource != null) fxAudioSource.volume = multiplier;
+        if (ambianceAudioSource != null) ambianceAudioSource.volume = slotMachineAmbianceVolume * multiplier;
+        if (wheelAudioSource != null) wheelAudioSource.volume = slotMachineWheelVolume * multiplier;
     }
 
     private bool AnyWheelTurning()
@@ -221,7 +229,7 @@ public class Slotmachine : MonoBehaviour
         if (wheelAudioSource == null || slotMachineWheel == null)
             return;
 
-        wheelAudioSource.volume = slotMachineWheelVolume;
+        wheelAudioSource.volume = slotMachineWheelVolume * currentMasterAudioMultiplier;
         bool shouldPlay = AnyWheelTurning();
         if (shouldPlay && !wheelLoopPlaying)
         {
@@ -315,7 +323,7 @@ public class Slotmachine : MonoBehaviour
         if (wheel2 != null) wheel2.Stop();
         if (wheel3 != null) wheel3.Stop();
 
-        FadeAmbianceOut();
+        FadeAllSoundsOut();
         PlayEndScreenSound(screenType);
 
         if (screenIndicator != null)

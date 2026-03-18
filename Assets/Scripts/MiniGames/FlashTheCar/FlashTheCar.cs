@@ -146,7 +146,7 @@ public class FlashTheCar : MonoBehaviour
         float difficulty = GameManager.Instance != null ? GameManager.Instance.DifficultyFactor : 0f;
         spawnChance = 0.75f + 0.25f * difficulty;
         carIsFast[carIndex] = Random.value < spawnChance;
-        carSpeeds[carIndex] = carIsFast[carIndex] ? fastSpeed + (0.2f + difficulty) : normalSpeed;
+        carSpeeds[carIndex] = carIsFast[carIndex] ? fastSpeed + (0.1f + difficulty) : normalSpeed;
         carWorldX[carIndex] = carIsFast[carIndex] ? fixedWorldXFast : fixedWorldX;
 
         bool isFast = carIsFast[carIndex];

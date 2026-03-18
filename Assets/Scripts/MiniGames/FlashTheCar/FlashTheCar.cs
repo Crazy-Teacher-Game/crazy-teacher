@@ -31,7 +31,7 @@ public class FlashTheCar : MonoBehaviour
     private float fixedWorldX = 206.19f;
     private float fixedWorldXFast = 211.4f;
     private float normalSpeed = 0.35f;
-    private float fastSpeed = 0.9f;
+    private float fastSpeed = 0.6f;
     private float startZ = 310f;
 
     // State variables
@@ -39,7 +39,7 @@ public class FlashTheCar : MonoBehaviour
     private float zoneMin = 220f;
     private float zoneMax = 260f;
     private float timerDuration = 30f;
-    private float timerMinDuration = 8f;
+    private float timerMinDuration = 15f;
     private int requiredFlashes = 3;
     [SerializeField] private float inputArmDelay = 0.75f;
     private float spawnChance; // Calculated based on difficulty for fast cars
@@ -55,7 +55,6 @@ public class FlashTheCar : MonoBehaviour
     [SerializeField] private FlashScreenIndicator screenIndicator;
 
     private int lastCarIndex = -1;
-    private bool isFirstCar = true;
     private bool inputWindowOpen;
     private bool hasPressedThisTurn;
     private bool currentCarHasPassedZone;
@@ -145,10 +144,9 @@ public class FlashTheCar : MonoBehaviour
 
         lastCarIndex = carIndex;
         float difficulty = GameManager.Instance != null ? GameManager.Instance.DifficultyFactor : 0f;
-        spawnChance = 0.5f + 0.9f * difficulty;
-        carIsFast[carIndex] = !isFirstCar && (Random.value < spawnChance);
-        isFirstCar = false;
-        carSpeeds[carIndex] = carIsFast[carIndex] ? fastSpeed * (0.4f + difficulty) : normalSpeed;
+        spawnChance = 0.75f + 0.25f * difficulty;
+        carIsFast[carIndex] = Random.value < spawnChance;
+        carSpeeds[carIndex] = carIsFast[carIndex] ? fastSpeed + (0.2f + difficulty) : normalSpeed;
         carWorldX[carIndex] = carIsFast[carIndex] ? fixedWorldXFast : fixedWorldX;
 
         bool isFast = carIsFast[carIndex];

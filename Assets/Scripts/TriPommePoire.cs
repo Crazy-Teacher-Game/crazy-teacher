@@ -8,8 +8,8 @@ public class TriPommePoire : MonoBehaviour
 {
     public GameObject fruitSpawner;
 
-    [SerializeField] public GameObject fruit1Prefab;
-    [SerializeField] public GameObject fruit2Prefab;
+    [SerializeField] public GameObject[] redPrefabs;
+    [SerializeField] public GameObject[] bluePrefabs;
 
     [SerializeField] public string currentFruitName;
 
@@ -37,7 +37,7 @@ public class TriPommePoire : MonoBehaviour
 
         float horizontalInput = Input.GetAxisRaw("P1_Horizontal");
 
-        fruitsATrouverText.text = "Fruits à trier: " + fruitsATrouver;
+        fruitsATrouverText.text = "Formes à trier: " + fruitsATrouver;
         // Si le joystick est revenu au centre, on autorise un nouvel input
         if (Mathf.Abs(horizontalInput) < 0.2f)
         {
@@ -73,7 +73,7 @@ public class TriPommePoire : MonoBehaviour
 
     IEnumerator WinAfterDelay()
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.2f);
         GameManager.Instance.NotifyWin();
     }
 
@@ -93,13 +93,11 @@ public class TriPommePoire : MonoBehaviour
 
         if (!gameEnded && fruitsATrouver > 0)
         {
-            GameObject prefabToSpawn = Random.Range(0, 2) == 0 ? fruit1Prefab : fruit2Prefab;
+            bool isRed = Random.Range(0, 2) == 0;
+            GameObject[] pool = isRed ? redPrefabs : bluePrefabs;
+            GameObject prefabToSpawn = pool[Random.Range(0, pool.Length)];
             lastSpawnedFruit = Instantiate(prefabToSpawn, fruitSpawner.transform);
-
-            if (prefabToSpawn == fruit1Prefab)
-                currentFruitName = "red";
-            else
-                currentFruitName = "blue";
+            currentFruitName = isRed ? "red" : "blue";
         }
 
 

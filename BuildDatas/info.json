@@ -1,0 +1,14 @@
+{
+  "name": "Crazy Teacher",
+  "description": "Enchaine les mini-jeux de plus en plus rapidement pour faire un max de points.",
+  "creator": "Marius NOGUERON, Valentin BEAUGET, Gabriel MAILLARD, Audric FULLHARDT",
+  "year": 2026,
+  "type": "mini-jeu",
+  "players": "1",
+  "catchphrase": "Pourrez vous réussir tous les mini-jeux ?",
+  "config": {
+    "scoreType": "score",
+    "scoreUnit": "points",
+    "scoreSort": "desc"
+  }
+}

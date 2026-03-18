@@ -18,8 +18,8 @@ public class ScenesLoader : MonoBehaviour
         yield return StartCoroutine(LoadTransitionSceneCoroutine("LoadingScene", controlType));
         yield return new WaitForSeconds(2f);
         yield return StartCoroutine(UnloadTransitionSceneCoroutine("LoadingScene"));
-        GameManager.Instance.ShowDescription(sceneName);
         yield return StartCoroutine(LoadMiniGameCoroutine(sceneName));
+        yield return StartCoroutine(GameManager.Instance.ShowDescriptionCoroutine(sceneName));
     }
 
     public Coroutine LoadGameOverScene()

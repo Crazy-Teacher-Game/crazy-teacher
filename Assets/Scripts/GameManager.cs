@@ -205,6 +205,15 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public IEnumerator ShowDescriptionCoroutine(string sceneName)
+    {
+        string description = GameDescriptionDatabase.GetDescription(sceneName);
+        if (!string.IsNullOrEmpty(description) && descriptionText != null)
+        {
+            yield return CoShowDescription(description);
+        }
+    }
+
     private IEnumerator CoShowDescription(string description)
     {
         isDescriptionShowing = true;
@@ -218,19 +227,27 @@ public class GameManager : MonoBehaviour
             animator.Play(0, -1, 0f);
         }
 
-        // Force le Canvas au premier plan pour ne pas être masqué par les scènes de mini-jeux
+        // Passer en Overlay pour garantir l'affichage par-dessus les sprites du mini-jeu
         Canvas canvas = descriptionText.GetComponentInParent<Canvas>();
-        int originalSortOrder = 0;
+        RenderMode originalMode = RenderMode.ScreenSpaceCamera;
+        Camera originalCam = null;
         if (canvas != null)
         {
-            originalSortOrder = canvas.sortingOrder;
-            canvas.sortingOrder = 100;
+            originalMode = canvas.renderMode;
+            originalCam = canvas.worldCamera;
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = 999;
         }
 
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(1.85f);
 
         if (canvas != null)
-            canvas.sortingOrder = originalSortOrder;
+        {
+            canvas.renderMode = originalMode;
+            if (originalMode == RenderMode.ScreenSpaceCamera)
+                canvas.worldCamera = originalCam;
+            canvas.sortingOrder = 100;
+        }
 
         descriptionText.gameObject.SetActive(false);
         isDescriptionShowing = false;

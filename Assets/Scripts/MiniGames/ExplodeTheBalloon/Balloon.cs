@@ -12,8 +12,8 @@ public class Balloon : MonoBehaviour
 
     public float inflateSpeed = 0.5f;
     public float maxScale = 140f;
-    public float durationSeconds = 15f;
-    public float minDurationSeconds = 8f;
+    public float durationSeconds = 10f;
+    public float minDurationSeconds = 5f;
     public int fragmentCount = 50;
     public float fragmentSpreadForce = 2f;
     private Vector3 baseBalloonPosition;

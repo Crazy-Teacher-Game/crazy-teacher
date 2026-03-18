@@ -11,7 +11,7 @@ public class Cup : MonoBehaviour
     public Vector3 rotationAxis = Vector3.up;
     public AudioSource audioSource;
     public AudioClip rightInHoleSound;
-    public int maxScore = 4;
+    public int maxScore = 6;
     void Start()
     {
         globalScore = 0;
@@ -23,7 +23,11 @@ public class Cup : MonoBehaviour
         if (rotationSpeedDegreesPerSecond == 0f || rotationCenter == null)
             return;
 
-        float deltaDegrees = rotationSpeedDegreesPerSecond * Time.deltaTime;
+        float difficultyMultiplier = 1f;
+        if (GameManager.Instance != null)
+            difficultyMultiplier = 1f + GameManager.Instance.DifficultyFactor * 0.3f;
+
+        float deltaDegrees = rotationSpeedDegreesPerSecond * difficultyMultiplier * Time.deltaTime;
         transform.RotateAround(
             rotationCenter.position,
             rotationAxis.normalized,
@@ -31,7 +35,7 @@ public class Cup : MonoBehaviour
         );
         if (GameManager.Instance == null) return;
 
-        if (globalScore >= 4 && !isWon)
+        if (globalScore >= maxScore && !isWon)
         {
             GameManager.Instance.NotifyWin();
             isWon = true;
@@ -47,7 +51,7 @@ public class Cup : MonoBehaviour
             UpdateScoreUI();
             float minPitch = 0.5f;
             float maxPitch = 1.0f;
-            float t = Mathf.InverseLerp(1, 4, globalScore);
+            float t = Mathf.InverseLerp(1, maxScore, globalScore);
             audioSource.pitch = Mathf.Lerp(minPitch, maxPitch, t);
             audioSource.PlayOneShot(rightInHoleSound);
         }

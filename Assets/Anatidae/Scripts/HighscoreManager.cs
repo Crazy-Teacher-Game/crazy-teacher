@@ -108,7 +108,7 @@ namespace Anatidae
         public static IEnumerator FetchHighscores()
         {
             Debug.Log("HighscoreManager: Fetching highscores...");
-            UnityWebRequest request = UnityWebRequest.Get("http://localhost:3000/api/?game=" + GameName);
+            UnityWebRequest request = UnityWebRequest.Get(GameManager.Config.API_URL);
             yield return request.SendWebRequest();
 
             if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)

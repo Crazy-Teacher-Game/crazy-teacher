@@ -484,7 +484,7 @@ MonoBehaviour:
   rotationAxis: {x: 0, y: 1, z: 0}
   audioSource: {fileID: 890436617}
   rightInHoleSound: {fileID: 8300000, guid: 996ff7bd3a0de422997bf5d02935de6d, type: 3}
-  maxScore: 4
+  maxScore: 6
 --- !u!23 &162265975
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -693,7 +693,7 @@ MonoBehaviour:
   rotationAxis: {x: 0, y: 1, z: 0}
   audioSource: {fileID: 890436617}
   rightInHoleSound: {fileID: 8300000, guid: 996ff7bd3a0de422997bf5d02935de6d, type: 3}
-  maxScore: 4
+  maxScore: 6
 --- !u!23 &278209608
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1125,7 +1125,7 @@ MonoBehaviour:
   rotationAxis: {x: 0, y: 1, z: 0}
   audioSource: {fileID: 890436617}
   rightInHoleSound: {fileID: 8300000, guid: 996ff7bd3a0de422997bf5d02935de6d, type: 3}
-  maxScore: 4
+  maxScore: 6
 --- !u!23 &675595425
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1720,7 +1720,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 890436611}
-  m_Mesh: {fileID: -9065064668161727565, guid: 214515eded4ab4d4f9cc5ec01d43635e, type: 3}
+  m_Mesh: {fileID: 0}
 --- !u!4 &890436616
 Transform:
   m_ObjectHideFlags: 0
@@ -2879,7 +2879,7 @@ MonoBehaviour:
   rotationAxis: {x: 0, y: 1, z: 0}
   audioSource: {fileID: 890436617}
   rightInHoleSound: {fileID: 8300000, guid: 996ff7bd3a0de422997bf5d02935de6d, type: 3}
-  maxScore: 4
+  maxScore: 6
 --- !u!23 &1668523365
 MeshRenderer:
   m_ObjectHideFlags: 0

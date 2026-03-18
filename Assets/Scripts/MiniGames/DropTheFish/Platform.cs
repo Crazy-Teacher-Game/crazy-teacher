@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Platform : MonoBehaviour
 {
-    public float durationSeconds = 15f;
+    public float durationSeconds = 12f;
     public float minDurationSeconds = 8f;
     void Start()
     {

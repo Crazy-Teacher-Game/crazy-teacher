@@ -61,24 +61,38 @@ public class GameManager : MonoBehaviour
     private AudioListener _activeAudioListener;
     private AudioSource audioSource;
     public AudioClip winSound;
-    [SerializeField] [Range(0f, 3f)] private float winSoundVolume = 1f;
+    [SerializeField][Range(0f, 3f)] private float winSoundVolume = 1f;
     public AudioClip failSound;
-    [SerializeField] [Range(0f, 3f)] private float failSoundVolume = 1f;
+    [SerializeField][Range(0f, 3f)] private float failSoundVolume = 1f;
 
     [Header("Audio - Menu Theme")]
     [SerializeField] private AudioClip menuIntroClip;
-    [SerializeField] [Range(0f, 3f)] private float menuIntroVolume = 1f;
+    [SerializeField][Range(0f, 3f)] private float menuIntroVolume = 1f;
     [SerializeField] private AudioClip menuLoopClip;
-    [SerializeField] [Range(0f, 3f)] private float menuLoopVolume = 1f;
+    [SerializeField][Range(0f, 3f)] private float menuLoopVolume = 1f;
+
+    [Header("Audio - Game Theme")]
+    [SerializeField] private AudioClip gameThemeClip;
+    [SerializeField][Range(0f, 3f)] private float gameThemeVolume = 1f;
+    [SerializeField] private float gameThemeFadeDuration = 0.5f;
+
+    [Header("Audio - Game Over")]
+    [SerializeField] private AudioClip gameOverSound1;
+    [SerializeField][Range(0f, 3f)] private float gameOverSound1Volume = 1f;
+    [SerializeField] private AudioClip gameOverSound2;
+    [SerializeField][Range(0f, 3f)] private float gameOverSound2Volume = 1f;
+    [SerializeField] private float gameOverSound2Delay = 0f;
 
     [Header("Audio - SFX")]
     [SerializeField] private AudioClip goSound;
-    [SerializeField] [Range(0f, 3f)] private float goSoundVolume = 1f;
+    [SerializeField][Range(0f, 3f)] private float goSoundVolume = 1f;
     [SerializeField] private AudioClip descriptionSound;
-    [SerializeField] [Range(0f, 3f)] private float descriptionSoundVolume = 1f;
+    [SerializeField][Range(0f, 3f)] private float descriptionSoundVolume = 1f;
 
     private AudioSource musicSource;
+    private AudioSource gameThemeSource;
     private Coroutine _menuThemeCo;
+    private Coroutine _gameThemeFadeCo;
 
     // Back to menu manager
     private float afkTimer = 0f;
@@ -113,17 +127,17 @@ public class GameManager : MonoBehaviour
 
     private static readonly string[] MinigameSceneNames =
     {
-        // "DropTheFish",
-        // "PopTheBottle",
-        // "SlotMachine", 
-        // "MentalMath",
-        // "Dice",
-        // "FlashTheCar",
+        "DropTheFish",
+        "PopTheBottle",
+        "SlotMachine",
+        "MentalMath",
+        "Dice",
+        "FlashTheCar",
         "Loop",
-        // "ExplodeTheBalloon",
-        // "TimerGame",
-        // "TriPommePoire",
-     
+        "ExplodeTheBalloon",
+        "TimerGame",
+        "TriPommePoire",
+
     };
     private List<string> _minigamePlaylist;
     private int _minigamePlaylistIndex;
@@ -177,6 +191,10 @@ public class GameManager : MonoBehaviour
         musicSource = gameObject.AddComponent<AudioSource>();
         musicSource.playOnAwake = false;
         musicSource.loop = false;
+
+        gameThemeSource = gameObject.AddComponent<AudioSource>();
+        gameThemeSource.playOnAwake = false;
+        gameThemeSource.loop = true;
     }
 
     public void RegisterGameOverManager(GameOverManager manager)
@@ -268,7 +286,7 @@ public class GameManager : MonoBehaviour
         }
 
         yield return new WaitForSeconds(1.85f);
-         //retrait du repassage en world space, comme ça on a le timer au dessus de tous les jeux en tout
+        //retrait du repassage en world space, comme ça on a le timer au dessus de tous les jeux en tout
 
         descriptionText.gameObject.SetActive(false);
         isDescriptionShowing = false;
@@ -335,6 +353,7 @@ public class GameManager : MonoBehaviour
     private IEnumerator CoNotifyWin()
     {
         StopTimer();
+        FadeOutGameTheme();
         OnMinigameWon?.Invoke();
         int gained = Mathf.RoundToInt((1f + difficultyFactor) * 10f);
         Score += gained;
@@ -359,6 +378,7 @@ public class GameManager : MonoBehaviour
     private IEnumerator CoNotifyFail()
     {
         StopTimer();
+        FadeOutGameTheme();
         OnMinigameFailed?.Invoke();
         if (failSound != null)
             audioSource.PlayOneShot(failSound, failSoundVolume);
@@ -388,6 +408,7 @@ public class GameManager : MonoBehaviour
         minigameEnded = false;
         string nextGame = GetNextGameInPlaylist();
         currentGame = nextGame;
+        PlayGameTheme();
         scenesLoader.LoadMiniGame(nextGame);
     }
 
@@ -439,9 +460,21 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator CoGameOver()
     {
+        if (gameOverSound1 != null)
+            audioSource.PlayOneShot(gameOverSound1, gameOverSound1Volume);
+        if (gameOverSound2 != null)
+            StartCoroutine(CoPlayGameOverSound2());
+
         yield return scenesLoader.LoadGameOverScene();
         yield return new WaitForSeconds(3f);
         LoadHighscoreInterface();
+    }
+
+    private IEnumerator CoPlayGameOverSound2()
+    {
+        if (gameOverSound2Delay > 0f)
+            yield return new WaitForSeconds(gameOverSound2Delay);
+        audioSource.PlayOneShot(gameOverSound2, gameOverSound2Volume);
     }
 
     // ─── Audio ───
@@ -482,6 +515,49 @@ public class GameManager : MonoBehaviour
     {
         if (clip != null)
             audioSource.PlayOneShot(clip, volume);
+    }
+
+    private void PlayGameTheme()
+    {
+        if (gameThemeClip == null) return;
+        if (_gameThemeFadeCo != null) StopCoroutine(_gameThemeFadeCo);
+        _gameThemeFadeCo = null;
+
+        // pitch = 1 + difficultyFactor → de x1 (diff=0) à x2 (diff=1)
+        // AudioSource.pitch contrôle vitesse ET pitch simultanément
+        float pitch = 1f + difficultyFactor;
+
+        gameThemeSource.clip = gameThemeClip;
+        gameThemeSource.volume = gameThemeVolume;
+        gameThemeSource.pitch = pitch;
+        gameThemeSource.loop = true;
+        gameThemeSource.Play();
+    }
+
+    private void FadeOutGameTheme()
+    {
+        if (_gameThemeFadeCo != null) StopCoroutine(_gameThemeFadeCo);
+        _gameThemeFadeCo = StartCoroutine(CoFadeOutGameTheme());
+    }
+
+    private IEnumerator CoFadeOutGameTheme()
+    {
+        if (gameThemeSource == null || !gameThemeSource.isPlaying)
+            yield break;
+
+        float startVolume = gameThemeSource.volume;
+        float elapsed = 0f;
+
+        while (elapsed < gameThemeFadeDuration)
+        {
+            elapsed += Time.deltaTime;
+            gameThemeSource.volume = Mathf.Lerp(startVolume, 0f, elapsed / gameThemeFadeDuration);
+            yield return null;
+        }
+
+        gameThemeSource.Stop();
+        gameThemeSource.volume = gameThemeVolume;
+        _gameThemeFadeCo = null;
     }
 
     private void RestartGame()

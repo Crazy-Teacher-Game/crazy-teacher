@@ -285,6 +285,7 @@ RectTransform:
   m_Children:
   - {fileID: 1646764337}
   - {fileID: 2022180}
+  - {fileID: 981741253}
   m_Father: {fileID: 1120783328}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -366,7 +367,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 100
   m_TargetDisplay: 0
@@ -815,7 +816,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &743853784
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -942,6 +943,7 @@ GameObject:
   - component: {fileID: 799674790}
   - component: {fileID: 799674791}
   - component: {fileID: 799674792}
+  - component: {fileID: 799674793}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -978,18 +980,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startingLives: 2
   difficulty: 1
-  lives: 0
+  _lives: 0
   difficultyDebugText: {fileID: 506433395}
   difficultyFactor: 0
   gamesBeforeDifficultyIncrease: 3
-  timerRunning: 0
-  remainingTime: 0
-  duration: 0
-  roundsPlayed: 0
+  _timerRunning: 0
+  _remainingTime: 0
+  _duration: 0
+  _roundsPlayed: 0
   currentRound: 0
   gameOverManager: {fileID: 0}
   timerUI: {fileID: 1846265154}
   livesUI: {fileID: 61360398}
+  winSprite: {fileID: 0}
+  failSprite: {fileID: 0}
+  resultDisplayTime: 1.5
+  winSound: {fileID: 0}
+  failSound: {fileID: 0}
   descriptionText: {fileID: 581587737}
 --- !u!114 &799674791
 MonoBehaviour:
@@ -1205,9 +1212,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1084507553}
-  - {fileID: 1920378937}
+  m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

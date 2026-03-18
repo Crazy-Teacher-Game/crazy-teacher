@@ -34,7 +34,6 @@ public class Balloon : MonoBehaviour
         originalBalloonLocalPos = balloonMesh.localPosition;
         GameManager.Instance.StartTimer(durationSeconds, minDurationSeconds);
         GameManager.Instance.OnTimerEnded += HandleTimeout;
-        GameManager.Instance.OnMinigameWon += AfterWin;
         balloonRenderer.material.color = startColor;
     }
 
@@ -42,9 +41,13 @@ public class Balloon : MonoBehaviour
     {
         GameManager.Instance.NotifyFail();
     }
-    void AfterWin()
+
+    void OnDestroy()
     {
-        GameManager.Instance.AddRound();
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnTimerEnded -= HandleTimeout;
+        }
     }
 
     void Update()

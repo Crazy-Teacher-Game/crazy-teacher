@@ -14,8 +14,8 @@ public class GameManager : MonoBehaviour
     [Header("Config Initiale")]
     [SerializeField] public int startingLives = 2;
     [SerializeField] public int difficulty = 1;
-    [SerializeField] private int lives;
-    public int Lives { get; private set; }
+    [SerializeField] private int _lives;
+    public int Lives { get => _lives; private set => _lives = value; }
 
     [Header("Debug")]
 
@@ -27,19 +27,19 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int gamesBeforeDifficultyIncrease = 3;
 
     [Header("Timer Partagé")]
-    [SerializeField] private bool timerRunning;
-    public bool TimerRunning { get; private set; }
-    [SerializeField] private float remainingTime;
-    public float RemainingTime { get; private set; }
-    [SerializeField] private float duration;
-    public float Duration { get; private set; }
+    [SerializeField] private bool _timerRunning;
+    public bool TimerRunning { get => _timerRunning; private set => _timerRunning = value; }
+    [SerializeField] private float _remainingTime;
+    public float RemainingTime { get => _remainingTime; private set => _remainingTime = value; }
+    [SerializeField] private float _duration;
+    public float Duration { get => _duration; private set => _duration = value; }
     private Coroutine _timerCo;
     public event Action OnTimerEnded;
     public event Action<float> OnTimerTick;
 
     [Header("Leaderboard")]
-    [SerializeField] private int roundsPlayed;
-    public int RoundsPlayed { get; private set; }
+    [SerializeField] private int _roundsPlayed;
+    public int RoundsPlayed { get => _roundsPlayed; private set => _roundsPlayed = value; }
     public int currentRound = 0;
     public int Score { get; private set; }
     [SerializeField] private GameOverManager gameOverManager;
@@ -96,16 +96,16 @@ public class GameManager : MonoBehaviour
 
     private static readonly string[] MinigameSceneNames =
     {
-        // "DropTheFish",
-        // "SlotMachine",
+        "DropTheFish",
+        "SlotMachine",
         "PopTheBottle",
-        // "MentalMath",
-        // "Dice",
-        // "FlashTheCar",
-        // "TriPommePoire",
-        // "Loop",
-        // "ExplodeTheBalloon",
-        // "TimerGame",
+        "MentalMath",
+        "Dice",
+        "FlashTheCar",
+        "TriPommePoire",
+        "Loop",
+        "ExplodeTheBalloon",
+        "TimerGame",
     };
     private List<string> _minigamePlaylist;
     private int _minigamePlaylistIndex;
@@ -235,7 +235,8 @@ public class GameManager : MonoBehaviour
         _timerCo = StartCoroutine(CoTimer());
 
         //debug
-        difficultyDebugText.text = $"DifficultyFactor: {difficultyFactor:0.0}";
+        if (difficultyDebugText != null)
+            difficultyDebugText.text = $"DifficultyFactor: {difficultyFactor:0.0}";
     }
 
     public void StopTimer()
@@ -281,7 +282,8 @@ public class GameManager : MonoBehaviour
         if (winSound != null)
             audioSource.PlayOneShot(winSound);
         yield return StartCoroutine(ShowWinResult());
-        scenesLoader.UnloadMiniGame(currentGame);
+        yield return scenesLoader.UnloadMiniGame(currentGame);
+        isTransitioning = false;
         AddRound();
         LoadNextMiniGame();
     }
@@ -305,12 +307,14 @@ public class GameManager : MonoBehaviour
         LoseLife();
         if (Lives > 0)
         {
-            scenesLoader.UnloadMiniGame(currentGame);
+            yield return scenesLoader.UnloadMiniGame(currentGame);
+            isTransitioning = false;
             LoadNextMiniGame();
         }
         else
         {
-            scenesLoader.UnloadMiniGame(currentGame);
+            yield return scenesLoader.UnloadMiniGame(currentGame);
+            isTransitioning = false;
             GameOver();
         }
     }
@@ -325,7 +329,6 @@ public class GameManager : MonoBehaviour
         minigameEnded = false;
         string nextGame = GetNextGameInPlaylist();
         currentGame = nextGame;
-        isTransitioning = false;
         scenesLoader.LoadMiniGame(nextGame);
     }
 
@@ -372,13 +375,14 @@ public class GameManager : MonoBehaviour
     private void GameOver()
     {
         isGameOver = true;
-        scenesLoader.LoadGameOverScene();
-        StartCoroutine(WaitFor3Seconds());
-        IEnumerator WaitFor3Seconds()
-        {
-            yield return new WaitForSeconds(3f);
-            LoadHighscoreInterface();
-        }
+        StartCoroutine(CoGameOver());
+    }
+
+    private IEnumerator CoGameOver()
+    {
+        yield return scenesLoader.LoadGameOverScene();
+        yield return new WaitForSeconds(3f);
+        LoadHighscoreInterface();
     }
 
     private void RestartGame()
@@ -392,6 +396,7 @@ public class GameManager : MonoBehaviour
         difficultyFactor = 0f;
         RoundsPlayed = 0;
         BuildAndShufflePlaylist();
+        Score = 0;
         replayTextShown = false;
         isTransitioning = false;
         highscoreInputWasShown = false;
@@ -404,10 +409,6 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (!HasExactlyOneActiveAudioListener())
-        {
-            EnsureSingleAudioListener();
-        }
         // Back to menu manager
         if (Input.GetButton("P1_Vertical") ||
             Input.GetButton("P1_Horizontal") ||

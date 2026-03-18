@@ -14,6 +14,7 @@ public class Cup : MonoBehaviour
     public int maxScore = 4;
     void Start()
     {
+        globalScore = 0;
         UpdateScoreUI();
     }
     void Update()

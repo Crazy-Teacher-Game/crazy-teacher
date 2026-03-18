@@ -18,13 +18,13 @@ public class ScenesLoader : MonoBehaviour
         yield return StartCoroutine(LoadTransitionSceneCoroutine("LoadingScene", controlType));
         yield return new WaitForSeconds(2f);
         yield return StartCoroutine(UnloadTransitionSceneCoroutine("LoadingScene"));
-        yield return StartCoroutine(LoadMiniGameCoroutine(sceneName));
         GameManager.Instance.ShowDescription(sceneName);
+        yield return StartCoroutine(LoadMiniGameCoroutine(sceneName));
     }
 
-    public void LoadGameOverScene()
+    public Coroutine LoadGameOverScene()
     {
-        StartCoroutine(LoadGameOverSequence());
+        return StartCoroutine(LoadGameOverSequence());
     }
 
     private IEnumerator LoadGameOverSequence()
@@ -180,9 +180,9 @@ public class ScenesLoader : MonoBehaviour
         }
     }
 
-    public void UnloadMiniGame(string sceneName)
+    public Coroutine UnloadMiniGame(string sceneName)
     {
-        StartCoroutine(UnloadMiniGameCoroutine(sceneName));
+        return StartCoroutine(UnloadMiniGameCoroutine(sceneName));
     }
 
     private IEnumerator UnloadMiniGameCoroutine(string sceneName)

@@ -40,7 +40,6 @@ public class Platform : MonoBehaviour
         {
             Destroy(ball);
         }
-        GameManager.Instance.NotifyWin();
     }
 
     void OnDisable()

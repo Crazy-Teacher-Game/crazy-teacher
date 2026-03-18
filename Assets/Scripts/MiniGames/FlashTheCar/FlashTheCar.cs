@@ -417,13 +417,13 @@ public class FlashTheCar : MonoBehaviour
             }
         };
 
-        if (screenType.HasValue)
-            PlayScreenSound(screenType.Value);
+        // if (screenType.HasValue)
+        //     PlayScreenSound(screenType.Value);
 
-        if (screenIndicator != null && screenType.HasValue)
-            screenIndicator.ShowScreen(screenType.Value, notify);
-        else
-            notify();
+        // if (screenIndicator != null && screenType.HasValue)
+        //     screenIndicator.ShowScreen(screenType.Value, notify);
+        // else
+        notify();
     }
 
     private void PlayScreenSound(FlashScreenIndicator.ScreenType screenType)

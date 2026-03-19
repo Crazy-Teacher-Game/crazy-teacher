@@ -127,16 +127,16 @@ public class GameManager : MonoBehaviour
 
     private static readonly string[] MinigameSceneNames =
     {
-        "DropTheFish",
-        "PopTheBottle",
-        "SlotMachine",
-        "MentalMath",
-        "Dice",
-        "FlashTheCar",
+        // "DropTheFish",
+        // "PopTheBottle",
+        // "SlotMachine",
+        // "MentalMath",
+        // "Dice",
+        // "FlashTheCar",
         "Loop",
-        "ExplodeTheBalloon",
-        "TimerGame",
-        "TriPommePoire",
+        // "ExplodeTheBalloon",
+        // "TimerGame",
+        // "TriPommePoire",
 
     };
     private List<string> _minigamePlaylist;

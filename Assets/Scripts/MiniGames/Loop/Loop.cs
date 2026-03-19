@@ -23,11 +23,11 @@ public class Loop : MonoBehaviour
     [SerializeField] private float blurFalloffRange = 0.6f;
 
     [Header("Validation")]
-    [SerializeField] private float requiredTimeInZone = 0.4f;
+    [SerializeField] private float requiredTimeInZone = 0.2f;
 
     [Header("Timer")]
-    [SerializeField] private float timerDuration = 12f;
-    [SerializeField] private float minTimerDuration = 8f;
+    [SerializeField] private float timerDuration = 10f;
+    [SerializeField] private float minTimerDuration = 4f;
 
     [Header("Debug")]
     [SerializeField] private bool debugMode = false;
@@ -159,7 +159,11 @@ public class Loop : MonoBehaviour
     {
         if (gameEnded) return;
         gameEnded = true;
-        GameManager.Instance?.NotifyFail();
+
+        if (hasInteracted && IsInAcceptableZone(currentScale))
+            GameManager.Instance?.NotifyWin();
+        else
+            GameManager.Instance?.NotifyFail();
     }
 
     private bool ValidateReferences()

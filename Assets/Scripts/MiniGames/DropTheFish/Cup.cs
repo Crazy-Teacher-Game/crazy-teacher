@@ -47,7 +47,6 @@ public class Cup : MonoBehaviour
         if (other.gameObject.CompareTag("ball"))
         {
             globalScore++;
-            Destroy(other.gameObject);
             UpdateScoreUI();
             float minPitch = 0.5f;
             float maxPitch = 1.0f;

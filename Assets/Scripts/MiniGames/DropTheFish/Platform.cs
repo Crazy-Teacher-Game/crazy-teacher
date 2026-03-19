@@ -23,14 +23,6 @@ public class Platform : MonoBehaviour
         }
     }
 
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.CompareTag("ball"))
-        {
-            Destroy(other.gameObject);
-        }
-    }
-
     void HandleTimeout()
     {
         GameManager.Instance.NotifyFail();
@@ -42,6 +34,12 @@ public class Platform : MonoBehaviour
     }
     void AfterWin()
     {
+        StartCoroutine(AfterWinCoroutine());
+    }
+
+    IEnumerator AfterWinCoroutine()
+    {
+        yield return new WaitForSeconds(1f);
         GameObject[] balls = GameObject.FindGameObjectsWithTag("ball");
         foreach (GameObject ball in balls)
         {

@@ -502,15 +502,17 @@ MonoBehaviour:
   blurMaterial: {fileID: 2100000, guid: f4a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0, type: 2}
   minScale: 0.5
   maxScale: 2
-  zoomSpeed: 1.5
-  minTargetScale: 0.9
-  maxTargetScale: 1.3
-  acceptableRange: 0.08
+  zoomSpeed: 0.4
+  minTargetScale: 0.7
+  maxTargetScale: 1.8
+  acceptableRange: 0.15
+  minimumStartDistance: 0.4
+  blurFalloffRange: 0.6
+  requiredTimeInZone: 0.2
+  timerDuration: 10
+  minTimerDuration: 4
   debugMode: 0
   debugText: {fileID: 0}
-  requiredTimeInZone: 1.5
-  timerDuration: 12
-  minTimerDuration: 8
 --- !u!4 &999888779
 Transform:
   m_ObjectHideFlags: 0
